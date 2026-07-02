@@ -1,0 +1,13 @@
+# Copier en terraform.tfvars et adapter. Le jeton Cloudflare se fournit plutôt
+# par variable d'environnement : export TF_VAR_cloudflare_api_token=...
+github_owner          = "VOTRE-ORG-OU-UTILISATEUR"
+github_repo           = "site-ffc"
+cloudflare_account_id = "VOTRE_ACCOUNT_ID_CLOUDFLARE"
+
+# Domaines (valeurs par défaut déjà correctes) :
+# domains = {
+#   en = "furnacefilterscanada.com"
+#   fr = "filtrationmontreal.com"
+# }
+
+dmarc_rua = "dmarc-reports@filtrationmontreal.com"

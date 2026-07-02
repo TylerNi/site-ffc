@@ -1,0 +1,75 @@
+# Dépendances de développement local : PostgreSQL + Redis.
+# Reproduit en local les services managés d'AWS (RDS PostgreSQL, ElastiCache
+# Redis) pour développer sans dépendre du cloud.
+#
+#   docker compose up -d        # démarre Postgres + Redis
+#   docker compose down         # arrête (garde les volumes)
+#   docker compose down -v      # arrête et supprime les données
+#
+# Chaînes de connexion locales (à mettre dans apps/api/.env à partir de la tâche 04) :
+#   DATABASE_URL=postgresql://ffc:ffc@localhost:5432/ffc_dev?schema=public
+#   REDIS_URL=redis://:ffc@localhost:6379
+#
+# Profil optionnel `app` pour lancer aussi l'API conteneurisée :
+#   docker compose --profile app up --build
+
+services:
+  postgres:
+    image: postgres:16-bookworm
+    container_name: ffc-postgres
+    environment:
+      POSTGRES_USER: ffc
+      POSTGRES_PASSWORD: ffc
+      POSTGRES_DB: ffc_dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ffc -d ffc_dev']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-bookworm
+    container_name: ffc-redis
+    command: ['redis-server', '--requirepass', 'ffc', '--appendonly', 'yes']
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', 'ffc', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Optionnel : API conteneurisée (mêmes Dockerfile/image que la production).
+  # Activé seulement avec `--profile app`.
+  api:
+    profiles: ['app']
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: ffc-api
+    environment:
+      NODE_ENV: development
+      PORT: '4000'
+      API_CORS_ORIGINS: http://localhost:3000,http://localhost:3001
+      DATABASE_URL: postgresql://ffc:ffc@postgres:5432/ffc_dev?schema=public
+      REDIS_URL: redis://:ffc@redis:6379
+    ports:
+      - '4000:4000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:

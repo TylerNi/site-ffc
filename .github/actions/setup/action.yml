@@ -1,0 +1,15 @@
+name: Setup pnpm + Node
+description: Installe pnpm (via corepack/packageManager), Node 22 et les dépendances avec cache.
+runs:
+  using: composite
+  steps:
+    - name: Installer pnpm
+      uses: pnpm/action-setup@v4
+    - name: Installer Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: pnpm
+    - name: Installer les dépendances
+      shell: bash
+      run: pnpm install --frozen-lockfile

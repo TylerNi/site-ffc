@@ -1,0 +1,7 @@
+# Copier en terraform.tfvars et adapter.
+# Le jeton Cloudflare se fournit par variable d'environnement :
+#   export TF_VAR_cloudflare_api_token=...
+tf_state_bucket = "REMPLACER-ffc-tfstate"
+alert_email     = "alertes@filtrationmontreal.com"
+api_domain      = "api.filtrationmontreal.com"
+cors_origins    = "https://filtrationmontreal.com,https://furnacefilterscanada.com"

@@ -1,0 +1,72 @@
+name: Déploiement (environnement)
+
+# Workflow réutilisable : déploie une image donnée dans un environnement
+# (staging ou production). L'ordre est strict :
+#   1. Migrations de BD — tâche ECS ponctuelle et contrôlée, AVANT basculement.
+#   2. Déploiement des services `api` puis `workers` (même image).
+# La protection de l'environnement GitHub (`environment:`) applique le gate
+# d'approbation manuelle pour `production`. Toutes les valeurs spécifiques à
+# l'environnement viennent des variables d'environnement GitHub (`vars.*`).
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: staging | production
+        required: true
+        type: string
+      image_uri:
+        description: URI complète de l'image ECR à déployer
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    name: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ca-central-1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurer les credentials AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Migrations (étape contrôlée AVANT basculement)
+        run: bash ./.github/scripts/run-migrations.sh
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          CLUSTER: ${{ vars.ECS_CLUSTER }}
+          TASK_DEF_FAMILY: ${{ vars.ECS_MIGRATE_TASKDEF }}
+          SUBNETS: ${{ vars.ECS_SUBNETS }}
+          SECURITY_GROUPS: ${{ vars.ECS_SECURITY_GROUP }}
+          IMAGE_URI: ${{ inputs.image_uri }}
+
+      - name: Déploiement du service api
+        run: bash ./.github/scripts/deploy-service.sh
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          CLUSTER: ${{ vars.ECS_CLUSTER }}
+          SERVICE: ${{ vars.ECS_API_SERVICE }}
+          TASK_DEF_FAMILY: ${{ vars.ECS_API_TASKDEF }}
+          IMAGE_URI: ${{ inputs.image_uri }}
+
+      - name: Déploiement du service workers
+        run: bash ./.github/scripts/deploy-service.sh
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          CLUSTER: ${{ vars.ECS_CLUSTER }}
+          SERVICE: ${{ vars.ECS_WORKERS_SERVICE }}
+          TASK_DEF_FAMILY: ${{ vars.ECS_WORKERS_TASKDEF }}
+          IMAGE_URI: ${{ inputs.image_uri }}
+
+      - name: Récapitulatif
+        run: |
+          echo "### Déploiement ${{ inputs.environment }} ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "Image : \`${{ inputs.image_uri }}\`" >> "$GITHUB_STEP_SUMMARY"

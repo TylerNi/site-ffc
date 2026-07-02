@@ -1,0 +1,27 @@
+# Contexte de build Docker — on ne copie que ce qui sert à installer et bâtir.
+# node_modules et sorties de build sont régénérés dans l'image.
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+**/.expo
+**/coverage
+**/*.tsbuildinfo
+
+# Git et CI
+.git
+.github
+.husky
+
+# Secrets et logs — jamais dans une image
+**/.env
+**/.env.*
+!**/.env.example
+*.log
+
+# Documents et infra non nécessaires au build de l'API
+infra
+docs
+taches-a-faire
+plan-projet-ffc.md
+.DS_Store

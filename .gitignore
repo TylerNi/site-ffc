@@ -25,6 +25,20 @@ node_modules/
 # Tests
 coverage/
 
+# Terraform — état, caches, verrous et artefacts locaux (jamais dans le dépôt)
+**/.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+# Vraies valeurs (les *.example sont versionnés)
+**/terraform.tfvars
+**/*.auto.tfvars
+**/backend.hcl
+.terraform.lock.hcl
+# Artefact de build de la sonde Synthetics
+infra/terraform/modules/environment/.build/
+
 # Divers
 .DS_Store
 *.log

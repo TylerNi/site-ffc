@@ -102,6 +102,21 @@ est déterminée par le domaine; en développement, utiliser le préfixe `/fr`.
 - **CI locale** : `pnpm lint && pnpm typecheck && pnpm build && pnpm test` doit passer avant de pousser
 - L'API **refuse de démarrer** si une variable d'environnement est manquante ou invalide (schéma zod dans `apps/api/src/config/env.ts`)
 
+## Infrastructure et CI/CD
+
+Infrastructure as code (Terraform) en `ca-central-1`, environnements `staging` et
+`production` isolés, conteneurisation et pipeline GitHub Actions. Détails,
+justifications et procédures dans **[`infra/README.md`](infra/README.md)**.
+
+- **IaC** : `infra/terraform/` (socle `global` + module `environment` + roots par env).
+- **Conteneur** : [`apps/api/Dockerfile`](apps/api/Dockerfile) (multi-étapes, non root).
+- **Dev local** : `docker compose up -d` (PostgreSQL + Redis) — voir [`docker-compose.yml`](docker-compose.yml).
+- **CI** (PR) : lint, typecheck, tests, build, audit, build image — [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+- **CD** (main) : build → staging auto → **migrations contrôlées** → production sur
+  approbation, via OIDC (aucune clé statique) — [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+- **Runbooks** : [coûts](docs/infra/couts.md), [restauration BD](docs/infra/restauration-bd.md), [rotation de secret](docs/infra/rotation-secret.md).
+
 ## État
 
-En construction — fondations du monorepo en place (tâche 02).
+En construction — fondations du monorepo (tâche 02) et infrastructure/CI-CD
+(tâche 03) en place.

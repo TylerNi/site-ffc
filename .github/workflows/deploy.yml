@@ -1,0 +1,70 @@
+name: Deploy
+
+# Sur push main : build de l'image, déploiement staging automatique, puis
+# production SUR APPROBATION MANUELLE (protection de l'environnement GitHub
+# `production` : reviewers requis). La MÊME image (taguée par SHA) est promue
+# de staging vers production. Aucune clé AWS statique : OIDC GitHub → AWS.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # OIDC
+
+env:
+  AWS_REGION: ca-central-1
+  ECR_REPOSITORY: ffc-api
+
+jobs:
+  build-push:
+    name: Build & push image
+    runs-on: ubuntu-latest
+    outputs:
+      image_uri: ${{ steps.image.outputs.uri }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurer les credentials AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_BUILD_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Calculer l'URI de l'image (tag = SHA court)
+        id: image
+        run: echo "uri=${{ steps.ecr.outputs.registry }}/${ECR_REPOSITORY}:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.image.outputs.uri }}
+            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Déploiement staging (auto)
+    needs: build-push
+    uses: ./.github/workflows/_deploy-env.yml
+    with:
+      environment: staging
+      image_uri: ${{ needs.build-push.outputs.image_uri }}
+
+  deploy-production:
+    name: Déploiement production (approbation)
+    needs: [build-push, deploy-staging]
+    uses: ./.github/workflows/_deploy-env.yml
+    with:
+      environment: production
+      image_uri: ${{ needs.build-push.outputs.image_uri }}
