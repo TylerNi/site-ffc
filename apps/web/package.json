@@ -1,0 +1,29 @@
+{
+  "name": "@ffc/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@ffc/api-client": "workspace:*",
+    "@ffc/core": "workspace:*",
+    "@ffc/i18n": "workspace:*",
+    "next": "^15.5.4",
+    "next-intl": "^4.3.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@ffc/eslint-config": "workspace:*",
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "eslint": "^9.36.0",
+    "typescript": "^5.9.3"
+  }
+}

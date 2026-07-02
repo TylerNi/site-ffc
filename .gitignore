@@ -1,2 +1,30 @@
+# Documents de planification privés
 taches-a-faire/
 plan-projet-ffc.md
+
+# Dépendances
+node_modules/
+
+# Sorties de build
+**/dist/
+**/.next/
+**/out/
+*.tsbuildinfo
+
+# Turborepo
+.turbo/
+
+# Expo
+.expo/
+
+# Environnement — jamais de secrets dans le dépôt
+.env
+.env.*
+!.env.example
+
+# Tests
+coverage/
+
+# Divers
+.DS_Store
+*.log

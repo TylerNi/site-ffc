@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "FFC Mobile",
+    "slug": "ffc-mobile",
+    "version": "0.1.0",
+    "scheme": "ffc",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ffc.mobile"
+    },
+    "android": {
+      "package": "com.ffc.mobile",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": ["expo-router", "expo-localization"]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@ffc/eslint-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./react": "./react.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.36.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.4.0",
+    "typescript-eslint": "^8.44.0"
+  },
+  "peerDependencies": {
+    "eslint": ">=9"
+  }
+}

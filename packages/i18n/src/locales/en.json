@@ -1,0 +1,37 @@
+{
+  "common": {
+    "appName": "Furnace Filters Canada",
+    "language": "English"
+  },
+  "home": {
+    "title": "Furnace Filters Canada",
+    "tagline": "Quality furnace filters, delivered across Canada.",
+    "languageSwitch": "Language",
+    "apiStatus": {
+      "label": "API status",
+      "ok": "API online — version {version}",
+      "unreachable": "API unreachable. Start it with “pnpm dev”."
+    }
+  },
+  "admin": {
+    "login": {
+      "title": "FFC Admin — Sign in",
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Sign in",
+      "demoNotice": "Demo login — real authentication ships in tasks 05 and 09.",
+      "submitted": "Demo sign-in successful. No real session was created.",
+      "apiOk": "API online",
+      "apiUnreachable": "API unreachable",
+      "apiChecking": "Checking API…"
+    }
+  },
+  "mobile": {
+    "welcome": "Welcome to Furnace Filters Canada",
+    "tagline": "Quality furnace filters, delivered across Canada.",
+    "changeLanguage": "Passer au français",
+    "apiOk": "API online",
+    "apiUnreachable": "API unreachable",
+    "apiChecking": "Checking API…"
+  }
+}

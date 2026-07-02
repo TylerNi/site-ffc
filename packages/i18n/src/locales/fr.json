@@ -1,0 +1,37 @@
+{
+  "common": {
+    "appName": "Filtration Montréal",
+    "language": "Français"
+  },
+  "home": {
+    "title": "Filtration Montréal",
+    "tagline": "Des filtres à fournaise de qualité, livrés partout au Canada.",
+    "languageSwitch": "Langue",
+    "apiStatus": {
+      "label": "État de l'API",
+      "ok": "API en ligne — version {version}",
+      "unreachable": "API injoignable. Démarrez-la avec « pnpm dev »."
+    }
+  },
+  "admin": {
+    "login": {
+      "title": "Admin FFC — Connexion",
+      "email": "Adresse courriel",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "demoNotice": "Connexion factice — l'authentification réelle arrive aux tâches 05 et 09.",
+      "submitted": "Connexion démo réussie. Aucune session réelle n'a été créée.",
+      "apiOk": "API en ligne",
+      "apiUnreachable": "API injoignable",
+      "apiChecking": "Vérification de l'API…"
+    }
+  },
+  "mobile": {
+    "welcome": "Bienvenue chez Filtration Montréal",
+    "tagline": "Des filtres à fournaise de qualité, livrés partout au Canada.",
+    "changeLanguage": "Switch to English",
+    "apiOk": "API en ligne",
+    "apiUnreachable": "API injoignable",
+    "apiChecking": "Vérification de l'API…"
+  }
+}
