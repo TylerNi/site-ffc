@@ -13,6 +13,10 @@ export const envSchema = z.object({
     .min(1)
     .default('http://localhost:3000,http://localhost:3001')
     .describe('Origines autorisées (CORS), séparées par des virgules'),
+  DATABASE_URL: z
+    .url()
+    .startsWith('postgresql://', 'DATABASE_URL doit être une URL postgresql://')
+    .describe('Chaîne de connexion PostgreSQL (RDS en production, Docker en local)'),
 });
 
 export type Env = z.infer<typeof envSchema>;

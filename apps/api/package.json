@@ -4,11 +4,21 @@
   "private": true,
   "scripts": {
     "dev": "nest start --watch",
-    "build": "nest build",
+    "build": "prisma generate && nest build",
     "start": "node dist/main.js",
     "generate:openapi": "nest build && node dist/scripts/generate-openapi.js",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "prisma generate && tsc -p tsconfig.typecheck.json",
+    "test": "vitest run",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:reset": "prisma migrate reset --force",
+    "db:seed": "prisma db seed",
+    "db:erd": "prisma generate && tsx scripts/generate-erd.ts"
+  },
+  "prisma": {
+    "seed": "pnpm exec tsx prisma/seed.ts"
   },
   "dependencies": {
     "@ffc/core": "workspace:*",
@@ -17,6 +27,9 @@
     "@nestjs/core": "^11.1.6",
     "@nestjs/platform-express": "^11.1.6",
     "@nestjs/swagger": "^11.2.0",
+    "@prisma/client": "^6.19.3",
+    "argon2": "^0.44.0",
+    "prisma": "^6.19.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "zod": "^4.1.11"
@@ -27,6 +40,8 @@
     "@types/express": "^5.0.3",
     "@types/node": "^24.5.2",
     "eslint": "^9.36.0",
-    "typescript": "^5.9.3"
+    "tsx": "^4.22.5",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.6"
   }
 }

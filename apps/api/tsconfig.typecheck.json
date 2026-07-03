@@ -1,0 +1,10 @@
+{
+  // Périmètre du `pnpm typecheck` : tout le TypeScript du paquet, y compris
+  // le seed, les tests et les scripts (exclus du build Nest — voir
+  // tsconfig.build.json, qui garde dist/main.js à la racine de dist/).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src", "prisma", "test", "scripts", "vitest.config.ts"]
+}

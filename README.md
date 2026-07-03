@@ -47,6 +47,12 @@ cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env
 cp apps/admin/.env.example apps/admin/.env
 cp apps/mobile/.env.example apps/mobile/.env
+
+# Base de données locale (PostgreSQL via Docker) + migrations + seed
+docker compose up -d postgres
+pnpm build --filter @ffc/core
+pnpm --filter @ffc/api db:deploy
+pnpm --filter @ffc/api db:seed
 ```
 
 Toutes les valeurs par défaut fonctionnent en local sans modification.
@@ -62,7 +68,7 @@ Toutes s'exécutent à la racine :
 | `pnpm build`           | Build de tous les packages et apps                                               |
 | `pnpm lint`            | ESLint sur tout le monorepo                                                      |
 | `pnpm typecheck`       | `tsc --noEmit` sur tout le monorepo                                              |
-| `pnpm test`            | Tests unitaires (vitest)                                                         |
+| `pnpm test`            | Tests unitaires et d'intégration (vitest — l'API exige Postgres local)           |
 | `pnpm format`          | Prettier sur tout le dépôt                                                       |
 | `pnpm generate:client` | Régénère `packages/api-client` depuis l'OpenAPI de l'API                         |
 
@@ -116,7 +122,15 @@ justifications et procédures dans **[`infra/README.md`](infra/README.md)**.
   approbation, via OIDC (aucune clé statique) — [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
 - **Runbooks** : [coûts](docs/infra/couts.md), [restauration BD](docs/infra/restauration-bd.md), [rotation de secret](docs/infra/rotation-secret.md).
 
+## Base de données
+
+PostgreSQL 16 + Prisma 6 (`apps/api/prisma/`) : 43 tables, enums partagés avec
+`@ffc/core`, montants en cents, numérotation de factures sans trou, audit
+append-only, anonymisation Loi 25 outillée. Conventions, décisions et
+diagrammes dans **[`docs/database.md`](docs/database.md)** et
+[`docs/database-erd.md`](docs/database-erd.md).
+
 ## État
 
-En construction — fondations du monorepo (tâche 02) et infrastructure/CI-CD
-(tâche 03) en place.
+En construction — fondations du monorepo (tâche 02), infrastructure/CI-CD
+(tâche 03) et schéma de base de données (tâche 04) en place.

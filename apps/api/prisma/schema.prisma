@@ -1,0 +1,1451 @@
+// Schéma de base de données — Filtration Montréal / Furnace Filters Canada.
+//
+// Conventions (détail dans docs/database.md) :
+//   - Modèles PascalCase singulier ↔ tables snake_case pluriel (@@map) ;
+//     champs camelCase ↔ colonnes snake_case (@map).
+//   - Identifiants : UUID v7 (ordonnés dans le temps, favorables aux index).
+//   - Montants : TOUJOURS en cents (Int) avec devise explicite — jamais de flottants.
+//   - Enums : dupliquées depuis @ffc/core (packages/core/src/enums.ts) ;
+//     synchronisation garantie par apps/api/test/enums-sync.test.ts.
+//   - created_at/updated_at sur toute table mutable ; les tables immuables
+//     (order_items, audit_logs…) n'ont pas d'updated_at.
+//
+// Règles d'intégrité hors schéma (migration 000002_contraintes_et_triggers) :
+//   - CHECKs (quantités > 0, montants >= 0, rating 1..5, panier compte OU invité).
+//   - Triggers : audit_logs append-only, order_items immuables (UPDATE interdit).
+//   - Fonction allocate_invoice_number(series) : numérotation de factures
+//     séquentielle SANS TROU par série annuelle (compteur verrouillé).
+//   - Séquence order_number_seq pour les numéros de commande lisibles.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+  // native : poste de dev · debian-openssl-3.0.x : image Docker (bookworm).
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pg_trgm, citext]
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Enums — miroir de @ffc/core (ne pas modifier sans mettre à jour
+ */
+/**
+ * packages/core/src/enums.ts : le test de synchronisation échouera).
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+enum Locale {
+  fr
+  en
+
+  @@map("locale")
+}
+
+enum UserRole {
+  CUSTOMER
+  STAFF
+  ADMIN
+
+  @@map("user_role")
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+  ANONYMIZED
+
+  @@map("user_status")
+}
+
+enum DevicePlatform {
+  IOS
+  ANDROID
+  WEB
+
+  @@map("device_platform")
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+
+  @@map("product_status")
+}
+
+enum InventoryMovementType {
+  RECEIPT
+  SALE
+  RETURN
+  ADJUSTMENT
+
+  @@map("inventory_movement_type")
+}
+
+enum EquipmentKind {
+  FURNACE
+  AIR_HANDLER
+  HRV_ERV
+  AIR_CONDITIONER
+  OTHER
+
+  @@map("equipment_kind")
+}
+
+enum CompatibilitySource {
+  MANUAL
+  AI
+  IMPORT
+
+  @@map("compatibility_source")
+}
+
+enum AiIdentificationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  NEEDS_REVIEW
+  CONFIRMED
+  REJECTED
+  FAILED
+
+  @@map("ai_identification_status")
+}
+
+enum Currency {
+  CAD
+  USD
+
+  @@map("currency")
+}
+
+enum CartStatus {
+  ACTIVE
+  CONVERTED
+  ABANDONED
+
+  @@map("cart_status")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+
+  @@map("order_status")
+}
+
+enum OrderChannel {
+  WEB
+  MOBILE
+  ADMIN
+  SUBSCRIPTION
+
+  @@map("order_channel")
+}
+
+enum PaymentProvider {
+  STRIPE
+  MANUAL
+
+  @@map("payment_provider")
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+
+  @@map("payment_status")
+}
+
+enum RefundStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+
+  @@map("refund_status")
+}
+
+enum InvoiceKind {
+  INVOICE
+  CREDIT_NOTE
+
+  @@map("invoice_kind")
+}
+
+enum InvoiceStatus {
+  ISSUED
+  VOIDED
+
+  @@map("invoice_status")
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_SHIPPING
+
+  @@map("coupon_type")
+}
+
+enum Carrier {
+  CANADA_POST
+  NATIONEX
+  CANPAR
+  OTHER
+
+  @@map("carrier")
+}
+
+enum ShipmentStatus {
+  CREATED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  EXCEPTION
+  RETURNED
+
+  @@map("shipment_status")
+}
+
+enum NotificationCategory {
+  TRANSACTIONAL
+  REPLENISHMENT_REMINDER
+  REVIEW_REQUEST
+  MARKETING
+
+  @@map("notification_category")
+}
+
+enum NotificationChannel {
+  EMAIL
+  PUSH
+
+  @@map("notification_channel")
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  SKIPPED
+
+  @@map("notification_status")
+}
+
+enum ReplenishmentPlanStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+
+  @@map("replenishment_plan_status")
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+
+  @@map("review_status")
+}
+
+enum WebhookEventStatus {
+  RECEIVED
+  PROCESSED
+  FAILED
+  IGNORED
+
+  @@map("webhook_event_status")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Comptes
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model User {
+  id                    String     @id @default(uuid(7)) @db.Uuid
+  /// citext : unicité insensible à la casse.
+  email                 String     @unique @db.Citext
+  emailVerifiedAt       DateTime?  @map("email_verified_at")
+  /// Argon2id (tâche 05). Null si connexion sociale uniquement.
+  passwordHash          String?    @map("password_hash")
+  firstName             String?    @map("first_name")
+  lastName              String?    @map("last_name")
+  phone                 String?
+  role                  UserRole   @default(CUSTOMER)
+  status                UserStatus @default(ACTIVE)
+  locale                Locale     @default(fr)
+  /// MFA TOTP (tâche 05) : secret chiffré côté application, jamais en clair.
+  mfaEnabled            Boolean    @default(false) @map("mfa_enabled")
+  mfaSecretEnc          String?    @map("mfa_secret_enc")
+  mfaRecoveryCodeHashes String[]   @default([]) @map("mfa_recovery_code_hashes")
+  /// Identifiants externes — Stripe est l'ancrage des futurs abonnements Billing.
+  stripeCustomerId      String?    @unique @map("stripe_customer_id")
+  googleId              String?    @unique @map("google_id")
+  appleId               String?    @unique @map("apple_id")
+  /// Loi 25 : date d'anonymisation (voir src/database/anonymize-user.ts).
+  anonymizedAt          DateTime?  @map("anonymized_at")
+  deletionRequestedAt   DateTime?  @map("deletion_requested_at")
+  lastLoginAt           DateTime?  @map("last_login_at")
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
+
+  addresses                 Address[]
+  devices                   UserDevice[]
+  refreshTokens             RefreshToken[]
+  carts                     Cart[]
+  orders                    Order[]
+  orderStatusChanges        OrderStatusHistory[]     @relation("OrderStatusChangedBy")
+  refundsProcessed          Refund[]                 @relation("RefundProcessedBy")
+  couponRedemptions         CouponRedemption[]
+  equipment                 UserEquipment[]
+  aiIdentifications         AiIdentification[]       @relation("AiIdentificationUser")
+  aiIdentificationsReviewed AiIdentification[]       @relation("AiIdentificationReviewer")
+  replenishmentPlans        ReplenishmentPlan[]
+  notifications             Notification[]
+  notificationPreferences   NotificationPreference[]
+  reviews                   Review[]                 @relation("ReviewAuthor")
+  reviewsModerated          Review[]                 @relation("ReviewModerator")
+  roleAssignments           UserRoleAssignment[]     @relation("UserRoleAssignmentUser")
+  roleAssignmentsGranted    UserRoleAssignment[]     @relation("UserRoleAssignmentGrantedBy")
+  inventoryMovements        InventoryMovement[]
+
+  @@index([status])
+  @@index([role])
+  @@map("users")
+}
+
+model Address {
+  id                String   @id @default(uuid(7)) @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Libellé libre (« Maison », « Chalet »…).
+  label             String?
+  firstName         String?  @map("first_name")
+  lastName          String?  @map("last_name")
+  company           String?
+  line1             String
+  line2             String?
+  city              String
+  /// Code province/état (ex. « QC »). Validé côté application (@ffc/core).
+  province          String
+  postalCode        String   @map("postal_code")
+  country           String   @default("CA")
+  phone             String?
+  isDefaultShipping Boolean  @default(false) @map("is_default_shipping")
+  isDefaultBilling  Boolean  @default(false) @map("is_default_billing")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model UserDevice {
+  id         String         @id @default(uuid(7)) @db.Uuid
+  userId     String         @map("user_id") @db.Uuid
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform   DevicePlatform
+  /// Jeton push Expo/APNs/FCM. Unique : une ré-inscription réattribue le jeton.
+  pushToken  String         @unique @map("push_token")
+  deviceName String?        @map("device_name")
+  appVersion String?        @map("app_version")
+  lastSeenAt DateTime       @default(now()) @map("last_seen_at")
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("user_devices")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// SHA-256 du jeton — le jeton en clair n'est JAMAIS stocké.
+  tokenHash String    @unique @map("token_hash")
+  /// Lignée de rotation : détection de réutilisation → révocation de la famille (tâche 05).
+  familyId  String    @default(uuid(7)) @map("family_id") @db.Uuid
+  expiresAt DateTime  @map("expires_at")
+  /// Renseigné à la rotation : un jeton « usé » réutilisé signale un vol.
+  usedAt    DateTime? @map("used_at")
+  revokedAt DateTime? @map("revoked_at")
+  ip        String?   @db.Inet
+  userAgent String?   @map("user_agent")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Catalogue
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model Brand {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  slug      String    @unique
+  name      String
+  logoUrl   String?   @map("logo_url")
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  products  Product[]
+
+  @@map("brands")
+}
+
+model Category {
+  id           String                @id @default(uuid(7)) @db.Uuid
+  parentId     String?               @map("parent_id") @db.Uuid
+  parent       Category?             @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Category[]            @relation("CategoryTree")
+  sortOrder    Int                   @default(0) @map("sort_order")
+  isActive     Boolean               @default(true) @map("is_active")
+  createdAt    DateTime              @default(now()) @map("created_at")
+  updatedAt    DateTime              @updatedAt @map("updated_at")
+  translations CategoryTranslation[]
+  products     Product[]
+
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  categoryId  String   @map("category_id") @db.Uuid
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  locale      Locale
+  name        String
+  slug        String
+  description String?
+
+  @@unique([categoryId, locale])
+  /// Slugs uniques PAR locale (URL /fr/... et /en/... indépendantes).
+  @@unique([locale, slug])
+  @@map("category_translations")
+}
+
+model Product {
+  id         String        @id @default(uuid(7)) @db.Uuid
+  brandId    String        @map("brand_id") @db.Uuid
+  brand      Brand         @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  categoryId String?       @map("category_id") @db.Uuid
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  status     ProductStatus @default(DRAFT)
+  isFeatured Boolean       @default(false) @map("is_featured")
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  translations ProductTranslation[]
+  variants     ProductVariant[]
+  images       ProductImage[]
+  reviews      Review[]
+  orderItems   OrderItem[]
+
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("products")
+}
+
+model ProductTranslation {
+  id               String  @id @default(uuid(7)) @db.Uuid
+  productId        String  @map("product_id") @db.Uuid
+  product          Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  locale           Locale
+  name             String
+  slug             String
+  shortDescription String? @map("short_description")
+  description      String?
+  metaTitle        String? @map("meta_title")
+  metaDescription  String? @map("meta_description")
+
+  @@unique([productId, locale])
+  /// Slugs uniques PAR locale.
+  @@unique([locale, slug])
+  /// Recherche floue (pg_trgm) sur les noms de produits.
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "product_translations_name_trgm_idx")
+  @@map("product_translations")
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid(7)) @db.Uuid
+  productId String  @map("product_id") @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku       String  @unique
+  /// Code-barres (UPC/EAN) — utile à l'import BigCommerce et au picking.
+  barcode   String?
+
+  /// Taille nominale commerciale « LxHxP » (ex. « 16x25x1 ») + dimensions
+  /// nominales et RÉELLES en pouces (les réelles sont ~1/4–1/2 po de moins).
+  nominalLabel    String  @map("nominal_label")
+  nominalWidthIn  Decimal @map("nominal_width_in") @db.Decimal(5, 2)
+  nominalHeightIn Decimal @map("nominal_height_in") @db.Decimal(5, 2)
+  nominalDepthIn  Decimal @map("nominal_depth_in") @db.Decimal(5, 2)
+  actualWidthIn   Decimal @map("actual_width_in") @db.Decimal(5, 2)
+  actualHeightIn  Decimal @map("actual_height_in") @db.Decimal(5, 2)
+  actualDepthIn   Decimal @map("actual_depth_in") @db.Decimal(5, 2)
+
+  /// Cote MERV (null pour les produits non cotés, ex. pré-filtres lavables).
+  merv Int?
+
+  /// Format de boîte : nombre de filtres par unité de vente (1, 2, 4, 6, 12…).
+  packSize Int @default(1) @map("pack_size")
+
+  /// Prix en CENTS. compare_at = prix barré. cost = coût d'achat (marges).
+  priceCents          Int      @map("price_cents")
+  compareAtPriceCents Int?     @map("compare_at_price_cents")
+  costCents           Int?     @map("cost_cents")
+  currency            Currency @default(CAD)
+
+  /// Poids d'expédition en grammes.
+  weightGrams Int?     @map("weight_grams")
+  isActive    Boolean  @default(true) @map("is_active")
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  images             ProductImage[]
+  inventoryLevel     InventoryLevel?
+  inventoryMovements InventoryMovement[]
+  compatibilities    ModelFilterCompatibility[]
+  supplierProducts   SupplierProduct[]
+  cartItems          CartItem[]
+  orderItems         OrderItem[]
+  replenishmentPlans ReplenishmentPlan[]
+  installedOn        UserEquipment[]
+
+  @@index([productId])
+  @@index([nominalLabel])
+  @@index([merv])
+  @@index([nominalWidthIn, nominalHeightIn, nominalDepthIn])
+  @@index([isActive])
+  @@map("product_variants")
+}
+
+model ProductImage {
+  id        String          @id @default(uuid(7)) @db.Uuid
+  productId String          @map("product_id") @db.Uuid
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  /// Optionnel : image propre à une variante (ex. photo de la boîte de 6).
+  variantId String?         @map("variant_id") @db.Uuid
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  /// Clé S3 ou URL CDN.
+  url       String
+  altFr     String?         @map("alt_fr")
+  altEn     String?         @map("alt_en")
+  width     Int?
+  height    Int?
+  position  Int             @default(0)
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  @@index([productId, position])
+  @@map("product_images")
+}
+
+model InventoryLevel {
+  id                String         @id @default(uuid(7)) @db.Uuid
+  variantId         String         @unique @map("variant_id") @db.Uuid
+  variant           ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantityOnHand    Int            @default(0) @map("quantity_on_hand")
+  /// Réservé par des commandes payées non expédiées (tâche 11).
+  quantityReserved  Int            @default(0) @map("quantity_reserved")
+  /// Seuil d'alerte de stock bas (tâche 10). Null = pas d'alerte.
+  lowStockThreshold Int?           @map("low_stock_threshold")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  @@map("inventory_levels")
+}
+
+model InventoryMovement {
+  id              String                @id @default(uuid(7)) @db.Uuid
+  variantId       String                @map("variant_id") @db.Uuid
+  variant         ProductVariant        @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  type            InventoryMovementType
+  /// Quantité SIGNÉE : +réception/retour, -vente/ajustement à la baisse.
+  quantity        Int
+  reason          String?
+  /// Référence lâche vers la commande concernée (ventes/retours).
+  orderId         String?               @map("order_id") @db.Uuid
+  createdByUserId String?               @map("created_by_user_id") @db.Uuid
+  createdByUser   User?                 @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime              @default(now()) @map("created_at")
+
+  @@index([variantId, createdAt])
+  @@index([orderId])
+  @@map("inventory_movements")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Compatibilité équipements / IA
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model EquipmentModel {
+  id           String        @id @default(uuid(7)) @db.Uuid
+  /// Fabricant d'équipement (Lennox, Carrier…) — distinct des marques de filtres.
+  manufacturer String
+  modelNumber  String        @map("model_number")
+  kind         EquipmentKind @default(FURNACE)
+  /// Autres graphies/déclinaisons du numéro de modèle (ex. « G61MPV-36B-070 »).
+  aliases      String[]      @default([])
+  notes        String?
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  compatibilities   ModelFilterCompatibility[]
+  userEquipment     UserEquipment[]
+  aiIdentifications AiIdentification[]
+
+  @@unique([manufacturer, modelNumber])
+  /// Recherche floue sur le numéro de modèle (photo de plaque signalétique, faute de frappe).
+  @@index([modelNumber(ops: raw("gin_trgm_ops"))], type: Gin, map: "equipment_models_model_number_trgm_idx")
+  /// Recherche d'alias exacte (opérateur @> sur tableau).
+  @@index([aliases], type: Gin)
+  @@map("equipment_models")
+}
+
+model ModelFilterCompatibility {
+  id               String              @id @default(uuid(7)) @db.Uuid
+  equipmentModelId String              @map("equipment_model_id") @db.Uuid
+  equipmentModel   EquipmentModel      @relation(fields: [equipmentModelId], references: [id], onDelete: Cascade)
+  variantId        String              @map("variant_id") @db.Uuid
+  variant          ProductVariant      @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  source           CompatibilitySource @default(MANUAL)
+  /// Vérifié par un humain (file de révision, tâche 18).
+  isVerified       Boolean             @default(false) @map("is_verified")
+  notes            String?
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  @@unique([equipmentModelId, variantId])
+  @@index([variantId])
+  @@map("model_filter_compatibility")
+}
+
+model UserEquipment {
+  id                       String          @id @default(uuid(7)) @db.Uuid
+  userId                   String          @map("user_id") @db.Uuid
+  user                     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  equipmentModelId         String?         @map("equipment_model_id") @db.Uuid
+  equipmentModel           EquipmentModel? @relation(fields: [equipmentModelId], references: [id], onDelete: SetNull)
+  /// « Fournaise du sous-sol »…
+  nickname                 String?
+  /// Saisie libre si l'équipement n'est pas (encore) dans equipment_models.
+  customManufacturer       String?         @map("custom_manufacturer")
+  customModelNumber        String?         @map("custom_model_number")
+  photoKey                 String?         @map("photo_key")
+  installedFilterVariantId String?         @map("installed_filter_variant_id") @db.Uuid
+  installedFilterVariant   ProductVariant? @relation(fields: [installedFilterVariantId], references: [id], onDelete: SetNull)
+  lastFilterChangeAt       DateTime?       @map("last_filter_change_at")
+  createdAt                DateTime        @default(now()) @map("created_at")
+  updatedAt                DateTime        @updatedAt @map("updated_at")
+
+  aiIdentifications  AiIdentification[]
+  replenishmentPlans ReplenishmentPlan[]
+
+  @@index([userId])
+  @@map("user_equipment")
+}
+
+model AiIdentification {
+  id                      String                 @id @default(uuid(7)) @db.Uuid
+  /// Null pour un visiteur non connecté ; cascade à la suppression de compte
+  /// (les photos d'équipement sont des données personnelles — Loi 25).
+  userId                  String?                @map("user_id") @db.Uuid
+  user                    User?                  @relation("AiIdentificationUser", fields: [userId], references: [id], onDelete: Cascade)
+  userEquipmentId         String?                @map("user_equipment_id") @db.Uuid
+  userEquipment           UserEquipment?         @relation(fields: [userEquipmentId], references: [id], onDelete: SetNull)
+  /// Clé S3 de l'image téléversée (upload sécurisé, tâche 17).
+  imageKey                String                 @map("image_key")
+  status                  AiIdentificationStatus @default(PENDING)
+  /// Banc d'essai multi-fournisseurs (tâche 17) : « anthropic », « openai »…
+  provider                String?
+  model                   String?
+  /// Résultat d'extraction structuré (JSONB) : marque, modèle, dimensions lues…
+  extraction              Json?
+  /// Confiance globale 0.000–1.000.
+  confidence              Decimal?               @db.Decimal(4, 3)
+  matchedEquipmentModelId String?                @map("matched_equipment_model_id") @db.Uuid
+  matchedEquipmentModel   EquipmentModel?        @relation(fields: [matchedEquipmentModelId], references: [id], onDelete: SetNull)
+  failureReason           String?                @map("failure_reason")
+  reviewedByUserId        String?                @map("reviewed_by_user_id") @db.Uuid
+  reviewedByUser          User?                  @relation("AiIdentificationReviewer", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+  reviewedAt              DateTime?              @map("reviewed_at")
+  /// Date de purge de l'image S3 et de l'extraction (rétention limitée — Loi 25).
+  purgeAt                 DateTime?              @map("purge_at")
+  purgedAt                DateTime?              @map("purged_at")
+  createdAt               DateTime               @default(now()) @map("created_at")
+  updatedAt               DateTime               @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([status])
+  @@index([purgeAt])
+  @@map("ai_identifications")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Fournisseurs
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model Supplier {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  /// Code court interne (ex. « FPRO »).
+  code          String   @unique
+  name          String
+  email         String?
+  phone         String?
+  website       String?
+  leadTimeDays  Int?     @map("lead_time_days")
+  minOrderCents Int?     @map("min_order_cents")
+  currency      Currency @default(CAD)
+  notes         String?
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  supplierProducts SupplierProduct[]
+
+  @@map("suppliers")
+}
+
+model SupplierProduct {
+  id             String         @id @default(uuid(7)) @db.Uuid
+  supplierId     String         @map("supplier_id") @db.Uuid
+  supplier       Supplier       @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  variantId      String         @map("variant_id") @db.Uuid
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  supplierSku    String?        @map("supplier_sku")
+  costCents      Int            @map("cost_cents")
+  currency       Currency       @default(CAD)
+  /// Quantité minimale de commande.
+  moq            Int            @default(1)
+  isPreferred    Boolean        @default(false) @map("is_preferred")
+  lastPurchaseAt DateTime?      @map("last_purchase_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  @@unique([supplierId, variantId])
+  @@index([variantId])
+  @@map("supplier_products")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Ventes
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model Cart {
+  id         String     @id @default(uuid(7)) @db.Uuid
+  /// Panier de compte OU panier invité : au moins l'un des deux (CHECK en SQL).
+  userId     String?    @map("user_id") @db.Uuid
+  user       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Jeton opaque du cookie invité (256 bits aléatoires, généré côté API).
+  guestToken String?    @unique @map("guest_token")
+  status     CartStatus @default(ACTIVE)
+  currency   Currency   @default(CAD)
+  /// Purge des paniers invités expirés.
+  expiresAt  DateTime?  @map("expires_at")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  items CartItem[]
+  order Order?
+
+  @@index([userId])
+  @@index([status, updatedAt])
+  @@index([expiresAt])
+  @@map("carts")
+}
+
+model CartItem {
+  id                String         @id @default(uuid(7)) @db.Uuid
+  cartId            String         @map("cart_id") @db.Uuid
+  cart              Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId         String         @map("variant_id") @db.Uuid
+  variant           ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity          Int
+  /// Prix affiché à l'ajout — détection « le prix a changé » au checkout.
+  addedAtPriceCents Int?           @map("added_at_price_cents")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  @@unique([cartId, variantId])
+  @@map("cart_items")
+}
+
+model Order {
+  id         String  @id @default(uuid(7)) @db.Uuid
+  /// Numéro lisible « FFC-100042 » — alloué via la séquence order_number_seq
+  /// (src/database/order-number.ts). Contrairement aux factures, des trous
+  /// sont tolérés ici.
+  number     String  @unique
+  /// Null pour une commande invitée, ou après anonymisation (Loi 25) :
+  /// la commande reste pour la comptabilité, le lien nominal est coupé.
+  userId     String? @map("user_id") @db.Uuid
+  user       User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestEmail String? @map("guest_email") @db.Citext
+
+  status  OrderStatus  @default(PENDING)
+  channel OrderChannel @default(WEB)
+  /// Locale du client au moment de l'achat (courriels, facture).
+  locale  Locale       @default(fr)
+
+  /// Montants figés en CENTS. Taxes ventilées par type (rapports + QuickBooks).
+  /// tax_pst_cents couvre PST (BC/SK) et RST (MB).
+  currency      Currency @default(CAD)
+  subtotalCents Int      @map("subtotal_cents")
+  discountCents Int      @default(0) @map("discount_cents")
+  shippingCents Int      @default(0) @map("shipping_cents")
+  taxGstCents   Int      @default(0) @map("tax_gst_cents")
+  taxQstCents   Int      @default(0) @map("tax_qst_cents")
+  taxHstCents   Int      @default(0) @map("tax_hst_cents")
+  taxPstCents   Int      @default(0) @map("tax_pst_cents")
+  totalCents    Int      @map("total_cents")
+
+  cartId   String? @unique @map("cart_id") @db.Uuid
+  cart     Cart?   @relation(fields: [cartId], references: [id], onDelete: SetNull)
+  couponId String? @map("coupon_id") @db.Uuid
+  coupon   Coupon? @relation(fields: [couponId], references: [id], onDelete: SetNull)
+
+  /// Adresses FIGÉES à l'achat (instantané JSONB) — l'adresse du carnet peut
+  /// changer ensuite sans altérer la commande.
+  shippingAddress  Json?   @map("shipping_address")
+  billingAddress   Json?   @map("billing_address")
+  /// Colonne extraite de l'adresse de livraison pour les rapports de taxes.
+  shippingProvince String? @map("shipping_province")
+
+  customerNote String? @map("customer_note")
+  internalNote String? @map("internal_note")
+  ipAddress    String? @map("ip_address") @db.Inet
+  userAgent    String? @map("user_agent")
+
+  placedAt    DateTime  @default(now()) @map("placed_at")
+  paidAt      DateTime? @map("paid_at")
+  shippedAt   DateTime? @map("shipped_at")
+  deliveredAt DateTime? @map("delivered_at")
+  cancelledAt DateTime? @map("cancelled_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  items             OrderItem[]
+  statusHistory     OrderStatusHistory[]
+  payments          Payment[]
+  refunds           Refund[]
+  invoices          Invoice[]
+  shipments         Shipment[]
+  couponRedemptions CouponRedemption[]
+  reviews           Review[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([placedAt])
+  @@index([guestEmail])
+  @@index([shippingProvince])
+  @@map("orders")
+}
+
+model OrderItem {
+  id      String @id @default(uuid(7)) @db.Uuid
+  orderId String @map("order_id") @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  /// Références lâches (SetNull) : l'instantané ci-dessous fait foi même si
+  /// le produit/la variante est modifié ou supprimé plus tard.
+  variantId String?         @map("variant_id") @db.Uuid
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productId String?         @map("product_id") @db.Uuid
+  product   Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  /// INSTANTANÉ IMMUABLE copié à l'achat (trigger SQL : UPDATE interdit).
+  /// Nom dans les deux langues (facture bilingue), SKU, taille, MERV, boîte.
+  sku          String
+  nameFr       String  @map("name_fr")
+  nameEn       String  @map("name_en")
+  nominalLabel String? @map("nominal_label")
+  merv         Int?
+  packSize     Int     @default(1) @map("pack_size")
+
+  quantity       Int
+  unitPriceCents Int @map("unit_price_cents")
+  discountCents  Int @default(0) @map("discount_cents")
+  /// subtotal = unitPrice × quantity − discount ; total = subtotal + tax.
+  subtotalCents  Int @map("subtotal_cents")
+  taxCents       Int @default(0) @map("tax_cents")
+  totalCents     Int @map("total_cents")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  reviews Review[]
+
+  @@index([orderId])
+  @@index([variantId])
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id              String       @id @default(uuid(7)) @db.Uuid
+  orderId         String       @map("order_id") @db.Uuid
+  order           Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromStatus      OrderStatus? @map("from_status")
+  toStatus        OrderStatus  @map("to_status")
+  note            String?
+  /// Null = transition système (webhook, worker).
+  changedByUserId String?      @map("changed_by_user_id") @db.Uuid
+  changedByUser   User?        @relation("OrderStatusChangedBy", fields: [changedByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  @@index([orderId, createdAt])
+  @@map("order_status_history")
+}
+
+model Payment {
+  id      String @id @default(uuid(7)) @db.Uuid
+  orderId String @map("order_id") @db.Uuid
+  /// Restrict : on ne supprime jamais une commande qui a un paiement.
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  provider PaymentProvider @default(STRIPE)
+  status   PaymentStatus   @default(PENDING)
+
+  amountCents Int      @map("amount_cents")
+  currency    Currency @default(CAD)
+
+  /// Identifiant externe principal (Stripe : PaymentIntent). L'unicité
+  /// (provider, external_id) rend les webhooks idempotents côté paiement.
+  externalId        String? @map("external_id")
+  stripeChargeId    String? @map("stripe_charge_id")
+  paymentMethodType String? @map("payment_method_type")
+  cardBrand         String? @map("card_brand")
+  cardLast4         String? @map("card_last4")
+  receiptUrl        String? @map("receipt_url")
+  failureCode       String? @map("failure_code")
+  failureMessage    String? @map("failure_message")
+
+  capturedAt DateTime? @map("captured_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  refunds Refund[]
+
+  @@unique([provider, externalId])
+  @@index([orderId])
+  @@map("payments")
+}
+
+model Refund {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  orderId   String   @map("order_id") @db.Uuid
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  paymentId String?  @map("payment_id") @db.Uuid
+  payment   Payment? @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  provider    PaymentProvider @default(STRIPE)
+  status      RefundStatus    @default(PENDING)
+  amountCents Int             @map("amount_cents")
+  currency    Currency        @default(CAD)
+  reason      String?
+  externalId  String?         @map("external_id")
+
+  processedByUserId String? @map("processed_by_user_id") @db.Uuid
+  processedByUser   User?   @relation("RefundProcessedBy", fields: [processedByUserId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  invoice Invoice?
+
+  @@unique([provider, externalId])
+  @@index([orderId])
+  @@map("refunds")
+}
+
+model Invoice {
+  id      String @id @default(uuid(7)) @db.Uuid
+  orderId String @map("order_id") @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  kind   InvoiceKind   @default(INVOICE)
+  status InvoiceStatus @default(ISSUED)
+
+  /// Numérotation séquentielle SANS TROU par série annuelle (ex. « INV-2026 »,
+  /// « CRN-2026 » pour les notes de crédit). sequence est alloué par la
+  /// fonction SQL allocate_invoice_number(series) DANS LA MÊME TRANSACTION
+  /// que l'insertion (voir src/database/invoice-number.ts + docs/database.md).
+  /// Une facture annulée est VOIDED — le numéro n'est jamais réutilisé ni sauté.
+  series   String
+  sequence Int
+  /// Numéro complet affiché : « INV-2026-000042 ».
+  number   String @unique
+
+  /// Instantané financier du document (immuable une fois émis).
+  currency      Currency @default(CAD)
+  subtotalCents Int      @map("subtotal_cents")
+  discountCents Int      @default(0) @map("discount_cents")
+  shippingCents Int      @default(0) @map("shipping_cents")
+  taxGstCents   Int      @default(0) @map("tax_gst_cents")
+  taxQstCents   Int      @default(0) @map("tax_qst_cents")
+  taxHstCents   Int      @default(0) @map("tax_hst_cents")
+  taxPstCents   Int      @default(0) @map("tax_pst_cents")
+  totalCents    Int      @map("total_cents")
+
+  /// Note de crédit liée à un remboursement.
+  refundId String? @unique @map("refund_id") @db.Uuid
+  refund   Refund? @relation(fields: [refundId], references: [id], onDelete: SetNull)
+
+  /// PDF bilingue généré en tâche 12 (clé S3).
+  pdfKey    String?   @map("pdf_key")
+  issuedAt  DateTime  @default(now()) @map("issued_at")
+  voidedAt  DateTime? @map("voided_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@unique([series, sequence])
+  @@index([orderId])
+  @@map("invoices")
+}
+
+/// Compteur verrouillé de numérotation des factures — une ligne par série.
+/// Manipulé UNIQUEMENT via allocate_invoice_number() (fonction SQL).
+model InvoiceCounter {
+  series    String   @id
+  lastValue Int      @default(0) @map("last_value")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("invoice_counters")
+}
+
+model Coupon {
+  id   String @id @default(uuid(7)) @db.Uuid
+  /// citext : « BIENVENUE10 » = « bienvenue10 ».
+  code String @unique @db.Citext
+
+  type         CouponType
+  /// PERCENTAGE → value_percent (1–100) ; FIXED_AMOUNT → value_cents.
+  valueCents   Int?       @map("value_cents")
+  valuePercent Int?       @map("value_percent")
+  currency     Currency   @default(CAD)
+
+  minSubtotalCents      Int?      @map("min_subtotal_cents")
+  startsAt              DateTime? @map("starts_at")
+  endsAt                DateTime? @map("ends_at")
+  maxRedemptions        Int?      @map("max_redemptions")
+  maxRedemptionsPerUser Int?      @map("max_redemptions_per_user")
+  /// Compteur dénormalisé, maintenu transactionnellement avec coupon_redemptions.
+  timesRedeemed         Int       @default(0) @map("times_redeemed")
+  isActive              Boolean   @default(true) @map("is_active")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  redemptions CouponRedemption[]
+  orders      Order[]
+
+  @@map("coupons")
+}
+
+model CouponRedemption {
+  id                    String   @id @default(uuid(7)) @db.Uuid
+  couponId              String   @map("coupon_id") @db.Uuid
+  coupon                Coupon   @relation(fields: [couponId], references: [id], onDelete: Restrict)
+  orderId               String   @map("order_id") @db.Uuid
+  order                 Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId                String?  @map("user_id") @db.Uuid
+  user                  User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  amountDiscountedCents Int      @map("amount_discounted_cents")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  @@unique([couponId, orderId])
+  @@index([couponId, userId])
+  @@map("coupon_redemptions")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Expédition
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model Shipment {
+  id      String @id @default(uuid(7)) @db.Uuid
+  orderId String @map("order_id") @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  /// Références ShipStation (tâche 13).
+  shipstationOrderId    String? @map("shipstation_order_id")
+  shipstationShipmentId String? @unique @map("shipstation_shipment_id")
+
+  carrier        Carrier?
+  /// Code transporteur/service brut renvoyé par ShipStation.
+  carrierCode    String?  @map("carrier_code")
+  serviceCode    String?  @map("service_code")
+  trackingNumber String?  @map("tracking_number")
+  trackingUrl    String?  @map("tracking_url")
+
+  status ShipmentStatus @default(CREATED)
+
+  /// Étiquette PDF (clé S3) et coût d'expédition réel.
+  labelKey  String?  @map("label_key")
+  costCents Int?     @map("cost_cents")
+  currency  Currency @default(CAD)
+
+  weightGrams Int?     @map("weight_grams")
+  lengthCm    Decimal? @map("length_cm") @db.Decimal(6, 2)
+  widthCm     Decimal? @map("width_cm") @db.Decimal(6, 2)
+  heightCm    Decimal? @map("height_cm") @db.Decimal(6, 2)
+
+  shippedAt           DateTime? @map("shipped_at")
+  estimatedDeliveryAt DateTime? @map("estimated_delivery_at")
+  deliveredAt         DateTime? @map("delivered_at")
+  /// File de repérage adaptatif (tâche 14) : prochain passage du poller.
+  lastPolledAt        DateTime? @map("last_polled_at")
+  nextPollAt          DateTime? @map("next_poll_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  events ShipmentEvent[]
+
+  @@index([orderId])
+  @@index([trackingNumber])
+  @@index([status, nextPollAt])
+  @@map("shipments")
+}
+
+model ShipmentEvent {
+  id          String          @id @default(uuid(7)) @db.Uuid
+  shipmentId  String          @map("shipment_id") @db.Uuid
+  shipment    Shipment        @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  status      ShipmentStatus?
+  /// Code d'événement brut du transporteur.
+  code        String?
+  description String?
+  location    String?
+  occurredAt  DateTime        @map("occurred_at")
+  raw         Json?
+  /// Clé de déduplication calculée côté application (hash code+date+lieu) :
+  /// le polling répété n'insère jamais deux fois le même événement.
+  dedupKey    String?         @map("dedup_key")
+  createdAt   DateTime        @default(now()) @map("created_at")
+
+  @@unique([shipmentId, dedupKey])
+  @@index([shipmentId, occurredAt])
+  @@map("shipment_events")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Rappels / notifications
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model ReplenishmentPlan {
+  id              String                  @id @default(uuid(7)) @db.Uuid
+  userId          String                  @map("user_id") @db.Uuid
+  user            User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Restrict : désactiver la variante (is_active=false) plutôt que la supprimer
+  /// tant que des plans y réfèrent.
+  variantId       String                  @map("variant_id") @db.Uuid
+  variant         ProductVariant          @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  userEquipmentId String?                 @map("user_equipment_id") @db.Uuid
+  userEquipment   UserEquipment?          @relation(fields: [userEquipmentId], references: [id], onDelete: SetNull)
+  status          ReplenishmentPlanStatus @default(ACTIVE)
+  /// Cadence de remplacement en jours (30/60/90…).
+  intervalDays    Int                     @map("interval_days")
+  quantity        Int                     @default(1)
+  nextReminderAt  DateTime                @map("next_reminder_at")
+  lastRemindedAt  DateTime?               @map("last_reminded_at")
+  /// Dernière commande passée depuis ce plan (réachat 1 clic, tâche 20).
+  lastOrderId     String?                 @map("last_order_id") @db.Uuid
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  notifications Notification[]
+
+  @@index([userId])
+  @@index([status, nextReminderAt])
+  @@map("replenishment_plans")
+}
+
+model NotificationPreference {
+  id            String               @id @default(uuid(7)) @db.Uuid
+  userId        String               @map("user_id") @db.Uuid
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      NotificationCategory
+  channel       NotificationChannel
+  enabled       Boolean
+  /// LCAP : preuve de consentement (quand, comment).
+  consentAt     DateTime?            @map("consent_at")
+  consentSource String?              @map("consent_source")
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime             @updatedAt @map("updated_at")
+
+  @@unique([userId, category, channel])
+  @@map("notification_preferences")
+}
+
+model Notification {
+  id                  String               @id @default(uuid(7)) @db.Uuid
+  userId              String?              @map("user_id") @db.Uuid
+  user                User?                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category            NotificationCategory
+  channel             NotificationChannel
+  status              NotificationStatus   @default(PENDING)
+  /// Clé de gabarit (ex. « order_confirmation », « replenishment_reminder »).
+  templateKey         String               @map("template_key")
+  /// Destinataire figé : adresse courriel ou jeton push au moment de l'envoi.
+  destination         String?
+  subject             String?
+  /// Données du gabarit (JSONB).
+  payload             Json?
+  /// Références lâches pour le contexte.
+  orderId             String?              @map("order_id") @db.Uuid
+  replenishmentPlanId String?              @map("replenishment_plan_id") @db.Uuid
+  replenishmentPlan   ReplenishmentPlan?   @relation(fields: [replenishmentPlanId], references: [id], onDelete: SetNull)
+  /// Identifiant externe (SES message id, ticket Expo push).
+  externalId          String?              @map("external_id")
+  failureReason       String?              @map("failure_reason")
+  sentAt              DateTime?            @map("sent_at")
+  createdAt           DateTime             @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@map("notifications")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Avis
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model Review {
+  id          String     @id @default(uuid(7)) @db.Uuid
+  productId   String     @map("product_id") @db.Uuid
+  product     Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  /// SetNull : l'avis (anonymisé) survit à la suppression du compte.
+  userId      String?    @map("user_id") @db.Uuid
+  user        User?      @relation("ReviewAuthor", fields: [userId], references: [id], onDelete: SetNull)
+  /// Avis vérifié : lié à une ligne de commande livrée (unique → 1 avis/achat).
+  orderItemId String?    @unique @map("order_item_id") @db.Uuid
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  orderId     String?    @map("order_id") @db.Uuid
+  order       Order?     @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  rating     Int
+  title      String?
+  body       String?
+  locale     Locale  @default(fr)
+  /// Nom d'affichage figé (« Marie L. ») — effacé par l'anonymisation Loi 25.
+  authorName String? @map("author_name")
+
+  isVerifiedPurchase Boolean      @default(false) @map("is_verified_purchase")
+  status             ReviewStatus @default(PENDING)
+  moderatedByUserId  String?      @map("moderated_by_user_id") @db.Uuid
+  moderatedByUser    User?        @relation("ReviewModerator", fields: [moderatedByUserId], references: [id], onDelete: SetNull)
+  moderatedAt        DateTime?    @map("moderated_at")
+  moderationNote     String?      @map("moderation_note")
+
+  /// Réponse publique du marchand.
+  reply     String?
+  repliedAt DateTime? @map("replied_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  /// Un seul avis par client et par produit (NULLs multiples permis pour
+  /// les avis anonymisés).
+  @@unique([productId, userId])
+  @@index([productId, status])
+  @@index([status, createdAt])
+  @@map("reviews")
+}
+
+/**
+ * ------------------------------------------------------------------
+ */
+/**
+ * Technique
+ */
+/**
+ * ------------------------------------------------------------------
+ */
+
+model WebhookEvent {
+  id            String             @id @default(uuid(7)) @db.Uuid
+  /// Source émettrice : « stripe », « shipstation », « ses », « quickbooks »…
+  source        String
+  /// Identifiant fourni par la source (ex. Stripe event id « evt_… »).
+  externalId    String             @map("external_id")
+  /// Type d'événement déclaré par la source (ex. « payment_intent.succeeded »).
+  type          String?
+  payload       Json
+  status        WebhookEventStatus @default(RECEIVED)
+  attempts      Int                @default(0)
+  processedAt   DateTime?          @map("processed_at")
+  failureReason String?            @map("failure_reason")
+  receivedAt    DateTime           @default(now()) @map("received_at")
+
+  /// IDEMPOTENCE : un même événement livré deux fois n'est enregistré qu'une fois.
+  @@unique([source, externalId])
+  @@index([status, receivedAt])
+  @@map("webhook_events")
+}
+
+/// Journal d'audit APPEND-ONLY (trigger SQL : UPDATE/DELETE interdits).
+/// Références volontairement LÂCHES (pas de FK) : une suppression ou
+/// anonymisation ailleurs ne doit jamais modifier une ligne d'audit.
+model AuditLog {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  /// « user », « system », « webhook »…
+  actorType  String   @default("user") @map("actor_type")
+  actorId    String?  @map("actor_id") @db.Uuid
+  /// Courriel figé au moment de l'action (survit à l'anonymisation).
+  actorEmail String?  @map("actor_email")
+  /// Action au format « ressource.verbe » (ex. « order.refund », « user.anonymize »).
+  action     String
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  /// États avant/après (JSONB) pour les changements sensibles.
+  before     Json?
+  after      Json?
+  metadata   Json?
+  ip         String?  @db.Inet
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+/**
+ * RBAC fin (tâche 09) — users.role reste le rôle système grossier.
+ */
+
+model Role {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  /// Clé stable (ex. « super-admin », « support », « entrepot »).
+  key         String   @unique
+  nameFr      String   @map("name_fr")
+  nameEn      String   @map("name_en")
+  description String?
+  /// Rôles système non supprimables depuis l'admin.
+  isSystem    Boolean  @default(false) @map("is_system")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  permissions RolePermission[]
+  users       UserRoleAssignment[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  /// Clé « ressource.action » (ex. « orders.refund », « products.write »).
+  key         String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id") @db.Uuid
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String     @map("permission_id") @db.Uuid
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRoleAssignment {
+  userId           String   @map("user_id") @db.Uuid
+  user             User     @relation("UserRoleAssignmentUser", fields: [userId], references: [id], onDelete: Cascade)
+  roleId           String   @map("role_id") @db.Uuid
+  role             Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  assignedByUserId String?  @map("assigned_by_user_id") @db.Uuid
+  assignedByUser   User?    @relation("UserRoleAssignmentGrantedBy", fields: [assignedByUserId], references: [id], onDelete: SetNull)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@id([userId, roleId])
+  @@map("user_role_assignments")
+}
+
+/// Réglages applicatifs clé → valeur JSONB (bandeaux, seuils, feature flags…).
+model Setting {
+  key         String   @id
+  value       Json
+  description String?
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("settings")
+}

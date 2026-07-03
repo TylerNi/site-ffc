@@ -18,6 +18,25 @@ jobs:
   quality:
     name: Lint · Typecheck · Tests · Build
     runs-on: ubuntu-latest
+    # Postgres de service pour les tests d'intégration de l'API (tâche 04) :
+    # le globalSetup vitest rejoue les migrations sur ffc_test puis seed.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ffc
+          POSTGRES_PASSWORD: ffc
+          POSTGRES_DB: ffc_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ffc -d ffc_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://ffc:ffc@localhost:5432/ffc_test?schema=public
+      TEST_DATABASE_URL: postgresql://ffc:ffc@localhost:5432/ffc_test?schema=public
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
