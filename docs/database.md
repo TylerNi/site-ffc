@@ -182,7 +182,8 @@ Points d'ancrage déjà en place :
 
 - **Emails et codes promo insensibles à la casse** : `citext`
   (`users.email`, `orders.guest_email`, `coupons.code`).
-- **Paniers invités** : `carts.guest_token` (jeton opaque du cookie) ;
+- **Paniers invités** : `carts.guest_token` (SHA-256 du jeton remis au
+  client — voir tâche 05) ;
   `CHECK (user_id IS NOT NULL OR guest_token IS NOT NULL)`.
 - **Adresses de commande figées en JSONB** (+ `shipping_province` extrait
   pour les rapports de taxes) — le carnet d'adresses peut changer sans
@@ -199,6 +200,28 @@ Points d'ancrage déjà en place :
 - **CHECKs** : quantités > 0, montants ≥ 0, `rating` 1–5, pourcentage de
   coupon 1–100 — le dernier rempart sous les validations applicatives.
 
+### 9. Jetons et verrouillage d'authentification (tâche 05)
+
+Migration `auth_jetons_et_verrouillage` — détail des décisions dans
+`docs/auth.md` :
+
+- **`one_time_tokens`** : jetons à usage unique et à expiration
+  (vérification de courriel, réinitialisation de mot de passe, défi MFA au
+  login, confirmation de suppression de compte — enum
+  `one_time_token_purpose`). Le jeton en clair n'est **jamais** stocké
+  (SHA-256) ; la consommation est atomique (UPDATE conditionnel sur
+  `used_at IS NULL` : un seul gagnant sous concurrence).
+- **`users`** : `failed_login_count` + `locked_until` (verrouillage
+  progressif anti force brute, persistant et multi-instances),
+  `mfa_pending_secret_enc` (enrôlement TOTP en deux temps) et
+  `mfa_last_used_step` (anti-rejeu d'un code déjà consommé). Les secrets
+  TOTP sont chiffrés AES-256-GCM côté application.
+- **`refresh_tokens`** (posé en tâche 04, exploité ici) : rotation
+  obligatoire par famille (`family_id` = session/appareil), réutilisation
+  → révocation de la famille entière.
+- **`carts.guest_token`** stocke désormais le **SHA-256** du jeton invité,
+  jamais le jeton lui-même (même règle que tous les jetons porteurs).
+
 ## Tests d'intégration
 
 `pnpm --filter @ffc/api test` — vitest, base **`ffc_test`** dédiée (jamais
@@ -206,8 +229,11 @@ Points d'ancrage déjà en place :
 migrations** (`migrate reset --force`) puis seed. Couverture : synchronisation
 des enums, unicité webhooks, immuabilité `order_items`, append-only
 `audit_logs`, séquence de factures sous concurrence et rollback, contraintes
-CHECK, recherche trigram, anonymisation Loi 25, idempotence du seed. En CI, le
-job `quality` fournit un Postgres 16 de service.
+CHECK, recherche trigram, anonymisation Loi 25, idempotence du seed, et
+l'authentification complète de la tâche 05 (e2e sur l'app Nest réelle :
+rotation/réutilisation des refresh tokens, verrouillage progressif,
+throttling, MFA, social OIDC, fusion de panier invité, export/suppression
+Loi 25). En CI, le job `quality` fournit un Postgres 16 de service.
 
 ## Seeds
 

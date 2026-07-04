@@ -74,6 +74,15 @@ enum DevicePlatform {
   @@map("device_platform")
 }
 
+enum OneTimeTokenPurpose {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  MFA_CHALLENGE
+  ACCOUNT_DELETION
+
+  @@map("one_time_token_purpose")
+}
+
 enum ProductStatus {
   DRAFT
   ACTIVE
@@ -302,10 +311,20 @@ model User {
   role                  UserRole   @default(CUSTOMER)
   status                UserStatus @default(ACTIVE)
   locale                Locale     @default(fr)
-  /// MFA TOTP (tâche 05) : secret chiffré côté application, jamais en clair.
+  /// MFA TOTP (tâche 05) : secret chiffré côté application (AES-256-GCM),
+  /// jamais en clair. Le secret « pending » vit entre l'enrôlement et
+  /// l'activation (preuve d'un premier code valide).
   mfaEnabled            Boolean    @default(false) @map("mfa_enabled")
   mfaSecretEnc          String?    @map("mfa_secret_enc")
+  mfaPendingSecretEnc   String?    @map("mfa_pending_secret_enc")
+  /// Dernier pas TOTP accepté (compteur RFC 6238) : interdit le rejeu d'un
+  /// code déjà consommé dans sa fenêtre de 30 s.
+  mfaLastUsedStep       Int?       @map("mfa_last_used_step")
   mfaRecoveryCodeHashes String[]   @default([]) @map("mfa_recovery_code_hashes")
+  /// Verrouillage progressif anti force brute (tâche 05) : compteur d'échecs
+  /// consécutifs et fin de verrouillage. Remis à zéro à la connexion réussie.
+  failedLoginCount      Int        @default(0) @map("failed_login_count")
+  lockedUntil           DateTime?  @map("locked_until")
   /// Identifiants externes — Stripe est l'ancrage des futurs abonnements Billing.
   stripeCustomerId      String?    @unique @map("stripe_customer_id")
   googleId              String?    @unique @map("google_id")
@@ -320,6 +339,7 @@ model User {
   addresses                 Address[]
   devices                   UserDevice[]
   refreshTokens             RefreshToken[]
+  oneTimeTokens             OneTimeToken[]
   carts                     Cart[]
   orders                    Order[]
   orderStatusChanges        OrderStatusHistory[]     @relation("OrderStatusChangedBy")
@@ -405,6 +425,27 @@ model RefreshToken {
   @@index([familyId])
   @@index([expiresAt])
   @@map("refresh_tokens")
+}
+
+/// Jetons à usage unique et à expiration (tâche 05) : vérification de
+/// courriel, réinitialisation de mot de passe, défi MFA, confirmation de
+/// suppression de compte. Le jeton en clair n'est JAMAIS stocké (SHA-256) ;
+/// la consommation est atomique (UPDATE conditionnel sur used_at NULL).
+model OneTimeToken {
+  id        String              @id @default(uuid(7)) @db.Uuid
+  userId    String              @map("user_id") @db.Uuid
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose   OneTimeTokenPurpose
+  tokenHash String              @unique @map("token_hash")
+  expiresAt DateTime            @map("expires_at")
+  usedAt    DateTime?           @map("used_at")
+  ip        String?             @db.Inet
+  userAgent String?             @map("user_agent")
+  createdAt DateTime            @default(now()) @map("created_at")
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+  @@map("one_time_tokens")
 }
 
 /**
@@ -791,7 +832,8 @@ model Cart {
   /// Panier de compte OU panier invité : au moins l'un des deux (CHECK en SQL).
   userId     String?    @map("user_id") @db.Uuid
   user       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  /// Jeton opaque du cookie invité (256 bits aléatoires, généré côté API).
+  /// SHA-256 du jeton invité (256 bits aléatoires remis au client) —
+  /// comme tout jeton porteur, jamais stocké en clair (tâche 05).
   guestToken String?    @unique @map("guest_token")
   status     CartStatus @default(ACTIVE)
   currency   Currency   @default(CAD)

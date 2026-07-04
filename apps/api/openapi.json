@@ -22,6 +22,778 @@
           "health"
         ]
       }
+    },
+    "/v1/auth/register": {
+      "post": {
+        "description": "Réponse identique que l’adresse soit libre ou non (anti-énumération). Envoie un courriel de vérification; aucune session n’est ouverte.",
+        "operationId": "register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Inscription par courriel",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/verify-email": {
+      "post": {
+        "operationId": "verifyEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Confirme une adresse courriel",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/resend-verification": {
+      "post": {
+        "description": "202 systématique, que le compte existe ou non.",
+        "operationId": "resendVerification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOnlyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Renvoie le courriel de vérification",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "description": "Si la MFA est active : renvoie mfaRequired=true et un challengeToken à présenter à POST /auth/login/mfa. Sinon : jetons de session (le refresh est aussi posé en cookie httpOnly).",
+        "operationId": "login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Connexion par courriel et mot de passe",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/login/mfa": {
+      "post": {
+        "operationId": "loginMfa",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Second facteur de la connexion (code TOTP ou code de secours)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "description": "Jeton lu dans le corps (mobile) ou le cookie httpOnly (web). Chaque jeton ne sert qu’UNE fois; une réutilisation révoque la session entière.",
+        "operationId": "refreshTokens",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Rotation du refresh token",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Déconnexion (révoque la session du refresh token présenté)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/forgot-password": {
+      "post": {
+        "description": "202 systématique, que le compte existe ou non.",
+        "operationId": "forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOnlyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Demande de réinitialisation de mot de passe",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/reset-password": {
+      "post": {
+        "description": "Révoque TOUTES les sessions du compte.",
+        "operationId": "resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Réinitialise le mot de passe (jeton à usage unique)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/change-password": {
+      "post": {
+        "operationId": "changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change le mot de passe (connecté) — révoque les autres sessions",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "operationId": "getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Profil du compte connecté",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/mfa/enroll": {
+      "post": {
+        "description": "Le secret reste en attente tant qu’un premier code valide n’a pas été fourni à /auth/mfa/activate.",
+        "operationId": "mfaEnroll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaEnrollResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Démarre l’enrôlement MFA (secret + QR otpauth)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/mfa/activate": {
+      "post": {
+        "description": "Les codes de secours ne sont montrés qu’UNE fois — à conserver hors ligne.",
+        "operationId": "mfaActivate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaActivateResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Active la MFA (premier code TOTP) et retourne les codes de secours",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/mfa/disable": {
+      "post": {
+        "description": "Refusé (403) pour les comptes STAFF/ADMIN : leur MFA est imposée par le serveur.",
+        "operationId": "mfaDisable",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Désactive la MFA (code TOTP ou code de secours exigé)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/sessions": {
+      "get": {
+        "operationId": "listSessions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Liste des sessions actives du compte",
+        "tags": [
+          "auth"
+        ]
+      },
+      "delete": {
+        "description": "Par défaut, déconnecte tous les AUTRES appareils. Avec ?all=true, révoque aussi la session courante.",
+        "operationId": "revokeAllSessions",
+        "parameters": [
+          {
+            "name": "all",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokeSessionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Révocation globale des sessions",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/sessions/{sessionId}": {
+      "delete": {
+        "operationId": "revokeSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokeSessionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Révoque une session (déconnecte l’appareil visé)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/social/google": {
+      "post": {
+        "description": "Le client obtient l’ID token via Google Sign-In puis le présente ici. Compte MFA → défi TOTP comme au login classique.",
+        "operationId": "loginWithGoogle",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Connexion / inscription via un ID token Google",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/social/apple": {
+      "post": {
+        "operationId": "loginWithApple",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Connexion / inscription via un ID token Apple",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/guest-cart": {
+      "post": {
+        "description": "Le jeton (256 bits, haché en base) identifie le panier anonyme pendant 30 jours. À présenter au login/register pour fusionner le panier dans le compte.",
+        "operationId": "createGuestCart",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuestCartResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Crée un panier invité et retourne son jeton opaque",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/me/export": {
+      "get": {
+        "operationId": "exportMyData",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Document JSON — profil, adresses, commandes, équipements, avis, préférences…",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Export JSON des renseignements personnels (Loi 25)",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/me/deletion-request": {
+      "post": {
+        "description": "Confirmation forte : session valide + jeton envoyé par courriel. Rien n’est supprimé avant la confirmation.",
+        "operationId": "requestAccountDeletion",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Demande la suppression du compte (Loi 25)",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/me/deletion-confirm": {
+      "post": {
+        "operationId": "confirmAccountDeletion",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletionConfirmDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirme la suppression : anonymisation immédiate et déconnexion générale",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/admin/ping": {
+      "get": {
+        "operationId": "adminPing",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPingResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sonde d’accès admin (JWT + rôle du personnel + MFA active)",
+        "tags": [
+          "admin"
+        ]
+      }
     }
   },
   "info": {
@@ -66,6 +838,461 @@
           "version",
           "timestamp",
           "uptimeSeconds"
+        ]
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "marie@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 128
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Marie"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Tremblay"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ],
+            "default": "fr"
+          },
+          "guestCartToken": {
+            "type": "string",
+            "description": "Jeton de panier invité à fusionner dans le compte"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "MessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "VerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Jeton reçu par courriel"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "EmailOnlyDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "marie@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "marie@example.com"
+          },
+          "password": {
+            "type": "string"
+          },
+          "guestCartToken": {
+            "type": "string",
+            "description": "Jeton de panier invité à fusionner à la connexion"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER",
+              "STAFF",
+              "ADMIN"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ]
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "mfaEnabled": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "firstName",
+          "lastName",
+          "role",
+          "locale",
+          "emailVerified",
+          "mfaEnabled",
+          "createdAt"
+        ]
+      },
+      "LoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "mfaRequired": {
+            "type": "boolean",
+            "description": "true = fournir un code via POST /auth/login/mfa"
+          },
+          "challengeToken": {
+            "type": "string",
+            "description": "Présent si mfaRequired — valide 5 minutes"
+          },
+          "accessToken": {
+            "type": "string",
+            "description": "JWT Bearer de 15 minutes"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token opaque (aussi posé en cookie httpOnly pour le web)"
+          },
+          "tokenType": {
+            "type": "string",
+            "enum": [
+              "Bearer"
+            ]
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Durée de vie de l’access token (secondes)"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserProfileDto"
+          }
+        },
+        "required": [
+          "mfaRequired"
+        ]
+      },
+      "MfaLoginDto": {
+        "type": "object",
+        "properties": {
+          "challengeToken": {
+            "type": "string",
+            "description": "Jeton de défi retourné par POST /auth/login (mfaRequired=true)"
+          },
+          "code": {
+            "type": "string",
+            "description": "Code TOTP à 6 chiffres ou code de secours XXXXX-XXXXX"
+          },
+          "guestCartToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challengeToken",
+          "code"
+        ]
+      },
+      "RefreshDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token (mobile). Le web utilise plutôt le cookie httpOnly."
+          }
+        }
+      },
+      "RefreshResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "tokenType": {
+            "type": "string",
+            "enum": [
+              "Bearer"
+            ]
+          },
+          "expiresIn": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "tokenType",
+          "expiresIn"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Jeton reçu par courriel"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "MfaEnrollResponseDto": {
+        "type": "object",
+        "properties": {
+          "secretBase32": {
+            "type": "string",
+            "description": "Secret TOTP en base32 (saisie manuelle)"
+          },
+          "otpauthUri": {
+            "type": "string",
+            "description": "URI otpauth:// pour les applications TOTP"
+          },
+          "qrCodeDataUrl": {
+            "type": "string",
+            "description": "QR d’enrôlement en data URL PNG"
+          }
+        },
+        "required": [
+          "secretBase32",
+          "otpauthUri",
+          "qrCodeDataUrl"
+        ]
+      },
+      "MfaCodeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Code TOTP à 6 chiffres ou code de secours XXXXX-XXXXX"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "MfaActivateResponseDto": {
+        "type": "object",
+        "properties": {
+          "recoveryCodes": {
+            "description": "Codes de secours à usage unique — montrés UNE seule fois",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "recoveryCodes"
+        ]
+      },
+      "SessionItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Id de session (famille de refresh tokens)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Ouverture de la session (connexion)"
+          },
+          "lastActiveAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Dernier rafraîchissement"
+          },
+          "ip": {
+            "type": "string",
+            "nullable": true
+          },
+          "userAgent": {
+            "type": "string",
+            "nullable": true
+          },
+          "current": {
+            "type": "boolean",
+            "description": "Session portant la requête courante"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "lastActiveAt",
+          "ip",
+          "userAgent",
+          "current"
+        ]
+      },
+      "RevokeSessionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "revokedSessions": {
+            "type": "number",
+            "description": "Nombre de sessions révoquées"
+          }
+        },
+        "required": [
+          "revokedSessions"
+        ]
+      },
+      "SocialLoginDto": {
+        "type": "object",
+        "properties": {
+          "idToken": {
+            "type": "string",
+            "description": "ID token OIDC émis par Google ou Apple"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ],
+            "default": "fr"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Prénom (Apple ne le transmet qu’à la première connexion)"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "guestCartToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "idToken"
+        ]
+      },
+      "GuestCartResponseDto": {
+        "type": "object",
+        "properties": {
+          "guestCartToken": {
+            "type": "string",
+            "description": "Jeton opaque du panier invité (à conserver côté client)"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "guestCartToken",
+          "expiresAt"
+        ]
+      },
+      "DeletionConfirmDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Jeton reçu par courriel (valide 30 minutes)"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "AdminPingResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "description": "Rôle du compte authentifié"
+          }
+        },
+        "required": [
+          "status",
+          "role"
         ]
       }
     }

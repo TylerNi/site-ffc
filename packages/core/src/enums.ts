@@ -32,6 +32,21 @@ export const DEVICE_PLATFORMS = ['IOS', 'ANDROID', 'WEB'] as const;
 export const devicePlatformSchema = z.enum(DEVICE_PLATFORMS);
 export type DevicePlatform = z.infer<typeof devicePlatformSchema>;
 
+/**
+ * Finalités des jetons à usage unique (table one_time_tokens, tâche 05).
+ * Chaque jeton est haché en base, expire, et n'est consommable qu'une fois :
+ * vérification de courriel, réinitialisation de mot de passe, défi MFA au
+ * login, confirmation forte de suppression de compte (Loi 25).
+ */
+export const ONE_TIME_TOKEN_PURPOSES = [
+  'EMAIL_VERIFICATION',
+  'PASSWORD_RESET',
+  'MFA_CHALLENGE',
+  'ACCOUNT_DELETION',
+] as const;
+export const oneTimeTokenPurposeSchema = z.enum(ONE_TIME_TOKEN_PURPOSES);
+export type OneTimeTokenPurpose = z.infer<typeof oneTimeTokenPurposeSchema>;
+
 /* ------------------------------------------------------------------ */
 /* Catalogue                                                           */
 /* ------------------------------------------------------------------ */
@@ -241,6 +256,7 @@ export const PRISMA_ENUMS = {
   UserRole: USER_ROLES,
   UserStatus: USER_STATUSES,
   DevicePlatform: DEVICE_PLATFORMS,
+  OneTimeTokenPurpose: ONE_TIME_TOKEN_PURPOSES,
   ProductStatus: PRODUCT_STATUSES,
   InventoryMovementType: INVENTORY_MOVEMENT_TYPES,
   EquipmentKind: EQUIPMENT_KINDS,

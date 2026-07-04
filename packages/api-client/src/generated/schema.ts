@@ -21,6 +21,437 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Inscription par courriel
+         * @description Réponse identique que l’adresse soit libre ou non (anti-énumération). Envoie un courriel de vérification; aucune session n’est ouverte.
+         */
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirme une adresse courriel */
+        post: operations["verifyEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/resend-verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Renvoie le courriel de vérification
+         * @description 202 systématique, que le compte existe ou non.
+         */
+        post: operations["resendVerification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Connexion par courriel et mot de passe
+         * @description Si la MFA est active : renvoie mfaRequired=true et un challengeToken à présenter à POST /auth/login/mfa. Sinon : jetons de session (le refresh est aussi posé en cookie httpOnly).
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/login/mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Second facteur de la connexion (code TOTP ou code de secours) */
+        post: operations["loginMfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotation du refresh token
+         * @description Jeton lu dans le corps (mobile) ou le cookie httpOnly (web). Chaque jeton ne sert qu’UNE fois; une réutilisation révoque la session entière.
+         */
+        post: operations["refreshTokens"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Déconnexion (révoque la session du refresh token présenté) */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/forgot-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Demande de réinitialisation de mot de passe
+         * @description 202 systématique, que le compte existe ou non.
+         */
+        post: operations["forgotPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Réinitialise le mot de passe (jeton à usage unique)
+         * @description Révoque TOUTES les sessions du compte.
+         */
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/change-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change le mot de passe (connecté) — révoque les autres sessions */
+        post: operations["changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Profil du compte connecté */
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/mfa/enroll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Démarre l’enrôlement MFA (secret + QR otpauth)
+         * @description Le secret reste en attente tant qu’un premier code valide n’a pas été fourni à /auth/mfa/activate.
+         */
+        post: operations["mfaEnroll"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/mfa/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Active la MFA (premier code TOTP) et retourne les codes de secours
+         * @description Les codes de secours ne sont montrés qu’UNE fois — à conserver hors ligne.
+         */
+        post: operations["mfaActivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/mfa/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Désactive la MFA (code TOTP ou code de secours exigé)
+         * @description Refusé (403) pour les comptes STAFF/ADMIN : leur MFA est imposée par le serveur.
+         */
+        post: operations["mfaDisable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liste des sessions actives du compte */
+        get: operations["listSessions"];
+        put?: never;
+        post?: never;
+        /**
+         * Révocation globale des sessions
+         * @description Par défaut, déconnecte tous les AUTRES appareils. Avec ?all=true, révoque aussi la session courante.
+         */
+        delete: operations["revokeAllSessions"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/sessions/{sessionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Révoque une session (déconnecte l’appareil visé) */
+        delete: operations["revokeSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/social/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Connexion / inscription via un ID token Google
+         * @description Le client obtient l’ID token via Google Sign-In puis le présente ici. Compte MFA → défi TOTP comme au login classique.
+         */
+        post: operations["loginWithGoogle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/social/apple": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connexion / inscription via un ID token Apple */
+        post: operations["loginWithApple"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/guest-cart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Crée un panier invité et retourne son jeton opaque
+         * @description Le jeton (256 bits, haché en base) identifie le panier anonyme pendant 30 jours. À présenter au login/register pour fusionner le panier dans le compte.
+         */
+        post: operations["createGuestCart"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export JSON des renseignements personnels (Loi 25) */
+        get: operations["exportMyData"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/deletion-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Demande la suppression du compte (Loi 25)
+         * @description Confirmation forte : session valide + jeton envoyé par courriel. Rien n’est supprimé avant la confirmation.
+         */
+        post: operations["requestAccountDeletion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/deletion-confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirme la suppression : anonymisation immédiate et déconnexion générale */
+        post: operations["confirmAccountDeletion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/ping": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sonde d’accès admin (JWT + rôle du personnel + MFA active) */
+        get: operations["adminPing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -35,6 +466,167 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
             uptimeSeconds: number;
+        };
+        RegisterDto: {
+            /** @example marie@example.com */
+            email: string;
+            password: string;
+            /** @example Marie */
+            firstName?: string;
+            /** @example Tremblay */
+            lastName?: string;
+            /**
+             * @default fr
+             * @enum {string}
+             */
+            locale: "fr" | "en";
+            /** @description Jeton de panier invité à fusionner dans le compte */
+            guestCartToken?: string;
+        };
+        MessageResponseDto: {
+            message: string;
+        };
+        VerifyEmailDto: {
+            /** @description Jeton reçu par courriel */
+            token: string;
+        };
+        EmailOnlyDto: {
+            /** @example marie@example.com */
+            email: string;
+        };
+        LoginDto: {
+            /** @example marie@example.com */
+            email: string;
+            password: string;
+            /** @description Jeton de panier invité à fusionner à la connexion */
+            guestCartToken?: string;
+        };
+        UserProfileDto: {
+            /** Format: uuid */
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+            /** @enum {string} */
+            role: "CUSTOMER" | "STAFF" | "ADMIN";
+            /** @enum {string} */
+            locale: "fr" | "en";
+            emailVerified: boolean;
+            mfaEnabled: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        LoginResponseDto: {
+            /** @description true = fournir un code via POST /auth/login/mfa */
+            mfaRequired: boolean;
+            /** @description Présent si mfaRequired — valide 5 minutes */
+            challengeToken?: string;
+            /** @description JWT Bearer de 15 minutes */
+            accessToken?: string;
+            /** @description Refresh token opaque (aussi posé en cookie httpOnly pour le web) */
+            refreshToken?: string;
+            /** @enum {string} */
+            tokenType?: "Bearer";
+            /** @description Durée de vie de l’access token (secondes) */
+            expiresIn?: number;
+            user?: components["schemas"]["UserProfileDto"];
+        };
+        MfaLoginDto: {
+            /** @description Jeton de défi retourné par POST /auth/login (mfaRequired=true) */
+            challengeToken: string;
+            /** @description Code TOTP à 6 chiffres ou code de secours XXXXX-XXXXX */
+            code: string;
+            guestCartToken?: string;
+        };
+        RefreshDto: {
+            /** @description Refresh token (mobile). Le web utilise plutôt le cookie httpOnly. */
+            refreshToken?: string;
+        };
+        RefreshResponseDto: {
+            accessToken: string;
+            refreshToken: string;
+            /** @enum {string} */
+            tokenType: "Bearer";
+            expiresIn: number;
+        };
+        ResetPasswordDto: {
+            /** @description Jeton reçu par courriel */
+            token: string;
+            newPassword: string;
+        };
+        ChangePasswordDto: {
+            currentPassword: string;
+            newPassword: string;
+        };
+        MfaEnrollResponseDto: {
+            /** @description Secret TOTP en base32 (saisie manuelle) */
+            secretBase32: string;
+            /** @description URI otpauth:// pour les applications TOTP */
+            otpauthUri: string;
+            /** @description QR d’enrôlement en data URL PNG */
+            qrCodeDataUrl: string;
+        };
+        MfaCodeDto: {
+            /** @description Code TOTP à 6 chiffres ou code de secours XXXXX-XXXXX */
+            code: string;
+        };
+        MfaActivateResponseDto: {
+            /** @description Codes de secours à usage unique — montrés UNE seule fois */
+            recoveryCodes: string[];
+        };
+        SessionItemDto: {
+            /**
+             * Format: uuid
+             * @description Id de session (famille de refresh tokens)
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Ouverture de la session (connexion)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Dernier rafraîchissement
+             */
+            lastActiveAt: string;
+            ip: string | null;
+            userAgent: string | null;
+            /** @description Session portant la requête courante */
+            current: boolean;
+        };
+        RevokeSessionsResponseDto: {
+            /** @description Nombre de sessions révoquées */
+            revokedSessions: number;
+        };
+        SocialLoginDto: {
+            /** @description ID token OIDC émis par Google ou Apple */
+            idToken: string;
+            /**
+             * @default fr
+             * @enum {string}
+             */
+            locale: "fr" | "en";
+            /** @description Prénom (Apple ne le transmet qu’à la première connexion) */
+            firstName?: string;
+            lastName?: string;
+            guestCartToken?: string;
+        };
+        GuestCartResponseDto: {
+            /** @description Jeton opaque du panier invité (à conserver côté client) */
+            guestCartToken: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        DeletionConfirmDto: {
+            /** @description Jeton reçu par courriel (valide 30 minutes) */
+            token: string;
+        };
+        AdminPingResponseDto: {
+            /** @enum {string} */
+            status: "ok";
+            /** @description Rôle du compte authentifié */
+            role: string;
         };
     };
     responses: never;
@@ -60,6 +652,529 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponseDto"];
+                };
+            };
+        };
+    };
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    verifyEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    resendVerification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailOnlyDto"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
+            };
+        };
+    };
+    loginMfa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaLoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
+            };
+        };
+    };
+    refreshTokens: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefreshResponseDto"];
+                };
+            };
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    forgotPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailOnlyDto"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    getMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserProfileDto"];
+                };
+            };
+        };
+    };
+    mfaEnroll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MfaEnrollResponseDto"];
+                };
+            };
+        };
+    };
+    mfaActivate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MfaActivateResponseDto"];
+                };
+            };
+        };
+    };
+    mfaDisable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    listSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionItemDto"][];
+                };
+            };
+        };
+    };
+    revokeAllSessions: {
+        parameters: {
+            query?: {
+                all?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevokeSessionsResponseDto"];
+                };
+            };
+        };
+    };
+    revokeSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sessionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevokeSessionsResponseDto"];
+                };
+            };
+        };
+    };
+    loginWithGoogle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SocialLoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
+            };
+        };
+    };
+    loginWithApple: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SocialLoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
+            };
+        };
+    };
+    createGuestCart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuestCartResponseDto"];
+                };
+            };
+        };
+    };
+    exportMyData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document JSON — profil, adresses, commandes, équipements, avis, préférences… */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    requestAccountDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    confirmAccountDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeletionConfirmDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    adminPing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPingResponseDto"];
                 };
             };
         };

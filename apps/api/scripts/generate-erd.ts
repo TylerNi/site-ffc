@@ -22,6 +22,7 @@ const DOMAINS: Array<{ title: string; models: string[] }> = [
       'Address',
       'UserDevice',
       'RefreshToken',
+      'OneTimeToken',
       'Role',
       'Permission',
       'RolePermission',

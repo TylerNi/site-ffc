@@ -3,7 +3,7 @@
 > Document GÉNÉRÉ par `pnpm --filter @ffc/api db:erd` — ne pas éditer à la main.
 > Un diagramme par domaine fonctionnel ; conventions et décisions dans [database.md](./database.md).
 
-Tables : 43 · Enums : 27
+Tables : 44 · Enums : 28
 
 ## Comptes et accès
 
@@ -22,7 +22,11 @@ erDiagram
     enum_Locale locale
     boolean mfa_enabled
     string mfa_secret_enc "nullable"
+    string mfa_pending_secret_enc "nullable"
+    int mfa_last_used_step "nullable"
     string_array mfa_recovery_code_hashes
+    int failed_login_count
+    datetime locked_until "nullable"
     string stripe_customer_id UK
     string google_id UK
     string apple_id UK
@@ -74,6 +78,17 @@ erDiagram
     string user_agent "nullable"
     datetime created_at
   }
+  one_time_tokens {
+    string id PK
+    string user_id FK
+    enum_OneTimeTokenPurpose purpose
+    string token_hash UK
+    datetime expires_at
+    datetime used_at "nullable"
+    string ip "nullable"
+    string user_agent "nullable"
+    datetime created_at
+  }
   roles {
     string id PK
     string key UK
@@ -104,6 +119,7 @@ erDiagram
   addresses }o--|| users : "user"
   user_devices }o--|| users : "user"
   refresh_tokens }o--|| users : "user"
+  one_time_tokens }o--|| users : "user"
   role_permissions }o--|| roles : "role"
   role_permissions }o--|| permissions : "permission"
   user_role_assignments }o--|| users : "user"

@@ -21,15 +21,25 @@
     "seed": "pnpm exec tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-sesv2": "^3.1079.0",
     "@ffc/core": "workspace:*",
     "@nestjs/common": "^11.1.6",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.6",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/platform-express": "^11.1.6",
     "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "^6.19.3",
     "argon2": "^0.44.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "cookie-parser": "^1.4.7",
+    "helmet": "^8.2.0",
+    "jose": "^6.2.3",
+    "otpauth": "^9.5.1",
     "prisma": "^6.19.3",
+    "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "zod": "^4.1.11"
@@ -37,11 +47,18 @@
   "devDependencies": {
     "@ffc/eslint-config": "workspace:*",
     "@nestjs/cli": "^11.0.10",
+    "@nestjs/testing": "^11.1.27",
+    "@swc/core": "^1.15.43",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.3",
     "@types/node": "^24.5.2",
+    "@types/qrcode": "^1.5.6",
+    "@types/supertest": "^7.2.0",
     "eslint": "^9.36.0",
+    "supertest": "^7.2.2",
     "tsx": "^4.22.5",
     "typescript": "^5.9.3",
+    "unplugin-swc": "^1.5.9",
     "vitest": "^3.2.6"
   }
 }
