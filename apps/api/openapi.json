@@ -768,6 +768,516 @@
         ]
       }
     },
+    "/v1/catalog/categories": {
+      "get": {
+        "operationId": "getCatalogCategories",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "fr",
+              "type": "string",
+              "enum": [
+                "fr",
+                "en"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryTreeDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Arbre des catégories (localisé)",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/v1/catalog/products": {
+      "get": {
+        "operationId": "listCatalogProducts",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "description": "Langue des libellés/slugs",
+            "schema": {
+              "default": "fr",
+              "type": "string",
+              "enum": [
+                "fr",
+                "en"
+              ]
+            }
+          },
+          {
+            "name": "dimension",
+            "required": false,
+            "in": "query",
+            "description": "Dimension en n’importe quelle graphie : « 16x25x1 », « 16 x 25 x 1 », « 16-25-1 », « 15 3/4 x 24 3/4 » (réelle). Nominal et réel, orientation indifférente.",
+            "schema": {
+              "example": "16x25x1",
+              "type": "string"
+            }
+          },
+          {
+            "name": "merv",
+            "required": false,
+            "in": "query",
+            "description": "Cote MERV exacte",
+            "schema": {
+              "example": 11,
+              "type": "number"
+            }
+          },
+          {
+            "name": "brand",
+            "required": false,
+            "in": "query",
+            "description": "Slug de marque",
+            "schema": {
+              "example": "boreal-filtration",
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Slug de catégorie (localisé) — inclut les sous-catégories",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "equipmentKind",
+            "required": false,
+            "in": "query",
+            "description": "Type d’équipement compatible (fournaise, échangeur d’air…)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FURNACE",
+                "AIR_HANDLER",
+                "HRV_ERV",
+                "AIR_CONDITIONER",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "packSize",
+            "required": false,
+            "in": "query",
+            "description": "Format de boîte (filtres par unité de vente)",
+            "schema": {
+              "example": 6,
+              "type": "number"
+            }
+          },
+          {
+            "name": "depth",
+            "required": false,
+            "in": "query",
+            "description": "Profondeur nominale en pouces (1, 4, 5…)",
+            "schema": {
+              "example": 4,
+              "type": "number"
+            }
+          },
+          {
+            "name": "inStock",
+            "required": false,
+            "in": "query",
+            "description": "Ne garder que les produits en stock",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "relevance",
+              "type": "string",
+              "enum": [
+                "relevance",
+                "price",
+                "popularity"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Curseur opaque de pagination (voir nextCursor)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Taille de page (max 60)",
+            "schema": {
+              "default": 24,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Liste de produits filtrable et paginée par curseur",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/v1/catalog/sizes": {
+      "get": {
+        "operationId": "getCatalogSizeIndex",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SizeIndexDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Index des tailles disponibles avec compte de produits",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/v1/catalog/sizes/{label}/equivalents": {
+      "get": {
+        "operationId": "getCatalogSizeEquivalents",
+        "parameters": [
+          {
+            "name": "label",
+            "required": true,
+            "in": "path",
+            "description": "Dimension en toute graphie",
+            "schema": {
+              "example": "16x25x1",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SizeEquivalentsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Tailles équivalentes/compatibles (nominal ↔ réel)",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/v1/catalog/search/suggest": {
+      "get": {
+        "operationId": "suggestCatalog",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "fr",
+              "type": "string",
+              "enum": [
+                "fr",
+                "en"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Début de saisie",
+            "schema": {
+              "example": "16x2",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Nombre max de suggestions par catégorie",
+            "schema": {
+              "default": 6,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Autocomplétion (tailles + produits)",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/v1/catalog/search": {
+      "get": {
+        "operationId": "searchCatalog",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "description": "Langue des libellés/slugs",
+            "schema": {
+              "default": "fr",
+              "type": "string",
+              "enum": [
+                "fr",
+                "en"
+              ]
+            }
+          },
+          {
+            "name": "dimension",
+            "required": false,
+            "in": "query",
+            "description": "Dimension en n’importe quelle graphie : « 16x25x1 », « 16 x 25 x 1 », « 16-25-1 », « 15 3/4 x 24 3/4 » (réelle). Nominal et réel, orientation indifférente.",
+            "schema": {
+              "example": "16x25x1",
+              "type": "string"
+            }
+          },
+          {
+            "name": "merv",
+            "required": false,
+            "in": "query",
+            "description": "Cote MERV exacte",
+            "schema": {
+              "example": 11,
+              "type": "number"
+            }
+          },
+          {
+            "name": "brand",
+            "required": false,
+            "in": "query",
+            "description": "Slug de marque",
+            "schema": {
+              "example": "boreal-filtration",
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Slug de catégorie (localisé) — inclut les sous-catégories",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "equipmentKind",
+            "required": false,
+            "in": "query",
+            "description": "Type d’équipement compatible (fournaise, échangeur d’air…)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FURNACE",
+                "AIR_HANDLER",
+                "HRV_ERV",
+                "AIR_CONDITIONER",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "packSize",
+            "required": false,
+            "in": "query",
+            "description": "Format de boîte (filtres par unité de vente)",
+            "schema": {
+              "example": 6,
+              "type": "number"
+            }
+          },
+          {
+            "name": "depth",
+            "required": false,
+            "in": "query",
+            "description": "Profondeur nominale en pouces (1, 4, 5…)",
+            "schema": {
+              "example": 4,
+              "type": "number"
+            }
+          },
+          {
+            "name": "inStock",
+            "required": false,
+            "in": "query",
+            "description": "Ne garder que les produits en stock",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "relevance",
+              "type": "string",
+              "enum": [
+                "relevance",
+                "price",
+                "popularity"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Curseur opaque de pagination (voir nextCursor)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Taille de page (max 60)",
+            "schema": {
+              "default": 24,
+              "type": "number"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Requête : texte (nom, marque), SKU, ou dimension. Tolérante aux fautes.",
+            "schema": {
+              "example": "16x25x1 merv 11",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Recherche full-text/trigram tolérante aux fautes et aux dimensions",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/v1/catalog/products/{slug}": {
+      "get": {
+        "operationId": "getCatalogProduct",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Slug localisé (fr/en)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "fr",
+              "type": "string",
+              "enum": [
+                "fr",
+                "en"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Fiche produit par slug localisé",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
     "/v1/admin/ping": {
       "get": {
         "operationId": "adminPing",
@@ -1274,6 +1784,616 @@
         },
         "required": [
           "token"
+        ]
+      },
+      "CategoryNodeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "filtres-1-pouce"
+          },
+          "name": {
+            "type": "string",
+            "example": "Filtres 1 pouce"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "productCount": {
+            "type": "number",
+            "description": "Produits actifs dans cette catégorie et ses sous-catégories"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryNodeDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "productCount",
+          "children"
+        ]
+      },
+      "CategoryTreeDto": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryNodeDto"
+            }
+          }
+        },
+        "required": [
+          "categories"
+        ]
+      },
+      "BrandRefDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "boreal-filtration"
+          },
+          "name": {
+            "type": "string",
+            "example": "Boréal Filtration"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ]
+      },
+      "ProductImageDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Clé S3 ou URL CDN"
+          },
+          "alt": {
+            "type": "string",
+            "nullable": true
+          },
+          "width": {
+            "type": "number",
+            "nullable": true
+          },
+          "height": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "ProductListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Slug localisé de la fiche produit"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "brand": {
+            "$ref": "#/components/schemas/BrandRefDto"
+          },
+          "priceFromCents": {
+            "type": "number",
+            "description": "Prix le plus bas (cents)"
+          },
+          "priceToCents": {
+            "type": "number",
+            "description": "Prix le plus haut (cents)"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "inStock": {
+            "type": "boolean",
+            "description": "Au moins une variante disponible"
+          },
+          "nominalLabels": {
+            "description": "Tailles nominales offertes (ex. « 16x25x1 »)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mervValues": {
+            "description": "Cotes MERV offertes",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "packSizes": {
+            "description": "Formats de boîte offerts",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "isFeatured": {
+            "type": "boolean"
+          },
+          "image": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductImageDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "brand",
+          "priceFromCents",
+          "priceToCents",
+          "currency",
+          "inStock",
+          "nominalLabels",
+          "mervValues",
+          "packSizes",
+          "isFeatured"
+        ]
+      },
+      "ProductListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductListItemDto"
+            }
+          },
+          "count": {
+            "type": "number",
+            "description": "Nombre d’items retournés"
+          },
+          "hasMore": {
+            "type": "boolean",
+            "description": "Autres pages disponibles"
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "À passer en ?cursor= pour la page suivante"
+          }
+        },
+        "required": [
+          "items",
+          "count",
+          "hasMore"
+        ]
+      },
+      "SizeIndexItemDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "16x25x1"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "depth": {
+            "type": "number"
+          },
+          "productCount": {
+            "type": "number",
+            "description": "Produits actifs offrant cette taille"
+          },
+          "mervValues": {
+            "description": "Cotes MERV offertes dans cette taille",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "label",
+          "width",
+          "height",
+          "depth",
+          "productCount",
+          "mervValues"
+        ]
+      },
+      "SizeIndexDto": {
+        "type": "object",
+        "properties": {
+          "sizes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SizeIndexItemDto"
+            }
+          }
+        },
+        "required": [
+          "sizes"
+        ]
+      },
+      "EquivalentSizeDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "16x25x1"
+          },
+          "nominal": {
+            "type": "object",
+            "description": "Dimensions nominales (pouces)"
+          },
+          "actual": {
+            "type": "object",
+            "description": "Dimensions réelles (pouces)"
+          },
+          "inCatalog": {
+            "type": "boolean",
+            "description": "Cette taille est offerte au catalogue"
+          }
+        },
+        "required": [
+          "label",
+          "nominal",
+          "actual",
+          "inCatalog"
+        ]
+      },
+      "SizeEquivalentsDto": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "description": "Saisie normalisée",
+            "example": "16x25x1"
+          },
+          "canonical": {
+            "type": "string",
+            "description": "Libellé canonique",
+            "example": "16x25x1"
+          },
+          "catalogLabels": {
+            "description": "Libellés équivalents présents au catalogue (à interroger)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "equivalents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquivalentSizeDto"
+            }
+          }
+        },
+        "required": [
+          "input",
+          "canonical",
+          "catalogLabels",
+          "equivalents"
+        ]
+      },
+      "SizeSuggestionDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "16x25x1"
+          },
+          "productCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "label",
+          "productCount"
+        ]
+      },
+      "ProductSuggestionDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "priceFromCents": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "priceFromCents",
+          "currency"
+        ]
+      },
+      "SuggestDto": {
+        "type": "object",
+        "properties": {
+          "sizes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SizeSuggestionDto"
+            }
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductSuggestionDto"
+            }
+          }
+        },
+        "required": [
+          "sizes",
+          "products"
+        ]
+      },
+      "VariantDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "nominalLabel": {
+            "type": "string",
+            "example": "16x25x1"
+          },
+          "nominalWidthIn": {
+            "type": "number",
+            "description": "Dimensions nominales/réelles en pouces"
+          },
+          "nominalHeightIn": {
+            "type": "number"
+          },
+          "nominalDepthIn": {
+            "type": "number"
+          },
+          "actualWidthIn": {
+            "type": "number"
+          },
+          "actualHeightIn": {
+            "type": "number"
+          },
+          "actualDepthIn": {
+            "type": "number"
+          },
+          "merv": {
+            "type": "number",
+            "nullable": true
+          },
+          "packSize": {
+            "type": "number"
+          },
+          "priceCents": {
+            "type": "number"
+          },
+          "compareAtPriceCents": {
+            "type": "number",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "availableQuantity": {
+            "type": "number",
+            "description": "Quantité disponible (en main − réservée)"
+          },
+          "inStock": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "nominalLabel",
+          "nominalWidthIn",
+          "nominalHeightIn",
+          "nominalDepthIn",
+          "actualWidthIn",
+          "actualHeightIn",
+          "actualDepthIn",
+          "packSize",
+          "priceCents",
+          "currency",
+          "availableQuantity",
+          "inStock"
+        ]
+      },
+      "ReviewSummaryDto": {
+        "type": "object",
+        "properties": {
+          "average": {
+            "type": "number",
+            "description": "Note moyenne (0 si aucun avis)",
+            "example": 4.7
+          },
+          "count": {
+            "type": "number",
+            "description": "Nombre d’avis approuvés"
+          }
+        },
+        "required": [
+          "average",
+          "count"
+        ]
+      },
+      "RelatedProductDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "priceFromCents": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "merv": {
+            "type": "number",
+            "nullable": true
+          },
+          "relation": {
+            "type": "string",
+            "description": "Relation : « size » (même taille), « pack » (autre format)"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "priceFromCents",
+          "currency",
+          "relation"
+        ]
+      },
+      "ProductDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "brand": {
+            "$ref": "#/components/schemas/BrandRefDto"
+          },
+          "category": {
+            "type": "object",
+            "nullable": true,
+            "description": "Catégorie (slug + nom localisés)"
+          },
+          "equipmentKinds": {
+            "type": "array",
+            "description": "Types d’équipement compatibles",
+            "items": {
+              "type": "string",
+              "enum": [
+                "FURNACE",
+                "AIR_HANDLER",
+                "HRV_ERV",
+                "AIR_CONDITIONER",
+                "OTHER"
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariantDto"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImageDto"
+            }
+          },
+          "reviews": {
+            "$ref": "#/components/schemas/ReviewSummaryDto"
+          },
+          "related": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelatedProductDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "brand",
+          "equipmentKinds",
+          "variants",
+          "images",
+          "reviews",
+          "related"
         ]
       },
       "AdminPingResponseDto": {

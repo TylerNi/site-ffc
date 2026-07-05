@@ -130,7 +130,18 @@ append-only, anonymisation Loi 25 outillée. Conventions, décisions et
 diagrammes dans **[`docs/database.md`](docs/database.md)** et
 [`docs/database-erd.md`](docs/database-erd.md).
 
+## Catalogue et recherche
+
+API publique du catalogue sous `/v1/catalog` : arbre de catégories localisé,
+liste filtrable (dimension, MERV, marque, type d'équipement, format de boîte)
+triable et paginée par curseur, fiche produit par slug localisé, index des
+tailles et équivalences nominal ↔ réel. Recherche full-text Postgres + trigram
+tolérante aux fautes, avec normalisation des dimensions (« 16x25x1 », « 16 x
+25 x 1 », « 16-25-1 », « 15 3/4 x 24 3/4 »…) et autocomplétion `< 50 ms`.
+Détails et décisions dans **[`docs/catalog.md`](docs/catalog.md)**.
+
 ## État
 
 En construction — fondations du monorepo (tâche 02), infrastructure/CI-CD
-(tâche 03) et schéma de base de données (tâche 04) en place.
+(tâche 03), schéma de base de données (tâche 04), authentification (tâche 05)
+et API catalogue/recherche (tâche 06) en place.

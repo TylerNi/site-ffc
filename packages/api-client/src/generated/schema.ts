@@ -435,6 +435,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/catalog/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Arbre des catégories (localisé) */
+        get: operations["getCatalogCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liste de produits filtrable et paginée par curseur */
+        get: operations["listCatalogProducts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/sizes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Index des tailles disponibles avec compte de produits */
+        get: operations["getCatalogSizeIndex"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/sizes/{label}/equivalents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tailles équivalentes/compatibles (nominal ↔ réel) */
+        get: operations["getCatalogSizeEquivalents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/search/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Autocomplétion (tailles + produits) */
+        get: operations["suggestCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recherche full-text/trigram tolérante aux fautes et aux dimensions */
+        get: operations["searchCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/products/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fiche produit par slug localisé */
+        get: operations["getCatalogProduct"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/ping": {
         parameters: {
             query?: never;
@@ -621,6 +740,186 @@ export interface components {
         DeletionConfirmDto: {
             /** @description Jeton reçu par courriel (valide 30 minutes) */
             token: string;
+        };
+        CategoryNodeDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example filtres-1-pouce */
+            slug: string;
+            /** @example Filtres 1 pouce */
+            name: string;
+            description?: string | null;
+            /** @description Produits actifs dans cette catégorie et ses sous-catégories */
+            productCount: number;
+            children: components["schemas"]["CategoryNodeDto"][];
+        };
+        CategoryTreeDto: {
+            categories: components["schemas"]["CategoryNodeDto"][];
+        };
+        BrandRefDto: {
+            /** @example boreal-filtration */
+            slug: string;
+            /** @example Boréal Filtration */
+            name: string;
+        };
+        ProductImageDto: {
+            /** @description Clé S3 ou URL CDN */
+            url: string;
+            alt?: string | null;
+            width?: number | null;
+            height?: number | null;
+        };
+        ProductListItemDto: {
+            /** Format: uuid */
+            id: string;
+            /** @description Slug localisé de la fiche produit */
+            slug: string;
+            name: string;
+            shortDescription?: string | null;
+            brand: components["schemas"]["BrandRefDto"];
+            /** @description Prix le plus bas (cents) */
+            priceFromCents: number;
+            /** @description Prix le plus haut (cents) */
+            priceToCents: number;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            /** @description Au moins une variante disponible */
+            inStock: boolean;
+            /** @description Tailles nominales offertes (ex. « 16x25x1 ») */
+            nominalLabels: string[];
+            /** @description Cotes MERV offertes */
+            mervValues: number[];
+            /** @description Formats de boîte offerts */
+            packSizes: number[];
+            isFeatured: boolean;
+            image?: components["schemas"]["ProductImageDto"] | null;
+        };
+        ProductListDto: {
+            items: components["schemas"]["ProductListItemDto"][];
+            /** @description Nombre d’items retournés */
+            count: number;
+            /** @description Autres pages disponibles */
+            hasMore: boolean;
+            /** @description À passer en ?cursor= pour la page suivante */
+            nextCursor?: string | null;
+        };
+        SizeIndexItemDto: {
+            /** @example 16x25x1 */
+            label: string;
+            width: number;
+            height: number;
+            depth: number;
+            /** @description Produits actifs offrant cette taille */
+            productCount: number;
+            /** @description Cotes MERV offertes dans cette taille */
+            mervValues: number[];
+        };
+        SizeIndexDto: {
+            sizes: components["schemas"]["SizeIndexItemDto"][];
+        };
+        EquivalentSizeDto: {
+            /** @example 16x25x1 */
+            label: string;
+            /** @description Dimensions nominales (pouces) */
+            nominal: Record<string, never>;
+            /** @description Dimensions réelles (pouces) */
+            actual: Record<string, never>;
+            /** @description Cette taille est offerte au catalogue */
+            inCatalog: boolean;
+        };
+        SizeEquivalentsDto: {
+            /**
+             * @description Saisie normalisée
+             * @example 16x25x1
+             */
+            input: string;
+            /**
+             * @description Libellé canonique
+             * @example 16x25x1
+             */
+            canonical: string;
+            /** @description Libellés équivalents présents au catalogue (à interroger) */
+            catalogLabels: string[];
+            equivalents: components["schemas"]["EquivalentSizeDto"][];
+        };
+        SizeSuggestionDto: {
+            /** @example 16x25x1 */
+            label: string;
+            productCount: number;
+        };
+        ProductSuggestionDto: {
+            slug: string;
+            name: string;
+            priceFromCents: number;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+        };
+        SuggestDto: {
+            sizes: components["schemas"]["SizeSuggestionDto"][];
+            products: components["schemas"]["ProductSuggestionDto"][];
+        };
+        VariantDto: {
+            /** Format: uuid */
+            id: string;
+            sku: string;
+            /** @example 16x25x1 */
+            nominalLabel: string;
+            /** @description Dimensions nominales/réelles en pouces */
+            nominalWidthIn: number;
+            nominalHeightIn: number;
+            nominalDepthIn: number;
+            actualWidthIn: number;
+            actualHeightIn: number;
+            actualDepthIn: number;
+            merv?: number | null;
+            packSize: number;
+            priceCents: number;
+            compareAtPriceCents?: number | null;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            /** @description Quantité disponible (en main − réservée) */
+            availableQuantity: number;
+            inStock: boolean;
+        };
+        ReviewSummaryDto: {
+            /**
+             * @description Note moyenne (0 si aucun avis)
+             * @example 4.7
+             */
+            average: number;
+            /** @description Nombre d’avis approuvés */
+            count: number;
+        };
+        RelatedProductDto: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            priceFromCents: number;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            merv?: number | null;
+            /** @description Relation : « size » (même taille), « pack » (autre format) */
+            relation: string;
+        };
+        ProductDetailDto: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            shortDescription?: string | null;
+            description?: string | null;
+            metaTitle?: string | null;
+            metaDescription?: string | null;
+            brand: components["schemas"]["BrandRefDto"];
+            /** @description Catégorie (slug + nom localisés) */
+            category?: Record<string, never> | null;
+            /** @description Types d’équipement compatibles */
+            equipmentKinds: ("FURNACE" | "AIR_HANDLER" | "HRV_ERV" | "AIR_CONDITIONER" | "OTHER")[];
+            variants: components["schemas"]["VariantDto"][];
+            images: components["schemas"]["ProductImageDto"][];
+            reviews: components["schemas"]["ReviewSummaryDto"];
+            related: components["schemas"]["RelatedProductDto"][];
         };
         AdminPingResponseDto: {
             /** @enum {string} */
@@ -1156,6 +1455,205 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    getCatalogCategories: {
+        parameters: {
+            query?: {
+                locale?: "fr" | "en";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryTreeDto"];
+                };
+            };
+        };
+    };
+    listCatalogProducts: {
+        parameters: {
+            query?: {
+                /** @description Langue des libellés/slugs */
+                locale?: "fr" | "en";
+                /** @description Dimension en n’importe quelle graphie : « 16x25x1 », « 16 x 25 x 1 », « 16-25-1 », « 15 3/4 x 24 3/4 » (réelle). Nominal et réel, orientation indifférente. */
+                dimension?: string;
+                /** @description Cote MERV exacte */
+                merv?: number;
+                /** @description Slug de marque */
+                brand?: string;
+                /** @description Slug de catégorie (localisé) — inclut les sous-catégories */
+                category?: string;
+                /** @description Type d’équipement compatible (fournaise, échangeur d’air…) */
+                equipmentKind?: "FURNACE" | "AIR_HANDLER" | "HRV_ERV" | "AIR_CONDITIONER" | "OTHER";
+                /** @description Format de boîte (filtres par unité de vente) */
+                packSize?: number;
+                /** @description Profondeur nominale en pouces (1, 4, 5…) */
+                depth?: number;
+                /** @description Ne garder que les produits en stock */
+                inStock?: boolean;
+                sort?: "relevance" | "price" | "popularity";
+                /** @description Curseur opaque de pagination (voir nextCursor) */
+                cursor?: string;
+                /** @description Taille de page (max 60) */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductListDto"];
+                };
+            };
+        };
+    };
+    getCatalogSizeIndex: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SizeIndexDto"];
+                };
+            };
+        };
+    };
+    getCatalogSizeEquivalents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Dimension en toute graphie */
+                label: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SizeEquivalentsDto"];
+                };
+            };
+        };
+    };
+    suggestCatalog: {
+        parameters: {
+            query?: {
+                locale?: "fr" | "en";
+                /** @description Début de saisie */
+                q?: string;
+                /** @description Nombre max de suggestions par catégorie */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestDto"];
+                };
+            };
+        };
+    };
+    searchCatalog: {
+        parameters: {
+            query?: {
+                /** @description Langue des libellés/slugs */
+                locale?: "fr" | "en";
+                /** @description Dimension en n’importe quelle graphie : « 16x25x1 », « 16 x 25 x 1 », « 16-25-1 », « 15 3/4 x 24 3/4 » (réelle). Nominal et réel, orientation indifférente. */
+                dimension?: string;
+                /** @description Cote MERV exacte */
+                merv?: number;
+                /** @description Slug de marque */
+                brand?: string;
+                /** @description Slug de catégorie (localisé) — inclut les sous-catégories */
+                category?: string;
+                /** @description Type d’équipement compatible (fournaise, échangeur d’air…) */
+                equipmentKind?: "FURNACE" | "AIR_HANDLER" | "HRV_ERV" | "AIR_CONDITIONER" | "OTHER";
+                /** @description Format de boîte (filtres par unité de vente) */
+                packSize?: number;
+                /** @description Profondeur nominale en pouces (1, 4, 5…) */
+                depth?: number;
+                /** @description Ne garder que les produits en stock */
+                inStock?: boolean;
+                sort?: "relevance" | "price" | "popularity";
+                /** @description Curseur opaque de pagination (voir nextCursor) */
+                cursor?: string;
+                /** @description Taille de page (max 60) */
+                limit?: number;
+                /** @description Requête : texte (nom, marque), SKU, ou dimension. Tolérante aux fautes. */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductListDto"];
+                };
+            };
+        };
+    };
+    getCatalogProduct: {
+        parameters: {
+            query?: {
+                locale?: "fr" | "en";
+            };
+            header?: never;
+            path: {
+                /** @description Slug localisé (fr/en) */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductDetailDto"];
                 };
             };
         };
