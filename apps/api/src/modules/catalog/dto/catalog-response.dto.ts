@@ -54,6 +54,27 @@ export class BrandRefDto {
   name!: string;
 }
 
+/** Référence de catégorie localisée (fiche produit). */
+export class CategoryRefDto {
+  @ApiProperty({ example: 'filtres-1-pouce' })
+  slug!: string;
+
+  @ApiProperty({ example: 'Filtres 1 pouce' })
+  name!: string;
+}
+
+/** Dimensions en pouces (largeur × hauteur × profondeur). */
+export class DimensionsDto {
+  @ApiProperty({ example: 16 })
+  width!: number;
+
+  @ApiProperty({ example: 25 })
+  height!: number;
+
+  @ApiProperty({ example: 1 })
+  depth!: number;
+}
+
 /* --------------------------- Liste de produits --------------------------- */
 
 /** Carte produit pour les grilles de catalogue. */
@@ -203,12 +224,28 @@ export class ReviewSummaryDto {
   count!: number;
 }
 
+/**
+ * Slugs de la même ressource dans chaque locale — nécessaires aux liens
+ * hreflang et aux alternates de sitemap de la vitrine (tâche 07). Null si la
+ * traduction manque dans cette locale.
+ */
+export class LocalizedSlugsDto {
+  @ApiPropertyOptional({ nullable: true, type: String, example: 'filtre-16x25x1-merv-11' })
+  fr?: string | null;
+
+  @ApiPropertyOptional({ nullable: true, type: String, example: 'filter-16x25x1-merv-11' })
+  en?: string | null;
+}
+
 export class ProductDetailDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
   @ApiProperty()
   slug!: string;
+
+  @ApiProperty({ type: LocalizedSlugsDto, description: 'Slugs fr/en (hreflang, sitemap)' })
+  slugs!: LocalizedSlugsDto;
 
   @ApiProperty()
   name!: string;
@@ -228,8 +265,8 @@ export class ProductDetailDto {
   @ApiProperty({ type: BrandRefDto })
   brand!: BrandRefDto;
 
-  @ApiPropertyOptional({ nullable: true, description: 'Catégorie (slug + nom localisés)' })
-  category?: { slug: string; name: string } | null;
+  @ApiPropertyOptional({ type: CategoryRefDto, nullable: true })
+  category?: CategoryRefDto | null;
 
   @ApiProperty({
     enum: EQUIPMENT_KINDS,
@@ -284,11 +321,11 @@ export class EquivalentSizeDto {
   @ApiProperty({ example: '16x25x1' })
   label!: string;
 
-  @ApiProperty({ description: 'Dimensions nominales (pouces)' })
-  nominal!: { width: number; height: number; depth: number };
+  @ApiProperty({ type: DimensionsDto, description: 'Dimensions nominales (pouces)' })
+  nominal!: DimensionsDto;
 
-  @ApiProperty({ description: 'Dimensions réelles (pouces)' })
-  actual!: { width: number; height: number; depth: number };
+  @ApiProperty({ type: DimensionsDto, description: 'Dimensions réelles (pouces)' })
+  actual!: DimensionsDto;
 
   @ApiProperty({ description: 'Cette taille est offerte au catalogue' })
   inCatalog!: boolean;
@@ -309,6 +346,36 @@ export class SizeEquivalentsDto {
 
   @ApiProperty({ type: [EquivalentSizeDto] })
   equivalents!: EquivalentSizeDto[];
+}
+
+/* -------------------------------- Sitemap -------------------------------- */
+
+export class SitemapProductDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ type: LocalizedSlugsDto })
+  slugs!: LocalizedSlugsDto;
+
+  @ApiProperty({ format: 'date-time', description: 'Dernière modification (lastmod)' })
+  updatedAt!: string;
+}
+
+export class SitemapCategoryDto {
+  @ApiProperty({ type: LocalizedSlugsDto })
+  slugs!: LocalizedSlugsDto;
+}
+
+/** Matière première des sitemaps de la vitrine : toutes les URL indexables. */
+export class SitemapDto {
+  @ApiProperty({ type: [SitemapProductDto], description: 'Produits actifs' })
+  products!: SitemapProductDto[];
+
+  @ApiProperty({ type: [SitemapCategoryDto], description: 'Catégories actives' })
+  categories!: SitemapCategoryDto[];
+
+  @ApiProperty({ type: [String], description: 'Libellés nominaux des tailles au catalogue' })
+  sizes!: string[];
 }
 
 /* ------------------------------ Suggestions ------------------------------ */

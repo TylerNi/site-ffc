@@ -1,32 +1,813 @@
+/* ------------------------------------------------------------------ */
+/* Design tokens — vitrine Filtration Montréal / Furnace Filters Canada */
+/* ------------------------------------------------------------------ */
+
 :root {
-  --color-bg: #f7f8f9;
-  --color-fg: #17242d;
-  --color-accent: #1668a5;
-  --color-ok: #1a7f37;
-  --color-error: #b42318;
+  --bg: #f6f8fa;
+  --surface: #ffffff;
+  --ink: #14212b;
+  --muted: #5a6b77;
+  --line: #dfe6ec;
+
+  --brand: #0e5e96;
+  --brand-dark: #0a4a77;
+  --brand-soft: #e8f1f8;
+
+  --ok: #177245;
+  --ok-soft: #e6f4ec;
+  --err: #b42318;
+  --err-soft: #fbeae9;
+  --warn-soft: #fdf3e1;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(16, 33, 43, 0.06), 0 4px 12px rgba(16, 33, 43, 0.05);
+
+  /* Compat anciens composants (page d'accueil tâche 02, admin) */
+  --color-bg: var(--bg);
+  --color-fg: var(--ink);
+  --color-accent: var(--brand);
+  --color-ok: var(--ok);
+  --color-error: var(--err);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   font-family:
+    var(--font-sans, system-ui),
     system-ui,
     -apple-system,
     'Segoe UI',
     sans-serif;
-  background: var(--color-bg);
-  color: var(--color-fg);
-}
-
-main {
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 4rem 1.5rem;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+  font-size: 1rem;
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--brand);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+  letter-spacing: -0.015em;
+}
+
+h1 {
+  font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.2rem);
+  font-weight: 750;
+}
+
+h2 {
+  font-size: clamp(1.2rem, 1rem + 0.8vw, 1.5rem);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* ------------------------------- Layout ------------------------------ */
+
+.container {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+.main {
+  padding-block: 2rem 4rem;
+}
+
+.section {
+  margin-block: 2.5rem;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.section-head a {
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--surface);
+  color: var(--brand);
+  padding: 0.5rem 1rem;
+  z-index: 100;
+}
+
+.skip-link:focus-visible {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+/* ------------------------------- Header ------------------------------ */
+
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding-block: 0.75rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 750;
+  font-size: 1.05rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.logo:hover {
+  text-decoration: none;
+}
+
+.logo svg {
+  flex: none;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  font-size: 0.925rem;
+}
+
+.site-nav a {
+  color: var(--ink);
+  font-weight: 550;
+}
+
+.site-nav a:hover {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.lang-switch {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.25rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--brand);
+  background: var(--surface);
+}
+
+.lang-switch:hover {
+  background: var(--brand-soft);
+  text-decoration: none;
+}
+
+/* ---------------------------- Recherche ------------------------------ */
+
+.searchbox {
+  position: relative;
+  flex: 1 1 22rem;
+  min-width: 16rem;
+}
+
+.searchbox form {
+  display: flex;
+}
+
+.searchbox input {
+  flex: 1;
+  border: 1.5px solid var(--line);
+  border-right: 0;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  padding: 0.55rem 0.9rem;
+  font: inherit;
+  font-size: 0.95rem;
+  background: var(--bg);
+  color: var(--ink);
+  min-width: 0;
+}
+
+.searchbox input:focus {
+  outline: none;
+  border-color: var(--brand);
+  background: var(--surface);
+}
+
+.searchbox button {
+  border: 0;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0 1rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.searchbox button:hover {
+  background: var(--brand-dark);
+}
+
+.suggest {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  z-index: 50;
+  max-height: 24rem;
+  overflow: auto;
+  padding-block: 0.25rem;
+}
+
+.suggest-group {
+  padding: 0.4rem 0.9rem 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.suggest-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.45rem 0.9rem;
+  font: inherit;
+  font-size: 0.925rem;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.suggest-item[aria-selected='true'],
+.suggest-item:hover {
+  background: var(--brand-soft);
+}
+
+.suggest-item .muted {
+  flex: none;
+}
+
+/* -------------------------------- Héros ------------------------------ */
+
+.hero {
+  background:
+    radial-gradient(60rem 20rem at 85% -5rem, var(--brand-soft), transparent 60%), var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-inner {
+  padding-block: 3rem 2.5rem;
+  max-width: 46rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.hero .searchbox {
+  max-width: 34rem;
+}
+
+.hero-hint {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ------------------------------- Pills ------------------------------- */
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.pill .muted {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.pill:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  text-decoration: none;
+}
+
+/* ------------------------------- Badges ------------------------------ */
+
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.badge-merv {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+}
+
+.badge-ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.badge-out {
+  background: var(--err-soft);
+  color: var(--err);
+}
+
+/* ---------------------------- Grille / cartes ------------------------ */
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow);
+}
+
+.card-media {
+  aspect-ratio: 4 / 3;
+  background: var(--brand-soft);
+}
+
+.card-media img,
+.card-media svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem 1.1rem;
+  flex: 1;
+}
+
+.card-brand {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-name {
+  font-size: 0.98rem;
+  font-weight: 650;
+  line-height: 1.35;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-name a {
+  color: var(--ink);
+}
+
+.card-name a:hover {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.card-name a::after {
+  /* Toute la carte est cliquable sans sacrifier la sémantique du lien. */
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.card {
+  position: relative;
+}
+
+.card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.1rem;
+}
+
+.card-price {
+  margin-top: auto;
+  padding-top: 0.45rem;
+  font-weight: 700;
+}
+
+.card-price .muted {
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* ------------------------------ Boutons ------------------------------ */
+
+.btn {
+  display: inline-block;
+  background: var(--brand);
+  color: #fff;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 1.2rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--brand-dark);
+  text-decoration: none;
+}
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--brand);
+  border: 1px solid var(--line);
+}
+
+.btn-ghost:hover {
+  background: var(--brand-soft);
+}
+
+/* ------------------------------- Filtres ----------------------------- */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-block: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field > span {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--muted);
+}
+
+.field input,
+.field select {
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.7rem;
+  font: inherit;
+  font-size: 0.925rem;
+  background: var(--bg);
+  color: var(--ink);
+  min-width: 8rem;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--brand);
+  background: var(--surface);
+}
+
+.field-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45rem;
+  padding-bottom: 0.55rem;
+}
+
+.field-check span {
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ---------------------------- Fil d'Ariane ---------------------------- */
+
+.breadcrumbs {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.breadcrumbs ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumbs li + li::before {
+  content: '›';
+  margin-right: 0.4rem;
+  color: var(--line);
+}
+
+/* ---------------------------- Fiche produit --------------------------- */
+
+.product-layout {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: start;
+}
+
+@media (max-width: 56rem) {
+  .product-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.product-media {
+  background: var(--brand-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+}
+
+.product-media img,
+.product-media svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-head .muted {
+  margin-bottom: 0.25rem;
+}
+
+.product-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-block: 0.75rem;
+}
+
+.variant-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.925rem;
+}
+
+.variant-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.variant-table td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.variant-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.variant-table .price {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.notice {
+  background: var(--warn-soft);
+  border: 1px solid #f0dcb2;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.875rem;
+  margin-block: 1rem;
+}
+
+.info-box {
+  background: var(--brand-soft);
+  border: 1px solid #cfe2f0;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  font-size: 0.925rem;
+}
+
+/* ------------------------------ Étoiles ------------------------------ */
+
+.stars {
+  color: #d98e04;
+  letter-spacing: 0.1em;
+  font-size: 0.9rem;
+}
+
+/* ------------------------------- Footer ------------------------------ */
+
+.site-footer {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  margin-top: 3rem;
+  padding-block: 2.5rem 2rem;
+  font-size: 0.9rem;
+}
+
+.footer-cols {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  margin-bottom: 2rem;
+}
+
+.footer-cols h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+
+.footer-cols ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.footer-cols a {
+  color: var(--ink);
+}
+
+.footer-legal {
+  color: var(--muted);
+  font-size: 0.82rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.25rem;
+}
+
+/* ------------------------------ Divers ------------------------------- */
+
+.usp-row {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.usp {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+}
+
+.usp h3 {
+  margin-bottom: 0.25rem;
+}
+
+.usp p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  background: var(--surface);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.pager {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.size-sections h2 {
+  margin-top: 2rem;
+}
+
+.result-count {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-block: 0.5rem 1rem;
 }

@@ -1013,6 +1013,28 @@
         ]
       }
     },
+    "/v1/catalog/sitemap": {
+      "get": {
+        "operationId": "getCatalogSitemap",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitemapDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "URL indexables (slugs fr/en + lastmod) pour les sitemaps de la vitrine",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
     "/v1/catalog/search/suggest": {
       "get": {
         "operationId": "suggestCatalog",
@@ -2048,6 +2070,28 @@
           "sizes"
         ]
       },
+      "DimensionsDto": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "number",
+            "example": 16
+          },
+          "height": {
+            "type": "number",
+            "example": 25
+          },
+          "depth": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "width",
+          "height",
+          "depth"
+        ]
+      },
       "EquivalentSizeDto": {
         "type": "object",
         "properties": {
@@ -2056,12 +2100,20 @@
             "example": "16x25x1"
           },
           "nominal": {
-            "type": "object",
-            "description": "Dimensions nominales (pouces)"
+            "description": "Dimensions nominales (pouces)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DimensionsDto"
+              }
+            ]
           },
           "actual": {
-            "type": "object",
-            "description": "Dimensions réelles (pouces)"
+            "description": "Dimensions réelles (pouces)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DimensionsDto"
+              }
+            ]
           },
           "inCatalog": {
             "type": "boolean",
@@ -2107,6 +2159,85 @@
           "canonical",
           "catalogLabels",
           "equivalents"
+        ]
+      },
+      "LocalizedSlugsDto": {
+        "type": "object",
+        "properties": {
+          "fr": {
+            "type": "string",
+            "nullable": true,
+            "example": "filtre-16x25x1-merv-11"
+          },
+          "en": {
+            "type": "string",
+            "nullable": true,
+            "example": "filter-16x25x1-merv-11"
+          }
+        }
+      },
+      "SitemapProductDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slugs": {
+            "$ref": "#/components/schemas/LocalizedSlugsDto"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Dernière modification (lastmod)"
+          }
+        },
+        "required": [
+          "id",
+          "slugs",
+          "updatedAt"
+        ]
+      },
+      "SitemapCategoryDto": {
+        "type": "object",
+        "properties": {
+          "slugs": {
+            "$ref": "#/components/schemas/LocalizedSlugsDto"
+          }
+        },
+        "required": [
+          "slugs"
+        ]
+      },
+      "SitemapDto": {
+        "type": "object",
+        "properties": {
+          "products": {
+            "description": "Produits actifs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SitemapProductDto"
+            }
+          },
+          "categories": {
+            "description": "Catégories actives",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SitemapCategoryDto"
+            }
+          },
+          "sizes": {
+            "description": "Libellés nominaux des tailles au catalogue",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "products",
+          "categories",
+          "sizes"
         ]
       },
       "SizeSuggestionDto": {
@@ -2171,6 +2302,23 @@
         "required": [
           "sizes",
           "products"
+        ]
+      },
+      "CategoryRefDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "filtres-1-pouce"
+          },
+          "name": {
+            "type": "string",
+            "example": "Filtres 1 pouce"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
         ]
       },
       "VariantDto": {
@@ -2321,6 +2469,14 @@
           "slug": {
             "type": "string"
           },
+          "slugs": {
+            "description": "Slugs fr/en (hreflang, sitemap)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LocalizedSlugsDto"
+              }
+            ]
+          },
           "name": {
             "type": "string"
           },
@@ -2344,9 +2500,13 @@
             "$ref": "#/components/schemas/BrandRefDto"
           },
           "category": {
-            "type": "object",
             "nullable": true,
-            "description": "Catégorie (slug + nom localisés)"
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CategoryRefDto"
+              }
+            ]
           },
           "equipmentKinds": {
             "type": "array",
@@ -2387,6 +2547,7 @@
         "required": [
           "id",
           "slug",
+          "slugs",
           "name",
           "brand",
           "equipmentKinds",

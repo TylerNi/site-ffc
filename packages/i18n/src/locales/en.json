@@ -13,6 +13,155 @@
       "unreachable": "API unreachable. Start it with “pnpm dev”."
     }
   },
+  "web": {
+    "meta": {
+      "siteName": "Furnace Filters Canada",
+      "homeTitle": "Furnace filters and air filters — delivered across Canada",
+      "homeDescription": "Find the right furnace filter by size (16x25x1, 20x25x4…) and MERV rating. Quality filters, shipped fast anywhere in Canada.",
+      "sizesTitle": "Furnace filters by size",
+      "sizesDescription": "Every furnace filter size in stock: 1\", 4\" and 5\" thick. Find your exact size or its equivalent size.",
+      "sizeTitle": "{label} furnace filter",
+      "sizeDescription": "{label} furnace filters in stock — MERV {mervList} ratings. Actual dimensions {actual}. Shipping across Canada.",
+      "searchTitle": "Search",
+      "categoryFallbackDescription": "Shop {name} at Furnace Filters Canada — quality filters delivered across Canada."
+    },
+    "a11y": {
+      "skipToContent": "Skip to content",
+      "mainNav": "Main navigation",
+      "breadcrumb": "Breadcrumb",
+      "productImagePlaceholder": "Illustration of the {name} filter",
+      "searchSuggestions": "Search suggestions",
+      "pagination": "Pagination"
+    },
+    "nav": {
+      "home": "Home",
+      "sizes": "Sizes",
+      "menu": "Menu"
+    },
+    "header": {
+      "searchPlaceholder": "Size (e.g. 16x25x1), product or item #…",
+      "searchLabel": "Search for a filter",
+      "searchSubmit": "Search",
+      "suggestSizes": "Sizes",
+      "suggestProducts": "Products",
+      "languageSwitch": "Français",
+      "languageSwitchLabel": "Passer au français"
+    },
+    "footer": {
+      "tagline": "Quality furnace filters, shipped fast across Canada.",
+      "sizes": "Popular sizes",
+      "categories": "Categories",
+      "allSizes": "All sizes",
+      "legal": "© {year} Furnace Filters Canada / Filtration Montréal. All rights reserved."
+    },
+    "home": {
+      "heroTitle": "The right filter, in the right size",
+      "heroSubtitle": "Search by dimension — nominal or actual — and find your furnace filter in seconds.",
+      "heroHint": "E.g. 16x25x1, 20 x 25 x 4, 15 3/4 x 24 3/4…",
+      "popularSizes": "Popular sizes",
+      "allSizes": "See all sizes",
+      "featured": "Featured products",
+      "categories": "Shop by category",
+      "productCount": "{count, plural, one {# product} other {# products}}",
+      "usp": {
+        "shippingTitle": "Shipping across Canada",
+        "shippingText": "Fast shipping from Montréal, parcel tracking included.",
+        "sizesTitle": "Every common size",
+        "sizesText": "From 12x12x1 to 25x25x5 — including actual dimensions and equivalents.",
+        "mervTitle": "MERV ratings explained",
+        "mervText": "MERV 8 to 13: pick the right balance between filtration and airflow."
+      }
+    },
+    "listing": {
+      "filters": "Filters",
+      "dimension": "Dimension",
+      "dimensionPlaceholder": "e.g. 16x25x1",
+      "merv": "MERV rating",
+      "depth": "Thickness",
+      "depthValue": "{depth}\"",
+      "any": "Any",
+      "inStockOnly": "In stock only",
+      "sort": "Sort by",
+      "sortRelevance": "Relevance",
+      "sortPrice": "Price: low to high",
+      "sortPopularity": "Popularity",
+      "apply": "Apply",
+      "reset": "Reset",
+      "resultCount": "{count, plural, =0 {No products} one {# product} other {# products}}{hasMore, select, true { and more} other {}}",
+      "noResults": "No products match these filters.",
+      "noResultsTip": "Try another size or remove a filter — or check the equivalent sizes.",
+      "nextPage": "More products",
+      "backToFirst": "Back to start",
+      "unavailableTitle": "Catalogue briefly unavailable",
+      "unavailableText": "Please try again in a moment — we're restoring the connection."
+    },
+    "product": {
+      "from": "From {price}",
+      "perFilter": "{price} / filter",
+      "brand": "Brand",
+      "sku": "Item #",
+      "variantsTitle": "Formats and pricing",
+      "packSize": "Format",
+      "packOf": "{count, plural, one {Single} other {Box of #}}",
+      "price": "Price",
+      "unitPrice": "Price / filter",
+      "availability": "Availability",
+      "inStock": "In stock",
+      "inStockQty": "In stock ({count})",
+      "outOfStock": "Out of stock",
+      "merv": "MERV {merv}",
+      "nominalSize": "Nominal size",
+      "actualSize": "Actual dimensions",
+      "sizeUnit": "{w} × {h} × {d} in",
+      "checkoutSoon": "Online checkout is coming soon — the cart is under construction.",
+      "related": "Same size",
+      "reviews": "{count, plural, =0 {No reviews} one {# review} other {# reviews}}",
+      "ratingOutOf": "{average} out of 5",
+      "descriptionTitle": "Description",
+      "equipment": "Fits: {kinds}",
+      "equipmentKind": {
+        "FURNACE": "furnace",
+        "AIR_HANDLER": "air handler",
+        "HRV_ERV": "air exchanger (HRV/ERV)",
+        "AIR_CONDITIONER": "air conditioner",
+        "OTHER": "other equipment"
+      }
+    },
+    "sizes": {
+      "title": "Furnace filters by size",
+      "intro": "Find your size — it's printed on the frame of your current filter. Can't see yours? Search with the actual dimensions and we'll match it.",
+      "depthSection": "{depth}\" thick",
+      "productCount": "{count, plural, one {# product} other {# products}}"
+    },
+    "size": {
+      "title": "{label} furnace filter",
+      "intro": "{count, plural, one {# filter available} other {# filters available}} in {label}, MERV {mervList} ratings.",
+      "actualNote": "The nominal size {label} corresponds to actual dimensions of about {actual} — that's normal: filters run slightly small so they slide easily into the slot.",
+      "mervAvailable": "Available MERV ratings",
+      "products": "{label} filters",
+      "siblings": "Other thicknesses",
+      "equivalents": "Equivalent sizes",
+      "noProducts": "No products in this size at the moment."
+    },
+    "search": {
+      "title": "Search",
+      "resultsFor": "Results for “{query}”",
+      "noResults": "No results for “{query}”.",
+      "tip": "Tip: search by size (16x25x1 — actual dimensions work too), product name or item #.",
+      "empty": "Enter a size, product name or item #."
+    },
+    "notFound": {
+      "title": "Page not found",
+      "text": "This page doesn't exist or has moved. The filter you're looking for is only a few clicks away.",
+      "backHome": "Back to home",
+      "browseSizes": "Browse sizes"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "sizes": "Sizes",
+      "search": "Search"
+    }
+  },
   "admin": {
     "login": {
       "title": "FFC Admin — Sign in",

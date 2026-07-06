@@ -10,6 +10,10 @@
         "API_CORS_ORIGINS",
         "DATABASE_URL",
         "NEXT_PUBLIC_API_URL",
+        "API_URL",
+        "NEXT_PUBLIC_SITE_URL_FR",
+        "NEXT_PUBLIC_SITE_URL_EN",
+        "NEXT_PUBLIC_ASSETS_BASE_URL",
         "EXPO_PUBLIC_API_URL"
       ],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
@@ -30,7 +34,16 @@
     },
     "dev": {
       "dependsOn": ["^build"],
-      "env": ["PORT", "API_CORS_ORIGINS", "NEXT_PUBLIC_API_URL", "EXPO_PUBLIC_API_URL"],
+      "env": [
+        "PORT",
+        "API_CORS_ORIGINS",
+        "NEXT_PUBLIC_API_URL",
+        "API_URL",
+        "NEXT_PUBLIC_SITE_URL_FR",
+        "NEXT_PUBLIC_SITE_URL_EN",
+        "NEXT_PUBLIC_ASSETS_BASE_URL",
+        "EXPO_PUBLIC_API_URL"
+      ],
       "cache": false,
       "persistent": true
     }

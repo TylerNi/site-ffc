@@ -171,6 +171,50 @@ describe('catalogue et recherche (tâche 06)', () => {
     it('slug inconnu → 404', async () => {
       await get('/v1/catalog/products/nexiste-pas?locale=fr').expect(404);
     });
+
+    it('expose les slugs des deux locales, croisés cohérents (hreflang)', async () => {
+      const { body: fr } = await get(
+        '/v1/catalog/products/filtre-fournaise-boreal-filtration-merv-11-16-25-1?locale=fr',
+      ).expect(200);
+      expect(fr.slugs.fr).toBe('filtre-fournaise-boreal-filtration-merv-11-16-25-1');
+      expect(fr.slugs.en).toBeTruthy();
+
+      // Le slug anglais annoncé résout bien la même fiche en anglais.
+      const { body: en } = await get(`/v1/catalog/products/${fr.slugs.en}?locale=en`).expect(200);
+      expect(en.id).toBe(fr.id);
+      expect(en.slugs.fr).toBe(fr.slugs.fr);
+    });
+  });
+
+  /* -------------------------------- Sitemap ---------------------------- */
+
+  describe('GET /catalog/sitemap', () => {
+    it('retourne produits (slugs fr/en + lastmod), catégories et tailles', async () => {
+      const { body, headers } = await get('/v1/catalog/sitemap').expect(200);
+      expect(headers['cache-control']).toContain('public');
+
+      const products = body.products as Array<{
+        id: string;
+        slugs: { fr: string | null; en: string | null };
+        updatedAt: string;
+      }>;
+      expect(products).toHaveLength(40);
+      for (const product of products) {
+        expect(product.slugs.fr).toBeTruthy();
+        expect(product.slugs.en).toBeTruthy();
+        expect(Number.isNaN(Date.parse(product.updatedAt))).toBe(false);
+      }
+
+      const categories = body.categories as Array<{
+        slugs: { fr: string | null; en: string | null };
+      }>;
+      expect(categories.length).toBeGreaterThanOrEqual(4);
+      expect(categories.some((c) => c.slugs.fr === 'filtres-de-fournaise')).toBe(true);
+      expect(categories.some((c) => c.slugs.en === 'furnace-filters')).toBe(true);
+
+      expect(body.sizes).toContain('16x25x1');
+      expect(body.sizes).toHaveLength(14);
+    });
   });
 
   /* --------------------------- Index tailles --------------------------- */

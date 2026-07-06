@@ -13,6 +13,155 @@
       "unreachable": "API injoignable. Démarrez-la avec « pnpm dev »."
     }
   },
+  "web": {
+    "meta": {
+      "siteName": "Filtration Montréal",
+      "homeTitle": "Filtres à fournaise et filtres à air — livrés partout au Canada",
+      "homeDescription": "Trouvez le bon filtre à fournaise par taille (16x25x1, 20x25x4…) et par cote MERV. Filtres de qualité, expédiés rapidement partout au Canada.",
+      "sizesTitle": "Filtres à fournaise par taille",
+      "sizesDescription": "Toutes les tailles de filtres à fournaise en stock : 1 po, 4 po et 5 po d'épaisseur. Trouvez votre taille exacte ou sa taille équivalente.",
+      "sizeTitle": "Filtre à fournaise {label}",
+      "sizeDescription": "Filtres à fournaise {label} en stock — cotes MERV {mervList}. Dimensions réelles {actual}. Livraison partout au Canada.",
+      "searchTitle": "Recherche",
+      "categoryFallbackDescription": "Magasinez {name} chez Filtration Montréal — filtres de qualité livrés partout au Canada."
+    },
+    "a11y": {
+      "skipToContent": "Aller au contenu",
+      "mainNav": "Navigation principale",
+      "breadcrumb": "Fil d'Ariane",
+      "productImagePlaceholder": "Illustration du filtre {name}",
+      "searchSuggestions": "Suggestions de recherche",
+      "pagination": "Pagination"
+    },
+    "nav": {
+      "home": "Accueil",
+      "sizes": "Tailles",
+      "menu": "Menu"
+    },
+    "header": {
+      "searchPlaceholder": "Taille (ex. 16x25x1), produit ou n° d'article…",
+      "searchLabel": "Rechercher un filtre",
+      "searchSubmit": "Rechercher",
+      "suggestSizes": "Tailles",
+      "suggestProducts": "Produits",
+      "languageSwitch": "English",
+      "languageSwitchLabel": "Switch to English"
+    },
+    "footer": {
+      "tagline": "Des filtres à fournaise de qualité, expédiés rapidement partout au Canada.",
+      "sizes": "Tailles populaires",
+      "categories": "Catégories",
+      "allSizes": "Toutes les tailles",
+      "legal": "© {year} Filtration Montréal / Furnace Filters Canada. Tous droits réservés."
+    },
+    "home": {
+      "heroTitle": "Le bon filtre, à la bonne taille",
+      "heroSubtitle": "Cherchez par dimension — nominale ou réelle — et trouvez votre filtre à fournaise en quelques secondes.",
+      "heroHint": "Ex. : 16x25x1, 20 x 25 x 4, 15 3/4 x 24 3/4…",
+      "popularSizes": "Tailles populaires",
+      "allSizes": "Voir toutes les tailles",
+      "featured": "Produits vedettes",
+      "categories": "Magasiner par catégorie",
+      "productCount": "{count, plural, one {# produit} other {# produits}}",
+      "usp": {
+        "shippingTitle": "Livraison partout au Canada",
+        "shippingText": "Expédition rapide depuis Montréal, suivi de colis inclus.",
+        "sizesTitle": "Toutes les tailles courantes",
+        "sizesText": "Du 12x12x1 au 25x25x5 — y compris les dimensions réelles et les équivalences.",
+        "mervTitle": "Cotes MERV expliquées",
+        "mervText": "MERV 8 à 13 : choisissez le bon équilibre entre filtration et débit d'air."
+      }
+    },
+    "listing": {
+      "filters": "Filtres",
+      "dimension": "Dimension",
+      "dimensionPlaceholder": "ex. 16x25x1",
+      "merv": "Cote MERV",
+      "depth": "Épaisseur",
+      "depthValue": "{depth} po",
+      "any": "Toutes",
+      "inStockOnly": "En stock seulement",
+      "sort": "Trier par",
+      "sortRelevance": "Pertinence",
+      "sortPrice": "Prix croissant",
+      "sortPopularity": "Popularité",
+      "apply": "Appliquer",
+      "reset": "Réinitialiser",
+      "resultCount": "{count, plural, =0 {Aucun produit} one {# produit} other {# produits}}{hasMore, select, true { et plus} other {}}",
+      "noResults": "Aucun produit ne correspond à ces filtres.",
+      "noResultsTip": "Essayez une autre taille ou retirez un filtre — ou vérifiez les tailles équivalentes.",
+      "nextPage": "Produits suivants",
+      "backToFirst": "Revenir au début",
+      "unavailableTitle": "Catalogue momentanément indisponible",
+      "unavailableText": "Réessayez dans quelques instants — nous rétablissons la connexion."
+    },
+    "product": {
+      "from": "À partir de {price}",
+      "perFilter": "{price} / filtre",
+      "brand": "Marque",
+      "sku": "N° d'article",
+      "variantsTitle": "Formats et prix",
+      "packSize": "Format",
+      "packOf": "{count, plural, one {À l'unité} other {Boîte de #}}",
+      "price": "Prix",
+      "unitPrice": "Prix / filtre",
+      "availability": "Disponibilité",
+      "inStock": "En stock",
+      "inStockQty": "En stock ({count})",
+      "outOfStock": "Épuisé",
+      "merv": "MERV {merv}",
+      "nominalSize": "Taille nominale",
+      "actualSize": "Dimensions réelles",
+      "sizeUnit": "{w} × {h} × {d} po",
+      "checkoutSoon": "L'achat en ligne arrive sous peu — le panier est en construction.",
+      "related": "De la même taille",
+      "reviews": "{count, plural, =0 {Aucun avis} one {# avis} other {# avis}}",
+      "ratingOutOf": "{average} sur 5",
+      "descriptionTitle": "Description",
+      "equipment": "Compatible : {kinds}",
+      "equipmentKind": {
+        "FURNACE": "fournaise",
+        "AIR_HANDLER": "ventilo-convecteur",
+        "HRV_ERV": "échangeur d'air (VRC/VRE)",
+        "AIR_CONDITIONER": "climatiseur",
+        "OTHER": "autre équipement"
+      }
+    },
+    "sizes": {
+      "title": "Filtres à fournaise par taille",
+      "intro": "Repérez votre taille — elle est inscrite sur le cadre de votre filtre actuel. Vous ne trouvez pas la vôtre? Cherchez avec les dimensions réelles, nous ferons la correspondance.",
+      "depthSection": "Épaisseur {depth} po",
+      "productCount": "{count, plural, one {# produit} other {# produits}}"
+    },
+    "size": {
+      "title": "Filtre à fournaise {label}",
+      "intro": "{count, plural, one {# filtre offert} other {# filtres offerts}} en {label}, cotes MERV {mervList}.",
+      "actualNote": "La taille nominale {label} correspond à des dimensions réelles d'environ {actual} — c'est normal : les filtres sont légèrement plus petits pour bien glisser dans la fente.",
+      "mervAvailable": "Cotes MERV offertes",
+      "products": "Filtres {label}",
+      "siblings": "Autres épaisseurs",
+      "equivalents": "Tailles équivalentes",
+      "noProducts": "Aucun produit dans cette taille pour le moment."
+    },
+    "search": {
+      "title": "Recherche",
+      "resultsFor": "Résultats pour « {query} »",
+      "noResults": "Aucun résultat pour « {query} ».",
+      "tip": "Astuce : cherchez par taille (16x25x1, même avec les dimensions réelles), par nom de produit ou par n° d'article.",
+      "empty": "Entrez une taille, un nom de produit ou un n° d'article."
+    },
+    "notFound": {
+      "title": "Page introuvable",
+      "text": "Cette page n'existe pas ou a été déplacée. Le filtre que vous cherchez est sûrement à quelques clics.",
+      "backHome": "Retour à l'accueil",
+      "browseSizes": "Parcourir les tailles"
+    },
+    "breadcrumb": {
+      "home": "Accueil",
+      "sizes": "Tailles",
+      "search": "Recherche"
+    }
+  },
   "admin": {
     "login": {
       "title": "Admin FFC — Connexion",

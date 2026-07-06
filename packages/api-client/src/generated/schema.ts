@@ -503,6 +503,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/catalog/sitemap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** URL indexables (slugs fr/en + lastmod) pour les sitemaps de la vitrine */
+        get: operations["getCatalogSitemap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/catalog/search/suggest": {
         parameters: {
             query?: never;
@@ -817,13 +834,21 @@ export interface components {
         SizeIndexDto: {
             sizes: components["schemas"]["SizeIndexItemDto"][];
         };
+        DimensionsDto: {
+            /** @example 16 */
+            width: number;
+            /** @example 25 */
+            height: number;
+            /** @example 1 */
+            depth: number;
+        };
         EquivalentSizeDto: {
             /** @example 16x25x1 */
             label: string;
             /** @description Dimensions nominales (pouces) */
-            nominal: Record<string, never>;
+            nominal: components["schemas"]["DimensionsDto"];
             /** @description Dimensions réelles (pouces) */
-            actual: Record<string, never>;
+            actual: components["schemas"]["DimensionsDto"];
             /** @description Cette taille est offerte au catalogue */
             inCatalog: boolean;
         };
@@ -842,6 +867,33 @@ export interface components {
             catalogLabels: string[];
             equivalents: components["schemas"]["EquivalentSizeDto"][];
         };
+        LocalizedSlugsDto: {
+            /** @example filtre-16x25x1-merv-11 */
+            fr?: string | null;
+            /** @example filter-16x25x1-merv-11 */
+            en?: string | null;
+        };
+        SitemapProductDto: {
+            /** Format: uuid */
+            id: string;
+            slugs: components["schemas"]["LocalizedSlugsDto"];
+            /**
+             * Format: date-time
+             * @description Dernière modification (lastmod)
+             */
+            updatedAt: string;
+        };
+        SitemapCategoryDto: {
+            slugs: components["schemas"]["LocalizedSlugsDto"];
+        };
+        SitemapDto: {
+            /** @description Produits actifs */
+            products: components["schemas"]["SitemapProductDto"][];
+            /** @description Catégories actives */
+            categories: components["schemas"]["SitemapCategoryDto"][];
+            /** @description Libellés nominaux des tailles au catalogue */
+            sizes: string[];
+        };
         SizeSuggestionDto: {
             /** @example 16x25x1 */
             label: string;
@@ -857,6 +909,12 @@ export interface components {
         SuggestDto: {
             sizes: components["schemas"]["SizeSuggestionDto"][];
             products: components["schemas"]["ProductSuggestionDto"][];
+        };
+        CategoryRefDto: {
+            /** @example filtres-1-pouce */
+            slug: string;
+            /** @example Filtres 1 pouce */
+            name: string;
         };
         VariantDto: {
             /** Format: uuid */
@@ -906,14 +964,15 @@ export interface components {
             /** Format: uuid */
             id: string;
             slug: string;
+            /** @description Slugs fr/en (hreflang, sitemap) */
+            slugs: components["schemas"]["LocalizedSlugsDto"];
             name: string;
             shortDescription?: string | null;
             description?: string | null;
             metaTitle?: string | null;
             metaDescription?: string | null;
             brand: components["schemas"]["BrandRefDto"];
-            /** @description Catégorie (slug + nom localisés) */
-            category?: Record<string, never> | null;
+            category?: components["schemas"]["CategoryRefDto"] | null;
             /** @description Types d’équipement compatibles */
             equipmentKinds: ("FURNACE" | "AIR_HANDLER" | "HRV_ERV" | "AIR_CONDITIONER" | "OTHER")[];
             variants: components["schemas"]["VariantDto"][];
@@ -1560,6 +1619,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SizeEquivalentsDto"];
+                };
+            };
+        };
+    };
+    getCatalogSitemap: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SitemapDto"];
                 };
             };
         };

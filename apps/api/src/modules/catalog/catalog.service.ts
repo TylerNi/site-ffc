@@ -17,10 +17,12 @@ import { type CatalogFilterQueryDto, type CatalogSort } from './dto/catalog-quer
 import {
   type CategoryNodeDto,
   type CategoryTreeDto,
+  type LocalizedSlugsDto,
   type ProductDetailDto,
   type ProductImageDto,
   type ProductListDto,
   type ProductListItemDto,
+  type SitemapDto,
   type SizeIndexDto,
   type VariantDto,
 } from './dto/catalog-response.dto';
@@ -338,6 +340,7 @@ export class CatalogService {
     return {
       id: product.id,
       slug: translation?.slug ?? slug,
+      slugs: localizedSlugs(product.translations),
       name: translation?.name ?? '',
       shortDescription: translation?.shortDescription ?? null,
       description: translation?.description ?? null,
@@ -442,6 +445,46 @@ export class CatalogService {
         productCount: row.product_count,
         mervValues: row.merv_values ?? [],
       })),
+    };
+  }
+
+  /* -------------------------------- Sitemap ----------------------------- */
+
+  /**
+   * Matière première des sitemaps de la vitrine (tâche 07) : tous les
+   * produits/catégories actifs avec leurs slugs fr ET en (alternates
+   * hreflang), plus les libellés de tailles. Volume : un enregistrement léger
+   * par URL — pas de pagination tant que le catalogue reste < ~10 000 produits.
+   */
+  async getSitemap(): Promise<SitemapDto> {
+    const [products, categories, sizeIndex] = await Promise.all([
+      this.prisma.product.findMany({
+        where: { status: 'ACTIVE' },
+        select: {
+          id: true,
+          updatedAt: true,
+          translations: { select: { locale: true, slug: true } },
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.category.findMany({
+        where: { isActive: true },
+        select: { translations: { select: { locale: true, slug: true } } },
+        orderBy: { sortOrder: 'asc' },
+      }),
+      this.getSizeIndex(),
+    ]);
+
+    return {
+      products: products.map((product) => ({
+        id: product.id,
+        slugs: localizedSlugs(product.translations),
+        updatedAt: product.updatedAt.toISOString(),
+      })),
+      categories: categories.map((category) => ({
+        slugs: localizedSlugs(category.translations),
+      })),
+      sizes: sizeIndex.sizes.map((size) => size.label),
     };
   }
 
@@ -559,6 +602,14 @@ function pickTranslation<T extends { locale: Locale }>(
   locale: Locale,
 ): T | undefined {
   return translations.find((t) => t.locale === locale) ?? translations[0];
+}
+
+/** Slugs par locale (null si la traduction manque) — hreflang et sitemaps. */
+function localizedSlugs(translations: Array<{ locale: Locale; slug: string }>): LocalizedSlugsDto {
+  return {
+    fr: translations.find((t) => t.locale === 'fr')?.slug ?? null,
+    en: translations.find((t) => t.locale === 'en')?.slug ?? null,
+  };
 }
 
 function availableQty(level: { quantityOnHand: number; quantityReserved: number } | null): number {

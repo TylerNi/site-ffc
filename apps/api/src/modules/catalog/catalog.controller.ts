@@ -13,6 +13,7 @@ import {
   CategoryTreeDto,
   ProductDetailDto,
   ProductListDto,
+  SitemapDto,
   SizeEquivalentsDto,
   SizeIndexDto,
   SuggestDto,
@@ -75,6 +76,17 @@ export class CatalogController {
   @ApiOkResponse({ type: SizeEquivalentsDto })
   getSizeEquivalents(@Param('label') label: string): Promise<SizeEquivalentsDto> {
     return this.size.equivalents(label);
+  }
+
+  @Get('sitemap')
+  @Header('Cache-Control', CACHE_CONTROL.long)
+  @ApiOperation({
+    summary: 'URL indexables (slugs fr/en + lastmod) pour les sitemaps de la vitrine',
+    operationId: 'getCatalogSitemap',
+  })
+  @ApiOkResponse({ type: SitemapDto })
+  getSitemap(): Promise<SitemapDto> {
+    return this.catalog.getSitemap();
   }
 
   @Get('search/suggest')
