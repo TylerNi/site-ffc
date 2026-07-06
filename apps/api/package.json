@@ -15,12 +15,15 @@
     "db:deploy": "prisma migrate deploy",
     "db:reset": "prisma migrate reset --force",
     "db:seed": "prisma db seed",
-    "db:erd": "prisma generate && tsx scripts/generate-erd.ts"
+    "db:erd": "prisma generate && tsx scripts/generate-erd.ts",
+    "bigcommerce:export": "tsx scripts/bigcommerce/export.ts",
+    "bigcommerce:import": "tsx scripts/bigcommerce/import.ts"
   },
   "prisma": {
     "seed": "pnpm exec tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1079.0",
     "@aws-sdk/client-sesv2": "^3.1079.0",
     "@ffc/core": "workspace:*",
     "@nestjs/common": "^11.1.6",
@@ -42,6 +45,7 @@
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "sharp": "^0.35.3",
     "zod": "^4.1.11"
   },
   "devDependencies": {

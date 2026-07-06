@@ -137,6 +137,7 @@ erDiagram
     string name
     string logo_url "nullable"
     boolean is_active
+    string bigcommerce_brand_id UK
     datetime created_at
     datetime updated_at
   }
@@ -145,6 +146,7 @@ erDiagram
     string parent_id FK
     int sort_order
     boolean is_active
+    string bigcommerce_category_id UK
     datetime created_at
     datetime updated_at
   }
@@ -162,6 +164,7 @@ erDiagram
     string category_id FK
     enum_ProductStatus status
     boolean is_featured
+    string bigcommerce_product_id UK
     datetime created_at
     datetime updated_at
   }
@@ -181,6 +184,7 @@ erDiagram
     string product_id FK
     string sku UK
     string barcode "nullable"
+    string bigcommerce_variant_id UK
     string nominal_label
     decimal nominal_width_in
     decimal nominal_height_in

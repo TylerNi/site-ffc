@@ -464,6 +464,8 @@ model Brand {
   name      String
   logoUrl   String?   @map("logo_url")
   isActive  Boolean   @default(true) @map("is_active")
+  /// Identifiant de marque BigCommerce (brand_id) — clé d'idempotence de l'import (tâche 08).
+  bigcommerceBrandId String? @unique @map("bigcommerce_brand_id")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   products  Product[]
@@ -478,6 +480,8 @@ model Category {
   children     Category[]            @relation("CategoryTree")
   sortOrder    Int                   @default(0) @map("sort_order")
   isActive     Boolean               @default(true) @map("is_active")
+  /// Identifiant de catégorie BigCommerce (category_id, vitrine EN de référence) — idempotence import (tâche 08).
+  bigcommerceCategoryId String?              @unique @map("bigcommerce_category_id")
   createdAt    DateTime              @default(now()) @map("created_at")
   updatedAt    DateTime              @updatedAt @map("updated_at")
   translations CategoryTranslation[]
@@ -509,6 +513,10 @@ model Product {
   category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   status     ProductStatus @default(DRAFT)
   isFeatured Boolean       @default(false) @map("is_featured")
+  /// Identifiant de produit BigCommerce (vitrine EN de référence) — idempotence import (tâche 08).
+  /// Un produit apparié fr↔en n'a qu'UN id BigCommerce de référence ; l'id de
+  /// l'autre vitrine est conservé dans le rapport d'écarts, pas en base.
+  bigcommerceProductId String?       @unique @map("bigcommerce_product_id")
   createdAt  DateTime      @default(now()) @map("created_at")
   updatedAt  DateTime      @updatedAt @map("updated_at")
 
@@ -551,6 +559,9 @@ model ProductVariant {
   sku       String  @unique
   /// Code-barres (UPC/EAN) — utile à l'import BigCommerce et au picking.
   barcode   String?
+  /// Identifiant de variante BigCommerce — filet de sécurité d'idempotence
+  /// pour l'import (tâche 08) quand le SKU source est absent ou dupliqué.
+  bigcommerceVariantId String? @unique @map("bigcommerce_variant_id")
 
   /// Taille nominale commerciale « LxHxP » (ex. « 16x25x1 ») + dimensions
   /// nominales et RÉELLES en pouces (les réelles sont ~1/4–1/2 po de moins).
