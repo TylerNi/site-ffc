@@ -3,11 +3,13 @@ import type { ReactNode } from 'react';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { AdminAuthProvider } from '@/lib/auth-context';
 import { routing } from '@/i18n/routing';
 import '../globals.css';
 
 export const metadata: Metadata = {
   title: 'Admin — Filtration Montréal / Furnace Filters Canada',
+  robots: { index: false, follow: false },
 };
 
 export function generateStaticParams() {
@@ -30,7 +32,9 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <AdminAuthProvider>{children}</AdminAuthProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

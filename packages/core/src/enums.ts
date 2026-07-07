@@ -36,13 +36,15 @@ export type DevicePlatform = z.infer<typeof devicePlatformSchema>;
  * Finalités des jetons à usage unique (table one_time_tokens, tâche 05).
  * Chaque jeton est haché en base, expire, et n'est consommable qu'une fois :
  * vérification de courriel, réinitialisation de mot de passe, défi MFA au
- * login, confirmation forte de suppression de compte (Loi 25).
+ * login, confirmation forte de suppression de compte (Loi 25), invitation
+ * d'un compte du personnel à l'admin (tâche 09).
  */
 export const ONE_TIME_TOKEN_PURPOSES = [
   'EMAIL_VERIFICATION',
   'PASSWORD_RESET',
   'MFA_CHALLENGE',
   'ACCOUNT_DELETION',
+  'ADMIN_INVITATION',
 ] as const;
 export const oneTimeTokenPurposeSchema = z.enum(ONE_TIME_TOKEN_PURPOSES);
 export type OneTimeTokenPurpose = z.infer<typeof oneTimeTokenPurposeSchema>;

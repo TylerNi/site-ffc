@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma, type User } from '@prisma/client';
 import { type Locale } from '@ffc/core';
@@ -182,13 +187,22 @@ export class AuthService {
 
   /* ------------------------------ Connexion ---------------------------- */
 
-  async login(input: LoginInput, ctx: RequestContext): Promise<LoginResult> {
-    const email = input.email.trim().toLowerCase();
+  /**
+   * Vérifie identifiant + mot de passe et renvoie l'utilisateur ACTIF, ou
+   * lève l'erreur 401 neutre (anti-énumération, verrouillage, hachage
+   * factice à coût constant). Tronc commun du login client ET du login admin.
+   */
+  private async assertPasswordCredentials(
+    rawEmail: string,
+    password: string,
+    ctx: RequestContext,
+  ): Promise<User> {
+    const email = rawEmail.trim().toLowerCase();
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user || !user.passwordHash) {
       // Coût constant : on vérifie quand même un hachage factice.
-      await verifyAgainstDummyHash(input.password);
+      await verifyAgainstDummyHash(password);
       await this.audit.log({
         action: 'auth.login.failed',
         actorType: 'system',
@@ -202,7 +216,7 @@ export class AuthService {
 
     this.lockout.assertNotLocked(user);
 
-    const passwordValid = await verifyPassword(user.passwordHash, input.password);
+    const passwordValid = await verifyPassword(user.passwordHash, password);
     if (!passwordValid) {
       await this.lockout.registerFailure(user, ctx, 'password');
       throw new UnauthorizedException(NEUTRAL_LOGIN_ERROR);
@@ -223,6 +237,12 @@ export class AuthService {
       throw new UnauthorizedException(NEUTRAL_LOGIN_ERROR);
     }
 
+    return user;
+  }
+
+  async login(input: LoginInput, ctx: RequestContext): Promise<LoginResult> {
+    const user = await this.assertPasswordCredentials(input.email, input.password, ctx);
+
     if (user.mfaEnabled) {
       return this.issueMfaChallenge(user, ctx);
     }
@@ -232,6 +252,92 @@ export class AuthService {
       method: 'password',
     });
     return { mfaRequired: false, user, tokens };
+  }
+
+  /* ------------------------- Connexion admin (tâche 09) ------------------ */
+
+  /**
+   * Connexion à l'administration : mêmes vérifications que `login`, plus deux
+   * exigences propres à l'admin —
+   *   1. rôle du personnel (STAFF/ADMIN) — sinon 401 neutre (ne révèle pas
+   *      qu'un compte client a visé l'admin);
+   *   2. MFA active — sinon 403 explicite : impossible d'OUVRIR une session
+   *      admin sans MFA (critère d'acceptation). L'enrôlement se fait par le
+   *      parcours client (`/v1/auth/mfa/*`).
+   * Renvoie toujours un défi MFA — le second facteur est obligatoire ici.
+   */
+  async adminLogin(input: LoginInput, ctx: RequestContext): Promise<{ challengeToken: string }> {
+    const user = await this.assertPasswordCredentials(input.email, input.password, ctx);
+
+    if (user.role !== 'ADMIN' && user.role !== 'STAFF') {
+      await this.audit.log({
+        action: 'admin.login.denied',
+        actorType: 'system',
+        actorId: user.id,
+        actorEmail: user.email,
+        entityType: 'user',
+        entityId: user.id,
+        metadata: { reason: 'not_staff' },
+        ip: ctx.ip,
+        userAgent: ctx.userAgent,
+      });
+      throw new UnauthorizedException(NEUTRAL_LOGIN_ERROR);
+    }
+
+    if (!user.mfaEnabled) {
+      await this.audit.log({
+        action: 'admin.login.mfa_required',
+        actorType: 'system',
+        actorId: user.id,
+        actorEmail: user.email,
+        entityType: 'user',
+        entityId: user.id,
+        ip: ctx.ip,
+        userAgent: ctx.userAgent,
+      });
+      throw new ForbiddenException(
+        'Double authentification obligatoire : activez la MFA sur votre compte (espace client) avant d’accéder à l’administration.',
+      );
+    }
+
+    const challenge = await this.issueMfaChallenge(user, ctx);
+    if (!challenge.mfaRequired) throw new UnauthorizedException(NEUTRAL_LOGIN_ERROR);
+    return { challengeToken: challenge.challengeToken };
+  }
+
+  /**
+   * Second facteur du login admin : réutilise `completeMfaLogin` puis
+   * re-vérifie le rôle (défense en profondeur — le défi ne porte pas le rôle).
+   */
+  async completeAdminMfaLogin(
+    challengeToken: string,
+    code: string,
+    ctx: RequestContext,
+  ): Promise<{ user: User; tokens: IssuedTokens }> {
+    const result = await this.completeMfaLogin(challengeToken, code, undefined, ctx);
+    if (result.user.role !== 'ADMIN' && result.user.role !== 'STAFF') {
+      await this.tokens.revokeFamily(result.tokens.familyId);
+      throw new UnauthorizedException('Défi MFA invalide ou expiré.');
+    }
+    await this.audit.log({
+      action: 'admin.login.success',
+      actorId: result.user.id,
+      actorEmail: result.user.email,
+      entityType: 'user',
+      entityId: result.user.id,
+      metadata: { sessionFamilyId: result.tokens.familyId },
+      ip: ctx.ip,
+      userAgent: ctx.userAgent,
+    });
+    return result;
+  }
+
+  /**
+   * Vérifie un code TOTP/secours pour une ré-authentification « step-up »
+   * (actions sensibles admin). Délègue à la MFA; ne délivre aucune session.
+   */
+  async verifyMfaForStepUp(user: User, code: string, ctx: RequestContext): Promise<boolean> {
+    return this.mfa.verifyCode(user, code, ctx);
   }
 
   async issueMfaChallenge(user: User, ctx: RequestContext): Promise<LoginResult> {

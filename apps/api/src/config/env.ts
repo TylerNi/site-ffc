@@ -68,6 +68,12 @@ export const envSchema = z
       .url()
       .default('http://localhost:3000')
       .describe('URL de la vitrine web — liens des courriels (vérification, réinitialisation)'),
+    APP_ADMIN_URL: z
+      .url()
+      .default('http://localhost:3001')
+      .describe(
+        'URL de l’administration — liens des courriels d’invitation du personnel (tâche 09)',
+      ),
     AUTH_COOKIE_DOMAIN: z
       .string()
       .optional()

@@ -79,6 +79,7 @@ enum OneTimeTokenPurpose {
   PASSWORD_RESET
   MFA_CHALLENGE
   ACCOUNT_DELETION
+  ADMIN_INVITATION
 
   @@map("one_time_token_purpose")
 }

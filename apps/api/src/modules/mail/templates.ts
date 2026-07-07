@@ -19,7 +19,8 @@ export type MailTemplateKey =
   | 'mfa_enabled'
   | 'mfa_disabled'
   | 'account_deletion_request'
-  | 'account_deleted';
+  | 'account_deleted'
+  | 'admin_invitation';
 
 export interface RenderedMail {
   subject: string;
@@ -135,6 +136,26 @@ const TEMPLATES: Record<MailTemplateKey, Record<Locale, (vars: Vars) => Rendered
     en: () => ({
       subject: 'Your account has been deleted',
       text: `Hello,\n\nYour account has been deleted and your personal data erased, in accordance with Quebec Law 25. Thank you for having been a Furnace Filters Canada customer.\n\n${SIGNATURE.en}`,
+    }),
+  },
+  admin_invitation: {
+    fr: (v) => ({
+      subject: 'Invitation à l’administration Filtration Montréal',
+      text:
+        `Bonjour,\n\n${v.inviter} vous invite à rejoindre l'administration de Filtration Montréal ` +
+        `avec le ou les rôles : ${v.roles}.\n\nPour activer votre accès, choisissez un mot de passe ` +
+        `en ouvrant ce lien (valide ${v.ttl}, utilisable une seule fois) :\n\n${v.acceptUrl}\n\n` +
+        `Rappel de sécurité : l'accès à l'administration exige l'activation de la double ` +
+        `authentification (MFA) après la définition de votre mot de passe.\n\n${SIGNATURE.fr}`,
+    }),
+    en: (v) => ({
+      subject: 'Invitation to the Furnace Filters Canada admin',
+      text:
+        `Hello,\n\n${v.inviter} has invited you to join the Furnace Filters Canada admin ` +
+        `with the following role(s): ${v.roles}.\n\nTo activate your access, choose a password ` +
+        `by opening this link (valid ${v.ttl}, single use):\n\n${v.acceptUrl}\n\n` +
+        `Security reminder: admin access requires enabling two-factor authentication (MFA) ` +
+        `after you set your password.\n\n${SIGNATURE.en}`,
     }),
   },
 };

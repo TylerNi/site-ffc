@@ -38,10 +38,16 @@ export class CookieService {
     };
   }
 
-  setRefreshCookie(res: Response, refreshToken: string): void {
+  /**
+   * Pose le cookie de refresh. `maxAgeMsOverride` permet une durée plus
+   * courte que le défaut (l'admin ouvre des sessions volontairement brèves,
+   * tâche 09) : le jeton en base garde sa durée, mais le cookie — donc la
+   * session web pratique — expire plus tôt.
+   */
+  setRefreshCookie(res: Response, refreshToken: string, maxAgeMsOverride?: number): void {
     res.cookie(REFRESH_COOKIE_NAME, refreshToken, {
       ...this.baseOptions(),
-      maxAge: this.maxAgeMs,
+      maxAge: maxAgeMsOverride ?? this.maxAgeMs,
     });
   }
 

@@ -588,6 +588,267 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Connexion admin — étape 1 (courriel + mot de passe)
+         * @description Exige un rôle du personnel ET une MFA active. Renvoie un challengeToken à présenter à /admin/auth/login/mfa. Un compte sans MFA reçoit 403.
+         */
+        post: operations["adminLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/auth/login/mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connexion admin — étape 2 (code TOTP obligatoire) */
+        post: operations["adminLoginMfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Déconnexion admin (révoque la session) */
+        post: operations["adminLogout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Profil admin courant (rôles + permissions effectives) */
+        get: operations["adminMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/auth/step-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ré-authentification « step-up » (code TOTP) pour actions sensibles
+         * @description Retourne un jeton court à joindre en en-tête X-Step-Up-Token aux actions sensibles (remboursements, rôles, exports).
+         */
+        post: operations["adminStepUp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liste des comptes du personnel */
+        get: operations["adminListUsers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/users/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invite un compte du personnel (courriel + rôles) */
+        post: operations["adminInviteUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/users/{id}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Remplace les rôles d’un compte du personnel */
+        patch: operations["adminAssignRoles"];
+        trace?: never;
+    };
+    "/v1/admin/users/{id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Désactive un compte du personnel (révoque ses sessions) */
+        post: operations["adminDeactivateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/users/{id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Réactive un compte du personnel */
+        post: operations["adminReactivateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liste des rôles et de leurs permissions */
+        get: operations["adminListRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/roles/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catalogue des permissions granulaires */
+        get: operations["adminListPermissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/invitations/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accepte une invitation admin (définit le mot de passe) */
+        post: operations["adminAcceptInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulte le journal d’audit (filtrable, paginé) */
+        get: operations["adminListAuditLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/dashboard/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tuiles du tableau de bord (ventes, files, stock) */
+        get: operations["adminDashboardSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -985,6 +1246,153 @@ export interface components {
             status: "ok";
             /** @description Rôle du compte authentifié */
             role: string;
+        };
+        AdminLoginDto: {
+            /** @example admin@filtrationmontreal.com */
+            email: string;
+            password: string;
+        };
+        AdminLoginChallengeDto: {
+            /** @description À présenter à POST /admin/auth/login/mfa (valide 5 minutes) */
+            challengeToken: string;
+        };
+        AdminMfaLoginDto: {
+            /** @description Jeton de défi retourné par POST /admin/auth/login */
+            challengeToken: string;
+            /** @description Code TOTP à 6 chiffres ou code de secours */
+            code: string;
+        };
+        AdminRoleSummaryDto: {
+            key: string;
+            nameFr: string;
+            nameEn: string;
+        };
+        AdminProfileDto: {
+            /** Format: uuid */
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+            roles: components["schemas"]["AdminRoleSummaryDto"][];
+            /** @description Permissions effectives (« * » = toutes) */
+            permissions: string[];
+            mfaEnabled: boolean;
+        };
+        AdminSessionDto: {
+            /** @description JWT Bearer de 15 minutes */
+            accessToken: string;
+            /** @description Refresh token opaque (aussi posé en cookie httpOnly) */
+            refreshToken: string;
+            /** @enum {string} */
+            tokenType: "Bearer";
+            /** @description Durée de vie de l’access token (secondes) */
+            expiresIn: number;
+            profile: components["schemas"]["AdminProfileDto"];
+        };
+        StepUpDto: {
+            /** @description Code TOTP à 6 chiffres ou code de secours */
+            code: string;
+        };
+        StepUpResponseDto: {
+            /** @description À joindre en en-tête X-Step-Up-Token aux actions sensibles */
+            stepUpToken: string;
+            /** @description Durée de vie du jeton de step-up (secondes) */
+            expiresIn: number;
+        };
+        AdminUserDto: {
+            /** Format: uuid */
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+            /** @enum {string} */
+            status: "ACTIVE" | "DISABLED" | "ANONYMIZED";
+            /** @enum {string} */
+            role: "CUSTOMER" | "STAFF" | "ADMIN";
+            mfaEnabled: boolean;
+            roles: components["schemas"]["AdminRoleSummaryDto"][];
+            /** Format: date-time */
+            lastLoginAt: string | null;
+            /**
+             * Format: date-time
+             * @description Invitation en attente d’acceptation
+             */
+            invitedPendingAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        InviteAdminDto: {
+            /** @example nouvel.employe@filtrationmontreal.com */
+            email: string;
+            /** @description Clés de rôles à attribuer (au moins une) */
+            roleKeys: string[];
+            /**
+             * @default fr
+             * @enum {string}
+             */
+            locale: "fr" | "en";
+            firstName?: string;
+            lastName?: string;
+        };
+        AssignRolesDto: {
+            /** @description Ensemble complet des rôles du compte (remplace l’existant) */
+            roleKeys: string[];
+        };
+        RoleDto: {
+            key: string;
+            nameFr: string;
+            nameEn: string;
+            description: string | null;
+            isSystem: boolean;
+            permissions: string[];
+        };
+        PermissionDto: {
+            key: string;
+            description: string | null;
+        };
+        AcceptInvitationDto: {
+            /** @description Jeton d’invitation reçu par courriel */
+            token: string;
+            password: string;
+            firstName?: string;
+            lastName?: string;
+        };
+        AuditLogDto: {
+            /** Format: uuid */
+            id: string;
+            actorType: string;
+            actorId: string | null;
+            actorEmail: string | null;
+            action: string;
+            entityType: string | null;
+            entityId: string | null;
+            before: Record<string, never> | null;
+            after: Record<string, never> | null;
+            metadata: Record<string, never> | null;
+            ip: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AuditLogPageDto: {
+            items: components["schemas"]["AuditLogDto"][];
+            /** @description Curseur de la page suivante (ou null) */
+            nextCursor: string | null;
+        };
+        DashboardSummaryDto: {
+            /** @description Ventes payées aujourd’hui (cents) */
+            salesTodayCents: number;
+            /** @description Nombre de commandes payées aujourd’hui */
+            ordersTodayCount: number;
+            /** @description Commandes à expédier (payées/en traitement) */
+            ordersToShip: number;
+            /** @description Avis en attente de modération */
+            pendingReviews: number;
+            /** @description Identifications IA en file de révision */
+            aiReviewQueue: number;
+            /** @description Variantes sous le seuil de stock bas */
+            lowStock: number;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
         };
     };
     responses: never;
@@ -1751,6 +2159,337 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminPingResponseDto"];
+                };
+            };
+        };
+    };
+    adminLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminLoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLoginChallengeDto"];
+                };
+            };
+        };
+    };
+    adminLoginMfa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminMfaLoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSessionDto"];
+                };
+            };
+        };
+    };
+    adminLogout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    adminMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProfileDto"];
+                };
+            };
+        };
+    };
+    adminStepUp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StepUpDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StepUpResponseDto"];
+                };
+            };
+        };
+    };
+    adminListUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDto"][];
+                };
+            };
+        };
+    };
+    adminInviteUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteAdminDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDto"];
+                };
+            };
+        };
+    };
+    adminAssignRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignRolesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDto"];
+                };
+            };
+        };
+    };
+    adminDeactivateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDto"];
+                };
+            };
+        };
+    };
+    adminReactivateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDto"];
+                };
+            };
+        };
+    };
+    adminListRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleDto"][];
+                };
+            };
+        };
+    };
+    adminListPermissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PermissionDto"][];
+                };
+            };
+        };
+    };
+    adminAcceptInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptInvitationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    adminListAuditLogs: {
+        parameters: {
+            query?: {
+                /** @description Filtrer par acteur */
+                actorId?: string;
+                /** @description Filtrer par type d’entité (ex. user, order) */
+                entityType?: string;
+                /** @description Filtrer par identifiant d’entité */
+                entityId?: string;
+                /** @description Filtrer par action (préfixe, ex. admin.users) */
+                action?: string;
+                /** @description Début de période (inclus) */
+                from?: string;
+                /** @description Fin de période (exclus) */
+                to?: string;
+                limit?: number;
+                /** @description Curseur : id de la dernière ligne reçue */
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogPageDto"];
+                };
+            };
+        };
+    };
+    adminDashboardSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardSummaryDto"];
                 };
             };
         };

@@ -19,7 +19,15 @@
  *     commande payée, facture (numérotée par allocate_invoice_number),
  *     expédition en transit, avis approuvé, plan de rappel, identification IA.
  */
-import { MERV_RATINGS, NOMINAL_FILTER_SIZES, type NominalFilterSize, PROVINCES } from '@ffc/core';
+import {
+  ADMIN_PERMISSIONS,
+  ADMIN_ROLES,
+  MERV_RATINGS,
+  NOMINAL_FILTER_SIZES,
+  type NominalFilterSize,
+  PERMISSION_WILDCARD,
+  PROVINCES,
+} from '@ffc/core';
 import { type Prisma, PrismaClient } from '@prisma/client';
 import argon2 from 'argon2';
 import { allocateInvoiceNumber, invoiceSeries } from '../src/database/invoice-number';
@@ -554,58 +562,42 @@ async function seedSuppliers(prisma: PrismaClient): Promise<void> {
   }
 }
 
+/**
+ * RBAC fin (tâche 09) — permissions granulaires et rôles de départ, source
+ * @ffc/core (ADMIN_PERMISSIONS / ADMIN_ROLES). Le rôle super_admin porte la
+ * permission joker « * » (une seule ligne) : toute nouvelle permission lui est
+ * accordée sans re-seed. Idempotent : upsert par clé stable.
+ */
 async function seedRbac(prisma: PrismaClient): Promise<void> {
   const permissions = [
-    { id: ID.permission(1), key: 'products.read', description: 'Consulter le catalogue (admin)' },
-    { id: ID.permission(2), key: 'products.write', description: 'Modifier produits et inventaire' },
-    { id: ID.permission(3), key: 'orders.read', description: 'Consulter les commandes' },
-    { id: ID.permission(4), key: 'orders.write', description: 'Gérer les commandes' },
-    { id: ID.permission(5), key: 'orders.refund', description: 'Émettre des remboursements' },
-    { id: ID.permission(6), key: 'customers.read', description: 'Consulter les clients' },
-    { id: ID.permission(7), key: 'customers.write', description: 'Modifier les clients' },
-    {
-      id: ID.permission(8),
-      key: 'customers.anonymize',
-      description: 'Anonymiser un compte (Loi 25)',
-    },
-    { id: ID.permission(9), key: 'reviews.moderate', description: 'Modérer les avis' },
-    { id: ID.permission(10), key: 'settings.write', description: 'Modifier les réglages' },
-    { id: ID.permission(11), key: 'reports.read', description: 'Consulter les rapports' },
+    ...ADMIN_PERMISSIONS,
+    { key: PERMISSION_WILDCARD, description: 'Toutes les permissions (réservé à super_admin)' },
   ];
-  for (const permission of permissions) {
-    await prisma.permission.upsert({
-      where: { id: permission.id },
+  const permissionIdByKey = new Map<string, string>();
+  for (const [index, permission] of permissions.entries()) {
+    const row = await prisma.permission.upsert({
+      where: { key: permission.key },
       update: { description: permission.description },
-      create: permission,
+      create: {
+        id: ID.permission(index + 1),
+        key: permission.key,
+        description: permission.description,
+      },
     });
+    permissionIdByKey.set(permission.key, row.id);
   }
 
-  const roles = [
-    {
-      id: ID.role(1),
-      key: 'super-admin',
-      nameFr: 'Super administrateur',
-      nameEn: 'Super Administrator',
-      description: 'Accès complet — toutes les permissions.',
-      isSystem: true,
-      permissionIds: permissions.map((p) => p.id),
-    },
-    {
-      id: ID.role(2),
-      key: 'support',
-      nameFr: 'Support à la clientèle',
-      nameEn: 'Customer Support',
-      description: 'Commandes et clients, sans remboursement ni réglages.',
-      isSystem: true,
-      permissionIds: [ID.permission(3), ID.permission(4), ID.permission(6), ID.permission(9)],
-    },
-  ];
-  for (const role of roles) {
-    await prisma.role.upsert({
-      where: { id: role.id },
-      update: { nameFr: role.nameFr, nameEn: role.nameEn, description: role.description },
+  for (const [index, role] of ADMIN_ROLES.entries()) {
+    const row = await prisma.role.upsert({
+      where: { key: role.key },
+      update: {
+        nameFr: role.nameFr,
+        nameEn: role.nameEn,
+        description: role.description,
+        isSystem: role.isSystem,
+      },
       create: {
-        id: role.id,
+        id: ID.role(index + 1),
         key: role.key,
         nameFr: role.nameFr,
         nameEn: role.nameEn,
@@ -613,11 +605,13 @@ async function seedRbac(prisma: PrismaClient): Promise<void> {
         isSystem: role.isSystem,
       },
     });
-    for (const permissionId of role.permissionIds) {
+    for (const key of role.permissions) {
+      const permissionId = permissionIdByKey.get(key);
+      if (!permissionId) continue;
       await prisma.rolePermission.upsert({
-        where: { roleId_permissionId: { roleId: role.id, permissionId } },
+        where: { roleId_permissionId: { roleId: row.id, permissionId } },
         update: {},
-        create: { roleId: role.id, permissionId },
+        create: { roleId: row.id, permissionId },
       });
     }
   }

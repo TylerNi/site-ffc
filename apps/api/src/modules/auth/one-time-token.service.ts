@@ -10,6 +10,7 @@ export const ONE_TIME_TOKEN_TTL_MS: Record<OneTimeTokenPurpose, number> = {
   PASSWORD_RESET: 30 * 60_000, // 30 min
   MFA_CHALLENGE: 5 * 60_000, // 5 min
   ACCOUNT_DELETION: 30 * 60_000, // 30 min
+  ADMIN_INVITATION: 7 * 24 * 3600_000, // 7 jours (tâche 09)
 };
 
 /**

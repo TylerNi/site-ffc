@@ -1326,6 +1326,571 @@
           "admin"
         ]
       }
+    },
+    "/v1/admin/auth/login": {
+      "post": {
+        "description": "Exige un rôle du personnel ET une MFA active. Renvoie un challengeToken à présenter à /admin/auth/login/mfa. Un compte sans MFA reçoit 403.",
+        "operationId": "adminLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminLoginChallengeDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Connexion admin — étape 1 (courriel + mot de passe)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/auth/login/mfa": {
+      "post": {
+        "operationId": "adminLoginMfa",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminMfaLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSessionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Connexion admin — étape 2 (code TOTP obligatoire)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/auth/logout": {
+      "post": {
+        "operationId": "adminLogout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Déconnexion admin (révoque la session)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/auth/me": {
+      "get": {
+        "operationId": "adminMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Profil admin courant (rôles + permissions effectives)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/auth/step-up": {
+      "post": {
+        "description": "Retourne un jeton court à joindre en en-tête X-Step-Up-Token aux actions sensibles (remboursements, rôles, exports).",
+        "operationId": "adminStepUp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StepUpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StepUpResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ré-authentification « step-up » (code TOTP) pour actions sensibles",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/users": {
+      "get": {
+        "operationId": "adminListUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminUserDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Liste des comptes du personnel",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/users/invitations": {
+      "post": {
+        "operationId": "adminInviteUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite un compte du personnel (courriel + rôles)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/users/{id}/roles": {
+      "patch": {
+        "operationId": "adminAssignRoles",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRolesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remplace les rôles d’un compte du personnel",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/users/{id}/deactivate": {
+      "post": {
+        "operationId": "adminDeactivateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Désactive un compte du personnel (révoque ses sessions)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/users/{id}/reactivate": {
+      "post": {
+        "operationId": "adminReactivateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Réactive un compte du personnel",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/roles": {
+      "get": {
+        "operationId": "adminListRoles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Liste des rôles et de leurs permissions",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/roles/permissions": {
+      "get": {
+        "operationId": "adminListPermissions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Catalogue des permissions granulaires",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/invitations/accept": {
+      "post": {
+        "operationId": "adminAcceptInvitation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Accepte une invitation admin (définit le mot de passe)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/audit-logs": {
+      "get": {
+        "operationId": "adminListAuditLogs",
+        "parameters": [
+          {
+            "name": "actorId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par acteur",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityType",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par type d’entité (ex. user, order)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par identifiant d’entité",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par action (préfixe, ex. admin.users)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Début de période (inclus)",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Fin de période (exclus)",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Curseur : id de la dernière ligne reçue",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Consulte le journal d’audit (filtrable, paginé)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/dashboard/summary": {
+      "get": {
+        "operationId": "adminDashboardSummary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tuiles du tableau de bord (ventes, files, stock)",
+        "tags": [
+          "admin"
+        ]
+      }
     }
   },
   "info": {
@@ -2574,6 +3139,504 @@
         "required": [
           "status",
           "role"
+        ]
+      },
+      "AdminLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@filtrationmontreal.com"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AdminLoginChallengeDto": {
+        "type": "object",
+        "properties": {
+          "challengeToken": {
+            "type": "string",
+            "description": "À présenter à POST /admin/auth/login/mfa (valide 5 minutes)"
+          }
+        },
+        "required": [
+          "challengeToken"
+        ]
+      },
+      "AdminMfaLoginDto": {
+        "type": "object",
+        "properties": {
+          "challengeToken": {
+            "type": "string",
+            "description": "Jeton de défi retourné par POST /admin/auth/login"
+          },
+          "code": {
+            "type": "string",
+            "description": "Code TOTP à 6 chiffres ou code de secours"
+          }
+        },
+        "required": [
+          "challengeToken",
+          "code"
+        ]
+      },
+      "AdminRoleSummaryDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "nameFr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "nameFr",
+          "nameEn"
+        ]
+      },
+      "AdminProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminRoleSummaryDto"
+            }
+          },
+          "permissions": {
+            "description": "Permissions effectives (« * » = toutes)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mfaEnabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "firstName",
+          "lastName",
+          "roles",
+          "permissions",
+          "mfaEnabled"
+        ]
+      },
+      "AdminSessionDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "JWT Bearer de 15 minutes"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token opaque (aussi posé en cookie httpOnly)"
+          },
+          "tokenType": {
+            "type": "string",
+            "enum": [
+              "Bearer"
+            ]
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Durée de vie de l’access token (secondes)"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/AdminProfileDto"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "tokenType",
+          "expiresIn",
+          "profile"
+        ]
+      },
+      "StepUpDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Code TOTP à 6 chiffres ou code de secours"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "StepUpResponseDto": {
+        "type": "object",
+        "properties": {
+          "stepUpToken": {
+            "type": "string",
+            "description": "À joindre en en-tête X-Step-Up-Token aux actions sensibles"
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Durée de vie du jeton de step-up (secondes)"
+          }
+        },
+        "required": [
+          "stepUpToken",
+          "expiresIn"
+        ]
+      },
+      "AdminUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "DISABLED",
+              "ANONYMIZED"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER",
+              "STAFF",
+              "ADMIN"
+            ]
+          },
+          "mfaEnabled": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminRoleSummaryDto"
+            }
+          },
+          "lastLoginAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "invitedPendingAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Invitation en attente d’acceptation"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "firstName",
+          "lastName",
+          "status",
+          "role",
+          "mfaEnabled",
+          "roles",
+          "lastLoginAt",
+          "invitedPendingAt",
+          "createdAt"
+        ]
+      },
+      "InviteAdminDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "nouvel.employe@filtrationmontreal.com"
+          },
+          "roleKeys": {
+            "description": "Clés de rôles à attribuer (au moins une)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ],
+            "default": "fr"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "roleKeys"
+        ]
+      },
+      "AssignRolesDto": {
+        "type": "object",
+        "properties": {
+          "roleKeys": {
+            "description": "Ensemble complet des rôles du compte (remplace l’existant)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "roleKeys"
+        ]
+      },
+      "RoleDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "nameFr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "key",
+          "nameFr",
+          "nameEn",
+          "description",
+          "isSystem",
+          "permissions"
+        ]
+      },
+      "PermissionDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "key",
+          "description"
+        ]
+      },
+      "AcceptInvitationDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Jeton d’invitation reçu par courriel"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 128
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "AuditLogDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actorType": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string",
+            "nullable": true
+          },
+          "actorEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "action": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string",
+            "nullable": true
+          },
+          "entityId": {
+            "type": "string",
+            "nullable": true
+          },
+          "before": {
+            "type": "object",
+            "nullable": true
+          },
+          "after": {
+            "type": "object",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "nullable": true
+          },
+          "ip": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "actorType",
+          "actorId",
+          "actorEmail",
+          "action",
+          "entityType",
+          "entityId",
+          "before",
+          "after",
+          "metadata",
+          "ip",
+          "createdAt"
+        ]
+      },
+      "AuditLogPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Curseur de la page suivante (ou null)"
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "DashboardSummaryDto": {
+        "type": "object",
+        "properties": {
+          "salesTodayCents": {
+            "type": "number",
+            "description": "Ventes payées aujourd’hui (cents)"
+          },
+          "ordersTodayCount": {
+            "type": "number",
+            "description": "Nombre de commandes payées aujourd’hui"
+          },
+          "ordersToShip": {
+            "type": "number",
+            "description": "Commandes à expédier (payées/en traitement)"
+          },
+          "pendingReviews": {
+            "type": "number",
+            "description": "Avis en attente de modération"
+          },
+          "aiReviewQueue": {
+            "type": "number",
+            "description": "Identifications IA en file de révision"
+          },
+          "lowStock": {
+            "type": "number",
+            "description": "Variantes sous le seuil de stock bas"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          }
+        },
+        "required": [
+          "salesTodayCents",
+          "ordersTodayCount",
+          "ordersToShip",
+          "pendingReviews",
+          "aiReviewQueue",
+          "lowStock",
+          "currency"
         ]
       }
     }

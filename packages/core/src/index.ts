@@ -1,4 +1,5 @@
 export * from './enums';
+export * from './rbac';
 export * from './locales';
 export * from './filters';
 export * from './dimensions';
