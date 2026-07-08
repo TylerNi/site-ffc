@@ -6,13 +6,16 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../../../database';
-import { IS_PUBLIC_KEY } from '../decorators';
+import { IS_PUBLIC_KEY, OPTIONAL_AUTH_KEY } from '../decorators';
 import { type AuthenticatedRequest } from '../request-context';
 import { TokenService } from '../token.service';
 
 /**
  * Guard global d'authentification : Bearer JWT exigé partout, sauf sur
- * les routes @Public().
+ * les routes @Public(). Les routes @OptionalAuth() (panier/checkout,
+ * tâche 11) passent en anonyme SANS en-tête, mais un Bearer fourni est
+ * vérifié strictement — un jeton expiré fait un 401, jamais un invité
+ * silencieux.
  *
  * Le compte est RECHARGÉ de la base à chaque requête : un compte
  * désactivé/anonymisé perd l'accès immédiatement (sans attendre
@@ -34,10 +37,18 @@ export class JwtAuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
+    const isOptional = this.reflector.getAllAndOverride<boolean>(OPTIONAL_AUTH_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const header = request.headers.authorization;
     const token = header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : undefined;
-    if (!token) throw new UnauthorizedException('Authentification requise.');
+    if (!token) {
+      if (isOptional) return true;
+      throw new UnauthorizedException('Authentification requise.');
+    }
 
     let claims;
     try {

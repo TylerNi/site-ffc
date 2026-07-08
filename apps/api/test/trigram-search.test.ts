@@ -78,10 +78,33 @@ describe('recherche trigram (pg_trgm) sur les seeds', () => {
   });
 
   it('le catalogue seedé est complet (~40 produits, 3 marques, traductions fr+en)', async () => {
-    expect(await prisma.product.count()).toBe(40);
-    expect(await prisma.brand.count()).toBe(3);
-    expect(await prisma.productTranslation.count({ where: { locale: 'fr' } })).toBe(40);
-    expect(await prisma.productTranslation.count({ where: { locale: 'en' } })).toBe(40);
+    // Compte restreint aux IDENTIFIANTS DÉTERMINISTES du seed (bloc 8003) :
+    // la base de test est partagée avec les suites checkout (tâche 11) qui
+    // créent leurs propres produits en parallèle. (Colonne UUID : filtre par
+    // bornes, Prisma n'offre pas de startsWith sur ce type.)
+    const seededProducts = {
+      id: {
+        gte: '00000000-0000-4000-8003-000000000000',
+        lte: '00000000-0000-4000-8003-ffffffffffff',
+      },
+    };
+    expect(await prisma.product.count({ where: seededProducts })).toBe(40);
+    expect(
+      await prisma.brand.count({
+        where: {
+          id: {
+            gte: '00000000-0000-4000-8001-000000000000',
+            lte: '00000000-0000-4000-8001-ffffffffffff',
+          },
+        },
+      }),
+    ).toBe(3);
+    expect(
+      await prisma.productTranslation.count({ where: { locale: 'fr', product: seededProducts } }),
+    ).toBe(40);
+    expect(
+      await prisma.productTranslation.count({ where: { locale: 'en', product: seededProducts } }),
+    ).toBe(40);
     expect(await prisma.productVariant.count()).toBeGreaterThanOrEqual(100);
   });
 });

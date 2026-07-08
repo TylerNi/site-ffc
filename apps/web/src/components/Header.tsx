@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { type Locale } from '@ffc/i18n';
 import { Link } from '@/i18n/navigation';
 import { localizedPath, otherLocale } from '@/lib/site';
+import { CartBadge } from './CartBadge';
 import { LocaleSwitcher } from './LocaleSwitcher';
 import { SearchBox } from './SearchBox';
 
@@ -63,6 +64,9 @@ export async function Header({ locale }: { locale: Locale }) {
             label={t('header.languageSwitch')}
             ariaLabel={t('header.languageSwitchLabel')}
           />
+          <Link href="/cart" className="cart-link">
+            <CartBadge label={t('nav.cart')} />
+          </Link>
         </nav>
       </div>
     </header>

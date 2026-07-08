@@ -8,7 +8,9 @@ import { type Env } from './config/env';
 import { createOpenApiDocument } from './openapi';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // rawBody : indispensable à la vérification de signature des webhooks
+  // Stripe (le corps signé doit être l'octet près celui reçu).
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
   configureApp(app);
 
   const document = createOpenApiDocument(app);

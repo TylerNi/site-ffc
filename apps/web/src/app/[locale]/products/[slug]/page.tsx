@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { type Locale } from '@ffc/i18n';
+import { AddToCart } from '@/components/AddToCart';
 import { Breadcrumbs, type Crumb } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
 import { ProductImage } from '@/components/ProductImage';
@@ -168,6 +169,9 @@ export default async function ProductPage({
                 <th>{t('product.price')}</th>
                 <th>{t('product.unitPrice')}</th>
                 <th>{t('product.availability')}</th>
+                <th>
+                  <span className="visually-hidden">{t('product.addToCart')}</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -195,12 +199,24 @@ export default async function ProductPage({
                       <span className="badge badge-out">{t('product.outOfStock')}</span>
                     )}
                   </td>
+                  <td>
+                    <AddToCart
+                      variantId={variant.id}
+                      disabled={!variant.inStock}
+                      labels={{
+                        add: t('product.addToCart'),
+                        adding: t('product.adding'),
+                        added: t('product.added'),
+                        outOfStock: t('product.outOfStock'),
+                        insufficient: t('cart.onlyLeft', { count: '{count}' }),
+                        error: t('cart.updateError'),
+                      }}
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-
-          <p className="notice">{t('product.checkoutSoon')}</p>
 
           {firstVariant && (
             <div className="info-box">

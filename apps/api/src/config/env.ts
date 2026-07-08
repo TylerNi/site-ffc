@@ -100,6 +100,38 @@ export const envSchema = z
       .optional()
       .describe('Identifiants Apple (Services ID web + bundle IDs iOS), séparés par des virgules'),
 
+    /* ------------------------- Paiements (Stripe) ----------------------- */
+    // Chaîne vide ≡ absente : permet de neutraliser explicitement une
+    // variable (tests) sans retirer la ligne du .env.
+    STRIPE_SECRET_KEY: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .startsWith('sk_', 'STRIPE_SECRET_KEY doit commencer par sk_')
+        .optional()
+        .describe('Clé secrète Stripe (sk_test_… en dev). Absente : checkout désactivé (503).'),
+    ),
+    STRIPE_WEBHOOK_SECRET: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .startsWith('whsec_', 'STRIPE_WEBHOOK_SECRET doit commencer par whsec_')
+        .optional()
+        .describe('Secret de signature du endpoint webhook (stripe listen en dev).'),
+    ),
+
+    /* ------------------------- Files (BullMQ/Redis) --------------------- */
+    REDIS_URL: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .regex(/^rediss?:\/\//, 'REDIS_URL doit être une URL redis:// ou rediss://')
+        .optional()
+        .describe(
+          'Connexion Redis des files BullMQ (webhooks Stripe). Absente : traitement immédiat dans le processus API (dev/test seulement).',
+        ),
+    ),
+
     /* ------------------------------ Courriel ---------------------------- */
     MAIL_DRIVER: z
       .enum(['log', 'ses'])
@@ -132,6 +164,27 @@ export const envSchema = z
         code: 'custom',
         path: ['MAIL_DRIVER'],
         message: 'MAIL_DRIVER doit être « ses » en production (courriels de sécurité obligatoires)',
+      });
+    }
+    if (!env.STRIPE_SECRET_KEY) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['STRIPE_SECRET_KEY'],
+        message: 'STRIPE_SECRET_KEY est obligatoire en production (checkout)',
+      });
+    }
+    if (!env.STRIPE_WEBHOOK_SECRET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['STRIPE_WEBHOOK_SECRET'],
+        message: 'STRIPE_WEBHOOK_SECRET est obligatoire en production (webhooks signés)',
+      });
+    }
+    if (!env.REDIS_URL) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['REDIS_URL'],
+        message: 'REDIS_URL est obligatoire en production (files BullMQ)',
       });
     }
   });

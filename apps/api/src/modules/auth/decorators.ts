@@ -12,6 +12,15 @@ export const IS_PUBLIC_KEY = 'ffc:isPublic';
 /** Route accessible sans access token (login, santé, webhooks…). */
 export const Public = (): CustomDecorator => SetMetadata(IS_PUBLIC_KEY, true);
 
+export const OPTIONAL_AUTH_KEY = 'ffc:optionalAuth';
+/**
+ * Authentification FACULTATIVE (panier, checkout — tâche 11) : sans en-tête
+ * Authorization la requête passe en anonyme ; avec un Bearer, il est vérifié
+ * normalement (un jeton invalide reste un 401 franc — jamais de session
+ * silencieusement ignorée).
+ */
+export const OptionalAuth = (): CustomDecorator => SetMetadata(OPTIONAL_AUTH_KEY, true);
+
 export const ROLES_KEY = 'ffc:roles';
 /**
  * Rôles système exigés. Dès qu'un rôle du personnel (STAFF/ADMIN) est

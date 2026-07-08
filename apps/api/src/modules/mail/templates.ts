@@ -20,7 +20,8 @@ export type MailTemplateKey =
   | 'mfa_disabled'
   | 'account_deletion_request'
   | 'account_deleted'
-  | 'admin_invitation';
+  | 'admin_invitation'
+  | 'order_confirmation';
 
 export interface RenderedMail {
   subject: string;
@@ -156,6 +157,22 @@ const TEMPLATES: Record<MailTemplateKey, Record<Locale, (vars: Vars) => Rendered
         `by opening this link (valid ${v.ttl}, single use):\n\n${v.acceptUrl}\n\n` +
         `Security reminder: admin access requires enabling two-factor authentication (MFA) ` +
         `after you set your password.\n\n${SIGNATURE.en}`,
+    }),
+  },
+  order_confirmation: {
+    fr: (v) => ({
+      subject: `Confirmation de commande ${v.orderNumber}`,
+      text:
+        `Bonjour,\n\nMerci pour votre commande ${v.orderNumber} ! Elle est confirmée et sera préparée sous peu.\n\n` +
+        `Articles :\n${v.lines}\n\nTotal payé : ${v.total}\n\n` +
+        `Vous recevrez un courriel avec le numéro de suivi dès l'expédition.\n\n${SIGNATURE.fr}`,
+    }),
+    en: (v) => ({
+      subject: `Order confirmation ${v.orderNumber}`,
+      text:
+        `Hello,\n\nThank you for your order ${v.orderNumber}! It is confirmed and will be prepared shortly.\n\n` +
+        `Items:\n${v.lines}\n\nTotal paid: ${v.total}\n\n` +
+        `You will receive an email with the tracking number as soon as it ships.\n\n${SIGNATURE.en}`,
     }),
   },
 };

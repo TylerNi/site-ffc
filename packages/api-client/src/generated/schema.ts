@@ -435,6 +435,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/addresses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Adresses sauvegardées */
+        get: operations["listMyAddresses"];
+        put?: never;
+        /** Ajoute une adresse au carnet */
+        post: operations["createMyAddress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/addresses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Remplace une adresse du carnet */
+        put: operations["updateMyAddress"];
+        post?: never;
+        /** Supprime une adresse du carnet */
+        delete: operations["deleteMyAddress"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/catalog/categories": {
         parameters: {
             query?: never;
@@ -565,6 +601,104 @@ export interface paths {
         get: operations["getCatalogProduct"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/cart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Panier courant, revalidé côté serveur
+         * @description Jeton invité inconnu ou expiré ⇒ panier vide (jamais d’erreur). Les écarts corrigés (produit dépublié, épuisé, prix changé) sont signalés une seule fois dans `changes`.
+         */
+        get: operations["getCart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/cart/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ajoute une variante (les quantités s’additionnent)
+         * @description Sans panier existant, un panier est créé ; pour un invité, `guestCartToken` est retourné UNE seule fois — à stocker et renvoyer dans X-Cart-Token.
+         */
+        post: operations["addCartItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/cart/items/{variantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Retire une ligne */
+        delete: operations["removeCartItem"];
+        options?: never;
+        head?: never;
+        /** Fixe la quantité d’une ligne */
+        patch: operations["updateCartItem"];
+        trace?: never;
+    };
+    "/v1/checkout/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cote le panier et prépare le paiement (PaymentIntent)
+         * @description Revalide le panier (409 CART_CHANGED si un écart vient d’être corrigé), valide adresse/coupon, fige la commande PENDING et retourne le client_secret du Payment Element. Re-soumettre avec une autre adresse ou un autre coupon RECOTE la même commande.
+         */
+        post: operations["createCheckoutSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/checkout/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * État du paiement au retour du client (page de succès)
+         * @description Le client_secret sert de preuve de possession. Si Stripe confirme le paiement et que le webhook n’est pas encore passé, la finalisation idempotente est faite ici — la page de succès n’attend jamais.
+         */
+        post: operations["getCheckoutResult"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1019,6 +1153,49 @@ export interface components {
             /** @description Jeton reçu par courriel (valide 30 minutes) */
             token: string;
         };
+        AddressDto: {
+            /** Format: uuid */
+            id: string;
+            label?: string | null;
+            firstName: string;
+            lastName: string;
+            company?: string | null;
+            line1: string;
+            line2?: string | null;
+            city: string;
+            province: string;
+            postalCode: string;
+            /** @enum {string} */
+            country: "CA" | "US";
+            phone?: string | null;
+            isDefaultShipping: boolean;
+            isDefaultBilling: boolean;
+        };
+        AddressListDto: {
+            addresses: components["schemas"]["AddressDto"][];
+        };
+        SaveAddressDto: {
+            firstName: string;
+            lastName: string;
+            company?: string;
+            line1: string;
+            line2?: string;
+            city: string;
+            /**
+             * @description Code de province (CA) ou d’état (US)
+             * @example QC
+             */
+            province: string;
+            /** @description Code postal (A1A 1A1) ou ZIP (12345[-6789]) */
+            postalCode: string;
+            /** @enum {string} */
+            country: "CA" | "US";
+            phone?: string;
+            /** @description Libellé libre (« Maison », « Chalet »…) */
+            label?: string;
+            isDefaultShipping?: boolean;
+            isDefaultBilling?: boolean;
+        };
         CategoryNodeDto: {
             /** Format: uuid */
             id: string;
@@ -1240,6 +1417,216 @@ export interface components {
             images: components["schemas"]["ProductImageDto"][];
             reviews: components["schemas"]["ReviewSummaryDto"];
             related: components["schemas"]["RelatedProductDto"][];
+        };
+        CartLineDto: {
+            /** Format: uuid */
+            variantId: string;
+            /** Format: uuid */
+            productId: string;
+            sku: string;
+            quantity: number;
+            /** @description Prix courant de la variante (cents) — recalculé à chaque lecture */
+            unitPriceCents: number;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            /** @description quantity × unitPriceCents */
+            lineSubtotalCents: number;
+            nameFr: string;
+            nameEn: string;
+            slugFr?: string | null;
+            slugEn?: string | null;
+            /** @example 16x25x1 */
+            nominalLabel?: string | null;
+            packSize: number;
+            merv?: number | null;
+            imageUrl?: string | null;
+            /** @description Stock vendable restant (en main − réservé) */
+            availableQuantity: number;
+        };
+        RemovedCartLineDto: {
+            sku: string;
+            nameFr: string;
+            nameEn: string;
+            /**
+             * @description UNAVAILABLE : produit retiré du catalogue · OUT_OF_STOCK : épuisé
+             * @enum {string}
+             */
+            reason: "UNAVAILABLE" | "OUT_OF_STOCK";
+        };
+        AdjustedCartLineDto: {
+            sku: string;
+            nameFr: string;
+            nameEn: string;
+            /** @description Quantité demandée avant ajustement */
+            fromQuantity: number;
+            /** @description Quantité retenue (stock restant) */
+            toQuantity: number;
+        };
+        PriceChangedCartLineDto: {
+            sku: string;
+            nameFr: string;
+            nameEn: string;
+            /** @description Prix consigné à l’ajout (cents) */
+            fromCents: number;
+            /** @description Prix courant (cents) */
+            toCents: number;
+        };
+        CartChangesDto: {
+            removed: components["schemas"]["RemovedCartLineDto"][];
+            adjusted: components["schemas"]["AdjustedCartLineDto"][];
+            priceChanged: components["schemas"]["PriceChangedCartLineDto"][];
+        };
+        CartDto: {
+            /**
+             * Format: uuid
+             * @description Null tant qu’aucun panier n’existe pour ce client
+             */
+            id?: string | null;
+            /** @description Jeton de panier invité — présent UNIQUEMENT à la création (première addition sans compte). À stocker côté client et à renvoyer dans X-Cart-Token. */
+            guestCartToken?: string | null;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            items: components["schemas"]["CartLineDto"][];
+            /** @description Somme des lignes (cents) — les taxes se calculent au checkout */
+            subtotalCents: number;
+            /** @description Nombre total d’unités */
+            itemCount: number;
+            changes: components["schemas"]["CartChangesDto"];
+        };
+        AddCartItemDto: {
+            /**
+             * Format: uuid
+             * @description Variante de produit à ajouter
+             */
+            variantId: string;
+            /** @example 1 */
+            quantity: number;
+        };
+        UpdateCartItemDto: {
+            quantity: number;
+        };
+        CheckoutAddressDto: {
+            firstName: string;
+            lastName: string;
+            company?: string;
+            line1: string;
+            line2?: string;
+            city: string;
+            /**
+             * @description Code de province (CA) ou d’état (US)
+             * @example QC
+             */
+            province: string;
+            /** @description Code postal (A1A 1A1) ou ZIP (12345[-6789]) */
+            postalCode: string;
+            /** @enum {string} */
+            country: "CA" | "US";
+            phone?: string;
+        };
+        CreateCheckoutSessionDto: {
+            /** @description Courriel de commande — REQUIS pour un invité, ignoré si connecté */
+            email?: string;
+            /**
+             * @description Langue des courriels et de la facture
+             * @enum {string}
+             */
+            locale?: "fr" | "en";
+            shippingAddress?: components["schemas"]["CheckoutAddressDto"];
+            /**
+             * Format: uuid
+             * @description Adresse du carnet (compte connecté) — exclusif avec shippingAddress
+             */
+            shippingAddressId?: string;
+            /** @description Défaut : identique à la livraison */
+            billingAddress?: components["schemas"]["CheckoutAddressDto"];
+            /** @description Sauvegarder l’adresse au carnet (connecté seulement) */
+            saveAddress?: boolean;
+            couponCode?: string;
+            customerNote?: string;
+        };
+        OrderLineSummaryDto: {
+            sku: string;
+            nameFr: string;
+            nameEn: string;
+            nominalLabel?: string | null;
+            packSize: number;
+            merv?: number | null;
+            quantity: number;
+            unitPriceCents: number;
+            /** @description Part de la remise imputée à cette ligne (cents) */
+            discountCents: number;
+            /** @description unitPrice × quantity − remise (cents) */
+            subtotalCents: number;
+            /** @description Taxes de la ligne, toutes composantes (cents) */
+            taxCents: number;
+            totalCents: number;
+        };
+        OrderAddressDto: {
+            firstName: string;
+            lastName: string;
+            company?: string | null;
+            line1: string;
+            line2?: string | null;
+            city: string;
+            province: string;
+            postalCode: string;
+            /** @enum {string} */
+            country: "CA" | "US";
+            phone?: string | null;
+        };
+        OrderSummaryDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example FFC-100042 */
+            number: string;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            email: string;
+            lines: components["schemas"]["OrderLineSummaryDto"][];
+            subtotalCents: number;
+            discountCents: number;
+            shippingCents: number;
+            /** @description TPS (cents) */
+            taxGstCents: number;
+            /** @description TVQ (cents) */
+            taxQstCents: number;
+            /** @description TVH (cents) */
+            taxHstCents: number;
+            /** @description TVP/TVD (cents) */
+            taxPstCents: number;
+            /** @description Total des taxes (cents) */
+            totalTaxCents: number;
+            totalCents: number;
+            couponCode?: string | null;
+            shippingAddress: components["schemas"]["OrderAddressDto"];
+        };
+        CheckoutSessionDto: {
+            /** @description client_secret du PaymentIntent — alimente le Payment Element */
+            clientSecret: string;
+            paymentIntentId: string;
+            order: components["schemas"]["OrderSummaryDto"];
+        };
+        CartChangedErrorDto: {
+            /** @example CART_CHANGED */
+            code: string;
+            changes: components["schemas"]["CartChangesDto"];
+            message: string;
+        };
+        CheckoutResultRequestDto: {
+            /** @example pi_3Nxxxx */
+            paymentIntentId: string;
+            /** @description client_secret du même intent — preuve de possession de la session de paiement */
+            clientSecret: string;
+        };
+        CheckoutResultDto: {
+            /**
+             * @description paid : commande payée · processing : paiement en cours · payment_failed : refusé (réessayer) · cancelled_insufficient_stock : payé puis annulé-remboursé (dernier article parti)
+             * @enum {string}
+             */
+            status: "paid" | "processing" | "requires_action" | "payment_failed" | "cancelled" | "cancelled_insufficient_stock";
+            order?: components["schemas"]["OrderSummaryDto"] | null;
+            /** @description Message d’échec de paiement (déjà localisé par Stripe quand disponible) */
+            failureMessage?: string | null;
         };
         AdminPingResponseDto: {
             /** @enum {string} */
@@ -1926,6 +2313,92 @@ export interface operations {
             };
         };
     };
+    listMyAddresses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddressListDto"];
+                };
+            };
+        };
+    };
+    createMyAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveAddressDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddressDto"];
+                };
+            };
+        };
+    };
+    updateMyAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveAddressDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddressDto"];
+                };
+            };
+        };
+    };
+    deleteMyAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getCatalogCategories: {
         parameters: {
             query?: {
@@ -2140,6 +2613,164 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProductDetailDto"];
+                };
+            };
+        };
+    };
+    getCart: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Jeton de panier invité (émis à la première addition ou via POST /v1/auth/guest-cart). Ignoré quand un Bearer est présent : le panier du compte prime. */
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartDto"];
+                };
+            };
+        };
+    };
+    addCartItem: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Jeton de panier invité (émis à la première addition ou via POST /v1/auth/guest-cart). Ignoré quand un Bearer est présent : le panier du compte prime. */
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddCartItemDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartDto"];
+                };
+            };
+        };
+    };
+    removeCartItem: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Jeton de panier invité (émis à la première addition ou via POST /v1/auth/guest-cart). Ignoré quand un Bearer est présent : le panier du compte prime. */
+                "X-Cart-Token"?: string;
+            };
+            path: {
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartDto"];
+                };
+            };
+        };
+    };
+    updateCartItem: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Jeton de panier invité (émis à la première addition ou via POST /v1/auth/guest-cart). Ignoré quand un Bearer est présent : le panier du compte prime. */
+                "X-Cart-Token"?: string;
+            };
+            path: {
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCartItemDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartDto"];
+                };
+            };
+        };
+    };
+    createCheckoutSession: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Jeton de panier invité — mêmes règles que /v1/cart. */
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCheckoutSessionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutSessionDto"];
+                };
+            };
+            /** @description CART_CHANGED : le panier vient d’être réconcilié — réafficher puis réessayer */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartChangedErrorDto"];
+                };
+            };
+        };
+    };
+    getCheckoutResult: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutResultRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutResultDto"];
                 };
             };
         };

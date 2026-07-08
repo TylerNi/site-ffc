@@ -735,6 +735,12 @@ async function seedCouponAndSettings(prisma: PrismaClient): Promise<void> {
       description: 'Livraison gratuite à partir de ce sous-total (cents CAD).',
     },
     {
+      key: 'expedition.frais_fixes_us_cents',
+      value: 2500,
+      description:
+        'Frais de livraison fixes vers les États-Unis (cents CAD) — tâche 11. Le Canada est toujours gratuit.',
+    },
+    {
       key: 'inventaire.seuil_stock_bas_defaut',
       value: 5,
       description: 'Seuil d’alerte de stock bas par défaut (tâche 10).',

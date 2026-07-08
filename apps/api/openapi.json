@@ -768,6 +768,141 @@
         ]
       }
     },
+    "/v1/me/addresses": {
+      "get": {
+        "operationId": "listMyAddresses",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Adresses sauvegardées",
+        "tags": [
+          "account"
+        ]
+      },
+      "post": {
+        "operationId": "createMyAddress",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajoute une adresse au carnet",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/me/addresses/{id}": {
+      "put": {
+        "operationId": "updateMyAddress",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remplace une adresse du carnet",
+        "tags": [
+          "account"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteMyAddress",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprime une adresse du carnet",
+        "tags": [
+          "account"
+        ]
+      }
+    },
     "/v1/catalog/categories": {
       "get": {
         "operationId": "getCatalogCategories",
@@ -1297,6 +1432,256 @@
         "summary": "Fiche produit par slug localisé",
         "tags": [
           "catalog"
+        ]
+      }
+    },
+    "/v1/cart": {
+      "get": {
+        "description": "Jeton invité inconnu ou expiré ⇒ panier vide (jamais d’erreur). Les écarts corrigés (produit dépublié, épuisé, prix changé) sont signalés une seule fois dans `changes`.",
+        "operationId": "getCart",
+        "parameters": [
+          {
+            "name": "X-Cart-Token",
+            "in": "header",
+            "description": "Jeton de panier invité (émis à la première addition ou via POST /v1/auth/guest-cart). Ignoré quand un Bearer est présent : le panier du compte prime.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Panier courant, revalidé côté serveur",
+        "tags": [
+          "cart"
+        ]
+      }
+    },
+    "/v1/cart/items": {
+      "post": {
+        "description": "Sans panier existant, un panier est créé ; pour un invité, `guestCartToken` est retourné UNE seule fois — à stocker et renvoyer dans X-Cart-Token.",
+        "operationId": "addCartItem",
+        "parameters": [
+          {
+            "name": "X-Cart-Token",
+            "in": "header",
+            "description": "Jeton de panier invité (émis à la première addition ou via POST /v1/auth/guest-cart). Ignoré quand un Bearer est présent : le panier du compte prime.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Ajoute une variante (les quantités s’additionnent)",
+        "tags": [
+          "cart"
+        ]
+      }
+    },
+    "/v1/cart/items/{variantId}": {
+      "patch": {
+        "operationId": "updateCartItem",
+        "parameters": [
+          {
+            "name": "variantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Cart-Token",
+            "in": "header",
+            "description": "Jeton de panier invité (émis à la première addition ou via POST /v1/auth/guest-cart). Ignoré quand un Bearer est présent : le panier du compte prime.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Fixe la quantité d’une ligne",
+        "tags": [
+          "cart"
+        ]
+      },
+      "delete": {
+        "operationId": "removeCartItem",
+        "parameters": [
+          {
+            "name": "variantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Cart-Token",
+            "in": "header",
+            "description": "Jeton de panier invité (émis à la première addition ou via POST /v1/auth/guest-cart). Ignoré quand un Bearer est présent : le panier du compte prime.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retire une ligne",
+        "tags": [
+          "cart"
+        ]
+      }
+    },
+    "/v1/checkout/session": {
+      "post": {
+        "description": "Revalide le panier (409 CART_CHANGED si un écart vient d’être corrigé), valide adresse/coupon, fige la commande PENDING et retourne le client_secret du Payment Element. Re-soumettre avec une autre adresse ou un autre coupon RECOTE la même commande.",
+        "operationId": "createCheckoutSession",
+        "parameters": [
+          {
+            "name": "X-Cart-Token",
+            "in": "header",
+            "description": "Jeton de panier invité — mêmes règles que /v1/cart.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutSessionDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CART_CHANGED : le panier vient d’être réconcilié — réafficher puis réessayer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartChangedErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Cote le panier et prépare le paiement (PaymentIntent)",
+        "tags": [
+          "checkout"
+        ]
+      }
+    },
+    "/v1/checkout/result": {
+      "post": {
+        "description": "Le client_secret sert de preuve de possession. Si Stripe confirme le paiement et que le webhook n’est pas encore passé, la finalisation idempotente est faite ici — la page de succès n’attend jamais.",
+        "operationId": "getCheckoutResult",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutResultRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "État du paiement au retour du client (page de succès)",
+        "tags": [
+          "checkout"
         ]
       }
     },
@@ -2373,6 +2758,158 @@
           "token"
         ]
       },
+      "AddressDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string",
+            "nullable": true
+          },
+          "line1": {
+            "type": "string"
+          },
+          "line2": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string",
+            "enum": [
+              "CA",
+              "US"
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDefaultShipping": {
+            "type": "boolean"
+          },
+          "isDefaultBilling": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "line1",
+          "city",
+          "province",
+          "postalCode",
+          "country",
+          "isDefaultShipping",
+          "isDefaultBilling"
+        ]
+      },
+      "AddressListDto": {
+        "type": "object",
+        "properties": {
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddressDto"
+            }
+          }
+        },
+        "required": [
+          "addresses"
+        ]
+      },
+      "SaveAddressDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "company": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "line1": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "line2": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "province": {
+            "type": "string",
+            "description": "Code de province (CA) ou d’état (US)",
+            "example": "QC"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Code postal (A1A 1A1) ou ZIP (12345[-6789])",
+            "maxLength": 12
+          },
+          "country": {
+            "type": "string",
+            "enum": [
+              "CA",
+              "US"
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 60,
+            "description": "Libellé libre (« Maison », « Chalet »…)"
+          },
+          "isDefaultShipping": {
+            "type": "boolean"
+          },
+          "isDefaultBilling": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "line1",
+          "city",
+          "province",
+          "postalCode",
+          "country"
+        ]
+      },
       "CategoryNodeDto": {
         "type": "object",
         "properties": {
@@ -3120,6 +3657,670 @@
           "images",
           "reviews",
           "related"
+        ]
+      },
+      "CartLineDto": {
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unitPriceCents": {
+            "type": "number",
+            "description": "Prix courant de la variante (cents) — recalculé à chaque lecture"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "lineSubtotalCents": {
+            "type": "number",
+            "description": "quantity × unitPriceCents"
+          },
+          "nameFr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "slugFr": {
+            "type": "string",
+            "nullable": true
+          },
+          "slugEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "nominalLabel": {
+            "type": "string",
+            "nullable": true,
+            "example": "16x25x1"
+          },
+          "packSize": {
+            "type": "number"
+          },
+          "merv": {
+            "type": "number",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "availableQuantity": {
+            "type": "number",
+            "description": "Stock vendable restant (en main − réservé)"
+          }
+        },
+        "required": [
+          "variantId",
+          "productId",
+          "sku",
+          "quantity",
+          "unitPriceCents",
+          "currency",
+          "lineSubtotalCents",
+          "nameFr",
+          "nameEn",
+          "packSize",
+          "availableQuantity"
+        ]
+      },
+      "RemovedCartLineDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "nameFr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "UNAVAILABLE",
+              "OUT_OF_STOCK"
+            ],
+            "description": "UNAVAILABLE : produit retiré du catalogue · OUT_OF_STOCK : épuisé"
+          }
+        },
+        "required": [
+          "sku",
+          "nameFr",
+          "nameEn",
+          "reason"
+        ]
+      },
+      "AdjustedCartLineDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "nameFr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "fromQuantity": {
+            "type": "number",
+            "description": "Quantité demandée avant ajustement"
+          },
+          "toQuantity": {
+            "type": "number",
+            "description": "Quantité retenue (stock restant)"
+          }
+        },
+        "required": [
+          "sku",
+          "nameFr",
+          "nameEn",
+          "fromQuantity",
+          "toQuantity"
+        ]
+      },
+      "PriceChangedCartLineDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "nameFr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "fromCents": {
+            "type": "number",
+            "description": "Prix consigné à l’ajout (cents)"
+          },
+          "toCents": {
+            "type": "number",
+            "description": "Prix courant (cents)"
+          }
+        },
+        "required": [
+          "sku",
+          "nameFr",
+          "nameEn",
+          "fromCents",
+          "toCents"
+        ]
+      },
+      "CartChangesDto": {
+        "type": "object",
+        "properties": {
+          "removed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RemovedCartLineDto"
+            }
+          },
+          "adjusted": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdjustedCartLineDto"
+            }
+          },
+          "priceChanged": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PriceChangedCartLineDto"
+            }
+          }
+        },
+        "required": [
+          "removed",
+          "adjusted",
+          "priceChanged"
+        ]
+      },
+      "CartDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "Null tant qu’aucun panier n’existe pour ce client"
+          },
+          "guestCartToken": {
+            "type": "string",
+            "nullable": true,
+            "description": "Jeton de panier invité — présent UNIQUEMENT à la création (première addition sans compte). À stocker côté client et à renvoyer dans X-Cart-Token."
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartLineDto"
+            }
+          },
+          "subtotalCents": {
+            "type": "number",
+            "description": "Somme des lignes (cents) — les taxes se calculent au checkout"
+          },
+          "itemCount": {
+            "type": "number",
+            "description": "Nombre total d’unités"
+          },
+          "changes": {
+            "$ref": "#/components/schemas/CartChangesDto"
+          }
+        },
+        "required": [
+          "currency",
+          "items",
+          "subtotalCents",
+          "itemCount",
+          "changes"
+        ]
+      },
+      "AddCartItemDto": {
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Variante de produit à ajouter"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99,
+            "example": 1
+          }
+        },
+        "required": [
+          "variantId",
+          "quantity"
+        ]
+      },
+      "UpdateCartItemDto": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "required": [
+          "quantity"
+        ]
+      },
+      "CheckoutAddressDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "company": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "line1": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "line2": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "province": {
+            "type": "string",
+            "description": "Code de province (CA) ou d’état (US)",
+            "example": "QC"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Code postal (A1A 1A1) ou ZIP (12345[-6789])",
+            "maxLength": 12
+          },
+          "country": {
+            "type": "string",
+            "enum": [
+              "CA",
+              "US"
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "line1",
+          "city",
+          "province",
+          "postalCode",
+          "country"
+        ]
+      },
+      "CreateCheckoutSessionDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Courriel de commande — REQUIS pour un invité, ignoré si connecté"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ],
+            "description": "Langue des courriels et de la facture"
+          },
+          "shippingAddress": {
+            "$ref": "#/components/schemas/CheckoutAddressDto"
+          },
+          "shippingAddressId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Adresse du carnet (compte connecté) — exclusif avec shippingAddress"
+          },
+          "billingAddress": {
+            "description": "Défaut : identique à la livraison",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CheckoutAddressDto"
+              }
+            ]
+          },
+          "saveAddress": {
+            "type": "boolean",
+            "description": "Sauvegarder l’adresse au carnet (connecté seulement)"
+          },
+          "couponCode": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "customerNote": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      },
+      "OrderLineSummaryDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "nameFr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "nominalLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "packSize": {
+            "type": "number"
+          },
+          "merv": {
+            "type": "number",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unitPriceCents": {
+            "type": "number"
+          },
+          "discountCents": {
+            "type": "number",
+            "description": "Part de la remise imputée à cette ligne (cents)"
+          },
+          "subtotalCents": {
+            "type": "number",
+            "description": "unitPrice × quantity − remise (cents)"
+          },
+          "taxCents": {
+            "type": "number",
+            "description": "Taxes de la ligne, toutes composantes (cents)"
+          },
+          "totalCents": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sku",
+          "nameFr",
+          "nameEn",
+          "packSize",
+          "quantity",
+          "unitPriceCents",
+          "discountCents",
+          "subtotalCents",
+          "taxCents",
+          "totalCents"
+        ]
+      },
+      "OrderAddressDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string",
+            "nullable": true
+          },
+          "line1": {
+            "type": "string"
+          },
+          "line2": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string",
+            "enum": [
+              "CA",
+              "US"
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "line1",
+          "city",
+          "province",
+          "postalCode",
+          "country"
+        ]
+      },
+      "OrderSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string",
+            "example": "FFC-100042"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "email": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineSummaryDto"
+            }
+          },
+          "subtotalCents": {
+            "type": "number"
+          },
+          "discountCents": {
+            "type": "number"
+          },
+          "shippingCents": {
+            "type": "number"
+          },
+          "taxGstCents": {
+            "type": "number",
+            "description": "TPS (cents)"
+          },
+          "taxQstCents": {
+            "type": "number",
+            "description": "TVQ (cents)"
+          },
+          "taxHstCents": {
+            "type": "number",
+            "description": "TVH (cents)"
+          },
+          "taxPstCents": {
+            "type": "number",
+            "description": "TVP/TVD (cents)"
+          },
+          "totalTaxCents": {
+            "type": "number",
+            "description": "Total des taxes (cents)"
+          },
+          "totalCents": {
+            "type": "number"
+          },
+          "couponCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "shippingAddress": {
+            "$ref": "#/components/schemas/OrderAddressDto"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "currency",
+          "email",
+          "lines",
+          "subtotalCents",
+          "discountCents",
+          "shippingCents",
+          "taxGstCents",
+          "taxQstCents",
+          "taxHstCents",
+          "taxPstCents",
+          "totalTaxCents",
+          "totalCents",
+          "shippingAddress"
+        ]
+      },
+      "CheckoutSessionDto": {
+        "type": "object",
+        "properties": {
+          "clientSecret": {
+            "type": "string",
+            "description": "client_secret du PaymentIntent — alimente le Payment Element"
+          },
+          "paymentIntentId": {
+            "type": "string"
+          },
+          "order": {
+            "$ref": "#/components/schemas/OrderSummaryDto"
+          }
+        },
+        "required": [
+          "clientSecret",
+          "paymentIntentId",
+          "order"
+        ]
+      },
+      "CartChangedErrorDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "CART_CHANGED"
+          },
+          "changes": {
+            "$ref": "#/components/schemas/CartChangesDto"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "changes",
+          "message"
+        ]
+      },
+      "CheckoutResultRequestDto": {
+        "type": "object",
+        "properties": {
+          "paymentIntentId": {
+            "type": "string",
+            "example": "pi_3Nxxxx"
+          },
+          "clientSecret": {
+            "type": "string",
+            "description": "client_secret du même intent — preuve de possession de la session de paiement"
+          }
+        },
+        "required": [
+          "paymentIntentId",
+          "clientSecret"
+        ]
+      },
+      "CheckoutResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "paid",
+              "processing",
+              "requires_action",
+              "payment_failed",
+              "cancelled",
+              "cancelled_insufficient_stock"
+            ],
+            "description": "paid : commande payée · processing : paiement en cours · payment_failed : refusé (réessayer) · cancelled_insufficient_stock : payé puis annulé-remboursé (dernier article parti)"
+          },
+          "order": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderSummaryDto"
+              }
+            ]
+          },
+          "failureMessage": {
+            "type": "string",
+            "nullable": true,
+            "description": "Message d’échec de paiement (déjà localisé par Stripe quand disponible)"
+          }
+        },
+        "required": [
+          "status"
         ]
       },
       "AdminPingResponseDto": {

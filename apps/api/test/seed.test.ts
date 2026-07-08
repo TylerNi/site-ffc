@@ -19,11 +19,14 @@ describe('seed — contenu et reproductibilité', () => {
   });
 
   it('le contenu attendu du brief est présent', async () => {
-    expect(await prisma.product.count()).toBe(40);
-    expect(await prisma.brand.count()).toBe(3);
+    // Comptes restreints aux IDENTIFIANTS DÉTERMINISTES du seed : la base
+    // de test est partagée avec les suites checkout (tâche 11) qui créent
+    // leurs produits en parallèle (ids UUID v7 aléatoires, hors plage).
+    expect(await prisma.product.count({ where: { id: seedIdRange(3) } })).toBe(40);
+    expect(await prisma.brand.count({ where: { id: seedIdRange(1) } })).toBe(3);
     expect(await prisma.equipmentModel.count()).toBeGreaterThanOrEqual(5);
     expect(await prisma.modelFilterCompatibility.count()).toBeGreaterThan(0);
-    expect(await prisma.supplier.count()).toBe(2);
+    expect(await prisma.supplier.count({ where: { id: seedIdRange(7) } })).toBe(2);
 
     const admin = await prisma.user.findUnique({
       where: { email: 'admin@filtrationmontreal.com' },
@@ -68,26 +71,31 @@ describe('seed — contenu et reproductibilité', () => {
   });
 
   it('relancer le seed ne crée aucun doublon (idempotence)', async () => {
-    const before = {
-      products: await prisma.product.count(),
-      variants: await prisma.productVariant.count(),
-      users: await prisma.user.count(),
-      orders: await prisma.order.count(),
-      invoices: await prisma.invoice.count(),
-      movements: await prisma.inventoryMovement.count(),
-      compatibilities: await prisma.modelFilterCompatibility.count(),
-    };
+    // Instantané restreint aux données DU SEED : les suites parallèles
+    // (checkout) écrivent leurs propres lignes entre les deux mesures — le
+    // périmètre seedé, lui, doit rester strictement identique.
+    const snapshot = async () => ({
+      products: await prisma.product.count({ where: { id: seedIdRange(3) } }),
+      variants: await prisma.productVariant.count({ where: { id: seedIdRange(4) } }),
+      users: await prisma.user.count({ where: { id: seedIdRange(8) } }),
+      orders: await prisma.order.count({ where: { id: seedIdRange(11) } }),
+      invoices: await prisma.invoice.count({ where: { orderId: seedIdRange(11) } }),
+      movements: await prisma.inventoryMovement.count({
+        where: { variantId: seedIdRange(4) },
+      }),
+      compatibilities: await prisma.modelFilterCompatibility.count({
+        where: { variantId: seedIdRange(4) },
+      }),
+    });
 
+    const before = await snapshot();
     await seed(prisma);
-
-    expect({
-      products: await prisma.product.count(),
-      variants: await prisma.productVariant.count(),
-      users: await prisma.user.count(),
-      orders: await prisma.order.count(),
-      invoices: await prisma.invoice.count(),
-      movements: await prisma.inventoryMovement.count(),
-      compatibilities: await prisma.modelFilterCompatibility.count(),
-    }).toEqual(before);
+    expect(await snapshot()).toEqual(before);
   });
 });
+
+/** Plage d'ids déterministes d'un bloc du seed (voir seedId dans prisma/seed.ts). */
+function seedIdRange(block: number): { gte: string; lte: string } {
+  const prefix = `00000000-0000-4000-8${String(block).padStart(3, '0')}`;
+  return { gte: `${prefix}-000000000000`, lte: `${prefix}-ffffffffffff` };
+}

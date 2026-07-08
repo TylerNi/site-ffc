@@ -9,6 +9,7 @@ import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/bootstrap-app';
 import { PrismaService } from '../src/database';
 import { MailService, type OutboxEntry } from '../src/modules/mail/mail.service';
+import { StripeService } from '../src/modules/orders/stripe/stripe.service';
 import { hashPassword } from '../src/modules/auth/password';
 import {
   OIDC_VERIFIERS,
@@ -38,6 +39,8 @@ export interface CreateTestAppOptions {
   throttleEnabled?: boolean;
   /** Vérificateurs OIDC injectés (FakeOidcVerifier en général). */
   verifiers?: OidcVerifier[];
+  /** Substitut de StripeService (FakeStripeService pour le checkout). */
+  stripe?: unknown;
 }
 
 export async function createTestApp(options: CreateTestAppOptions = {}): Promise<AuthTestContext> {
@@ -45,13 +48,21 @@ export async function createTestApp(options: CreateTestAppOptions = {}): Promise
   process.env.DATABASE_URL = getTestDatabaseUrl();
   process.env.MAIL_DRIVER = 'log';
   process.env.AUTH_THROTTLE_DISABLED = options.throttleEnabled ? '0' : '1';
+  // Webhooks traités inline et attendus (déterminisme) — jamais de vraie
+  // file BullMQ dans les tests, même si le .env local a un REDIS_URL.
+  process.env.REDIS_URL = '';
 
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+  let builder = Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(OIDC_VERIFIERS)
-    .useValue(options.verifiers ?? [])
-    .compile();
+    .useValue(options.verifiers ?? []);
+  if (options.stripe !== undefined) {
+    builder = builder.overrideProvider(StripeService).useValue(options.stripe);
+  }
+  const moduleRef = await builder.compile();
 
-  const app = moduleRef.createNestApplication<NestExpressApplication>();
+  // rawBody : comme en production (main.ts) — la signature des webhooks
+  // Stripe se vérifie sur le corps brut.
+  const app = moduleRef.createNestApplication<NestExpressApplication>({ rawBody: true });
   configureApp(app);
   await app.init();
 

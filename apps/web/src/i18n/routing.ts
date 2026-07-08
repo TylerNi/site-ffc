@@ -44,6 +44,9 @@ export const routing = defineRouting({
     '/sizes': { en: '/sizes', fr: '/tailles' },
     '/sizes/[label]': { en: '/sizes/[label]', fr: '/tailles/[label]' },
     '/search': { en: '/search', fr: '/recherche' },
+    '/cart': { en: '/cart', fr: '/panier' },
+    '/checkout': { en: '/checkout', fr: '/caisse' },
+    '/checkout/success': { en: '/checkout/success', fr: '/caisse/confirmation' },
   },
 });
 

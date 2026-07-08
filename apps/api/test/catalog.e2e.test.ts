@@ -69,8 +69,16 @@ describe('catalogue et recherche (tâche 06)', () => {
         }
         cursor = body.nextCursor;
         pages += 1;
-      } while (cursor && pages < 10);
-      expect(seen.size).toBe(40); // le catalogue entier, une seule fois
+      } while (cursor && pages < 50);
+      // Couverture COMPLÈTE : les 40 produits seedés (ids déterministes,
+      // bloc 8003) sont tous vus exactement une fois. La base de test est
+      // partagée avec les suites checkout (tâche 11) qui ajoutent leurs
+      // propres produits — le total peut dépasser 40, jamais dupliquer.
+      expect(seen.size).toBeGreaterThanOrEqual(40);
+      for (let n = 1; n <= 40; n += 1) {
+        const seededId = `00000000-0000-4000-8003-${String(n).padStart(12, '0')}`;
+        expect(seen.has(seededId), `produit seedé ${n} absent de la pagination`).toBe(true);
+      }
     });
 
     it('tri par prix croissant', async () => {
@@ -198,7 +206,13 @@ describe('catalogue et recherche (tâche 06)', () => {
         slugs: { fr: string | null; en: string | null };
         updatedAt: string;
       }>;
-      expect(products).toHaveLength(40);
+      // ≥ 40 : les produits des suites checkout (base partagée) s'ajoutent
+      // aux 40 seedés — dont la présence est vérifiée par id.
+      expect(products.length).toBeGreaterThanOrEqual(40);
+      const ids = new Set(products.map((p) => p.id));
+      for (let n = 1; n <= 40; n += 1) {
+        expect(ids.has(`00000000-0000-4000-8003-${String(n).padStart(12, '0')}`)).toBe(true);
+      }
       for (const product of products) {
         expect(product.slugs.fr).toBeTruthy();
         expect(product.slugs.en).toBeTruthy();
@@ -213,7 +227,9 @@ describe('catalogue et recherche (tâche 06)', () => {
       expect(categories.some((c) => c.slugs.en === 'furnace-filters')).toBe(true);
 
       expect(body.sizes).toContain('16x25x1');
-      expect(body.sizes).toHaveLength(14);
+      // Les 14 tailles seedées au minimum (les suites checkout ajoutent la
+      // taille de test 19x27x1 sur la base partagée).
+      expect((body.sizes as string[]).length).toBeGreaterThanOrEqual(14);
     });
   });
 
@@ -231,8 +247,9 @@ describe('catalogue et recherche (tâche 06)', () => {
       expect(size).toBeDefined();
       expect(size!.productCount).toBe(3);
       expect(size!.mervValues).toEqual([8, 11, 13]);
-      // 14 tailles distinctes seedées.
-      expect(sizes).toHaveLength(14);
+      // Les 14 tailles seedées au minimum (base partagée avec les suites
+      // checkout, qui n'utilisent QUE la taille de test 19x27x1).
+      expect(sizes.length).toBeGreaterThanOrEqual(14);
     });
   });
 
