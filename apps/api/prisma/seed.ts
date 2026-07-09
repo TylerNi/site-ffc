@@ -745,6 +745,31 @@ async function seedCouponAndSettings(prisma: PrismaClient): Promise<void> {
       value: 5,
       description: 'Seuil d’alerte de stock bas par défaut (tâche 10).',
     },
+    {
+      // Coordonnées légales de l'entreprise — affichées sur les factures et
+      // notes de crédit (tâche 12). Numéros d'inscription TPS/TVQ CONFIGURABLES
+      // ici (le brief l'exige) ; valeurs de démonstration, à remplacer par les
+      // vrais numéros avant la mise en production (accès tâche 01).
+      key: 'entreprise.facturation',
+      value: {
+        raisonSociale: 'Filtration Montréal inc.',
+        adresse: {
+          line1: '1234, rue Sainte-Catherine Est',
+          line2: 'Bureau 200',
+          city: 'Montréal',
+          province: 'QC',
+          postalCode: 'H2L 2G8',
+          country: 'CA',
+        },
+        courriel: 'facturation@filtrationmontreal.com',
+        telephone: '+1 514-555-0142',
+        // Numéros d'inscription aux taxes (démo — format réel : 9 chiffres RT/TQ).
+        numeroTps: '000000000 RT0001',
+        numeroTvq: '0000000000 TQ0001',
+      },
+      description:
+        'Coordonnées légales et numéros d’inscription TPS/TVQ affichés sur les factures (tâche 12).',
+    },
   ];
   for (const setting of settings) {
     await prisma.setting.upsert({

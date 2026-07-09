@@ -1,3 +1,5 @@
+import { type Locale } from './locales';
+
 /**
  * Arithmétique monétaire ENTIÈRE (cents) — jamais de flottants.
  *
@@ -6,6 +8,20 @@
  * doit être exacte au cent et la somme des parts doit valoir exactement
  * le total réparti.
  */
+
+const INTL_MONEY_LOCALES: Record<Locale, string> = { fr: 'fr-CA', en: 'en-CA' };
+
+/**
+ * Formatage monétaire canadien depuis des CENTS : « 13,99 $ » (fr-CA) /
+ * « $13.99 » (en-CA). Partagé par les factures PDF, les courriels et les
+ * vitrines pour un affichage identique partout.
+ */
+export function formatMoneyCents(cents: number, currency: string, locale: Locale): string {
+  return new Intl.NumberFormat(INTL_MONEY_LOCALES[locale], {
+    style: 'currency',
+    currency,
+  }).format(cents / 100);
+}
 
 /**
  * Répartit `totalCents` proportionnellement aux `weights` (méthode du plus

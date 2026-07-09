@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { type Locale } from '@ffc/core';
 import { type Env } from '../../config/env';
 import { PrismaService } from '../../database';
-import { type MailTemplateKey, renderMail } from './templates';
+import { type MailTemplateKey, type RenderedMail, renderMail } from './templates';
 
 export interface SendMailParams {
   /** Compte destinataire (null pour un destinataire hors plateforme). */
@@ -24,6 +24,16 @@ export interface SendMailParams {
    * suppression de compte — la trace retiendrait l'adresse effacée).
    */
   recordTrace?: boolean;
+  /**
+   * Clé d'idempotence (ex. « order_confirmation:<orderId> ») : un envoi
+   * déjà réussi sous cette clé n'est jamais refait (webhook/job rejoué →
+   * un seul courriel). Garanti par l'unicité de `notifications.idempotency_key`.
+   */
+  idempotencyKey?: string;
+  /** Catégorie de la trace (défaut TRANSACTIONAL). */
+  category?: 'TRANSACTIONAL' | 'REPLENISHMENT_REMINDER' | 'REVIEW_REQUEST';
+  /** Contexte de commande (trace). */
+  orderId?: string | null;
 }
 
 /** Courriel capturé par le driver `log` — consommé par les tests. */
@@ -32,6 +42,8 @@ export interface OutboxEntry {
   templateKey: MailTemplateKey;
   subject: string;
   text: string;
+  html?: string;
+  locale: Locale;
   variables: Record<string, string>;
 }
 
@@ -64,6 +76,19 @@ export class MailService {
 
   async send(params: SendMailParams): Promise<void> {
     const variables = params.variables ?? {};
+
+    // Idempotence : un courriel déjà PARTI sous cette clé ne repart jamais.
+    if (params.idempotencyKey) {
+      const existing = await this.prisma.notification.findUnique({
+        where: { idempotencyKey: params.idempotencyKey },
+        select: { status: true },
+      });
+      if (existing?.status === 'SENT') {
+        this.logger.log(`[courriel idempotent] déjà envoyé (${params.idempotencyKey}) — ignoré.`);
+        return;
+      }
+    }
+
     const rendered = renderMail(params.templateKey, params.locale, {
       ...variables,
       ...params.secretVariables,
@@ -75,13 +100,15 @@ export class MailService {
 
     try {
       if (this.driver === 'ses') {
-        externalId = await this.sendViaSes(params.to, rendered.subject, rendered.text);
+        externalId = await this.sendViaSes(params.to, rendered);
       } else {
         this.outbox.push({
           to: params.to,
           templateKey: params.templateKey,
           subject: rendered.subject,
           text: rendered.text,
+          html: rendered.html,
+          locale: params.locale,
           variables: { ...variables, ...params.secretVariables },
         });
         this.logger.log(`[courriel simulé] → ${params.to} : ${rendered.subject}`);
@@ -92,31 +119,56 @@ export class MailService {
       this.logger.error(`Envoi SES échoué → ${params.to} (${params.templateKey})`, error);
     }
 
-    if (params.recordTrace === false) return;
+    if (params.recordTrace === false) {
+      // Aucune trace persistée : un échec doit tout de même se voir des files.
+      if (status === 'FAILED') throw new Error(failureReason ?? 'Envoi courriel échoué');
+      return;
+    }
 
     try {
-      await this.prisma.notification.create({
-        data: {
-          userId: params.userId ?? null,
-          category: 'TRANSACTIONAL',
-          channel: 'EMAIL',
-          status,
-          templateKey: params.templateKey,
-          destination: params.to,
-          subject: rendered.subject,
-          // Trace SANS les variables secrètes (jetons de vérification, etc.).
-          payload: variables,
-          externalId,
-          failureReason,
-          sentAt: status === 'SENT' ? new Date() : null,
-        },
-      });
+      const data = {
+        userId: params.userId ?? null,
+        category: params.category ?? ('TRANSACTIONAL' as const),
+        channel: 'EMAIL' as const,
+        status,
+        templateKey: params.templateKey,
+        destination: params.to,
+        subject: rendered.subject,
+        // Trace SANS les variables secrètes (jetons de vérification, etc.).
+        payload: variables,
+        orderId: params.orderId ?? null,
+        externalId,
+        failureReason,
+        idempotencyKey: params.idempotencyKey ?? null,
+        sentAt: status === 'SENT' ? new Date() : null,
+      };
+      if (params.idempotencyKey) {
+        // Une ligne PENDING/FAILED antérieure (retry) est mise à jour ; sinon créée.
+        await this.prisma.notification.upsert({
+          where: { idempotencyKey: params.idempotencyKey },
+          create: data,
+          update: {
+            status,
+            externalId,
+            failureReason,
+            sentAt: status === 'SENT' ? new Date() : null,
+          },
+        });
+      } else {
+        await this.prisma.notification.create({ data });
+      }
     } catch (error) {
       this.logger.error(`Trace de notification impossible (${params.templateKey})`, error);
     }
+
+    // Sur échec d'un envoi idempotent (job/queue), on PROPAGE : la file
+    // retentera, et la trace reste FAILED tant que l'envoi n'a pas réussi.
+    if (status === 'FAILED' && params.idempotencyKey) {
+      throw new Error(failureReason ?? 'Envoi courriel échoué');
+    }
   }
 
-  private async sendViaSes(to: string, subject: string, text: string): Promise<string | null> {
+  private async sendViaSes(to: string, rendered: RenderedMail): Promise<string | null> {
     this.sesClient ??= new SESv2Client({
       region: this.config.get('AWS_REGION', { infer: true }),
     });
@@ -126,8 +178,11 @@ export class MailService {
         Destination: { ToAddresses: [to] },
         Content: {
           Simple: {
-            Subject: { Data: subject, Charset: 'UTF-8' },
-            Body: { Text: { Data: text, Charset: 'UTF-8' } },
+            Subject: { Data: rendered.subject, Charset: 'UTF-8' },
+            Body: {
+              Text: { Data: rendered.text, Charset: 'UTF-8' },
+              ...(rendered.html ? { Html: { Data: rendered.html, Charset: 'UTF-8' } } : {}),
+            },
           },
         },
       }),

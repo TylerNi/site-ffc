@@ -2,7 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import type Stripe from 'stripe';
 import { PrismaService } from '../../../database';
 import { AuditService } from '../../audit/audit.service';
-import { MailService } from '../../mail/mail.service';
+import { InvoiceQueueService } from '../invoices/invoice-queue.service';
+import { OrderMailService } from '../invoices/order-mail.service';
 import { StripeService } from '../stripe/stripe.service';
 
 export type FinalizeOutcome = 'FINALIZED' | 'ALREADY_DONE' | 'CANCELLED_INSUFFICIENT_STOCK';
@@ -58,7 +59,8 @@ export class OrderFinalizerService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly stripe: StripeService,
-    private readonly mail: MailService,
+    private readonly invoiceQueue: InvoiceQueueService,
+    private readonly orderMail: OrderMailService,
     private readonly audit: AuditService,
   ) {}
 
@@ -162,42 +164,24 @@ export class OrderFinalizerService {
   private async afterFinalized(orderId: string, intent: Stripe.PaymentIntent): Promise<void> {
     const order = await this.prisma.order.findUniqueOrThrow({
       where: { id: orderId },
-      include: { items: true, user: { select: { email: true } } },
+      select: { number: true, totalCents: true },
     });
-    const email = order.guestEmail ?? order.user?.email;
 
     await this.audit.log({
       action: 'order.paid',
       actorType: 'system',
       entityType: 'order',
-      entityId: order.id,
+      entityId: orderId,
       metadata: { number: order.number, totalCents: order.totalCents, paymentIntent: intent.id },
     });
 
-    if (!email) return;
-    const linesText = order.items
-      .map(
-        (item) =>
-          `  ${item.quantity} × ${order.locale === 'fr' ? item.nameFr : item.nameEn} — ${(
-            item.totalCents / 100
-          ).toFixed(2)} $`,
-      )
-      .join('\n');
+    // Facture d'abord (asynchrone) : le job de facturation rend le PDF PUIS
+    // met en file le courriel de confirmation (lien de facture valide).
+    // La finalisation ne bloque jamais sur ces effets — chacun est idempotent.
     try {
-      await this.mail.send({
-        userId: order.userId,
-        to: email,
-        locale: order.locale,
-        templateKey: 'order_confirmation',
-        variables: {
-          orderNumber: order.number,
-          total: `${(order.totalCents / 100).toFixed(2)} $ CA`,
-          lines: linesText,
-        },
-      });
+      await this.invoiceQueue.enqueueGeneration(orderId);
     } catch (error) {
-      // Best effort : la commande est payée, le courriel ne bloque jamais.
-      this.logger.error(`Courriel de confirmation impossible (commande ${order.number})`, error);
+      this.logger.error(`Mise en file de la facture impossible (commande ${order.number})`, error);
     }
   }
 
@@ -235,7 +219,11 @@ export class OrderFinalizerService {
     });
 
     try {
-      const refund = await this.stripe.createRefund(intent.id, 'insufficient_stock');
+      const refund = await this.stripe.createRefund({
+        paymentIntentId: intent.id,
+        reason: 'insufficient_stock',
+        idempotencyKey: `refund:insufficient_stock:${orderId}`,
+      });
       await this.prisma.refund.upsert({
         where: { provider_externalId: { provider: 'STRIPE', externalId: refund.id } },
         update: { status: refund.status === 'succeeded' ? 'SUCCEEDED' : 'PENDING' },
@@ -265,6 +253,10 @@ export class OrderFinalizerService {
       entityId: orderId,
       metadata: { number: order.number, sku, paymentIntent: intent.id },
     });
+
+    // Courriel d'annulation (idempotent) — le client a été débité puis
+    // remboursé automatiquement faute de stock.
+    await this.orderMail.sendCancelled(orderId, order.totalCents);
   }
 }
 

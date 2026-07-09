@@ -98,13 +98,26 @@ export class StripeService {
     return page.data;
   }
 
-  /** Remboursement intégral (stock insuffisant post-paiement, tâche 11). */
-  async createRefund(paymentIntentId: string, reason: string): Promise<Stripe.Refund> {
+  /**
+   * Remboursement d'un PaymentIntent — intégral (montant omis) ou PARTIEL
+   * (`amountCents`). La clé d'idempotence Stripe rend un rejeu inoffensif :
+   * Stripe renvoie le MÊME remboursement plutôt que d'en créer un second.
+   */
+  async createRefund(params: {
+    paymentIntentId: string;
+    reason: string;
+    amountCents?: number;
+    idempotencyKey?: string;
+  }): Promise<Stripe.Refund> {
     this.requireConfigured();
-    return this.client.refunds.create({
-      payment_intent: paymentIntentId,
-      metadata: { reason },
-    });
+    return this.client.refunds.create(
+      {
+        payment_intent: params.paymentIntentId,
+        ...(params.amountCents !== undefined ? { amount: params.amountCents } : {}),
+        metadata: { reason: params.reason },
+      },
+      params.idempotencyKey ? { idempotencyKey: params.idempotencyKey } : undefined,
+    );
   }
 
   /**

@@ -3,6 +3,10 @@ import { NestFactory } from '@nestjs/core';
 import { Worker } from 'bullmq';
 import { AppModule } from './app.module';
 import { type Env } from './config/env';
+import { MAIL_QUEUE, type MailJob } from './modules/mail/mail-queue.service';
+import { MailService } from './modules/mail/mail.service';
+import { INVOICES_QUEUE } from './modules/orders/invoices/invoice-queue.service';
+import { InvoiceService } from './modules/orders/invoices/invoice.service';
 import { StripeWebhookProcessorService } from './modules/orders/webhooks/stripe-webhook-processor.service';
 import {
   redisConnectionFromUrl,
@@ -29,13 +33,17 @@ async function bootstrap(): Promise<void> {
   const config = app.get(ConfigService<Env, true>);
   const redisUrl = config.get('REDIS_URL', { infer: true });
 
-  let webhookWorker: Worker | null = null;
+  const workers: Worker[] = [];
   if (redisUrl) {
+    const connection = redisConnectionFromUrl(redisUrl);
     const processor = app.get(StripeWebhookProcessorService);
-    webhookWorker = new Worker<{ webhookEventId: string }>(
+    const invoices = app.get(InvoiceService);
+    const mail = app.get(MailService);
+
+    const webhookWorker = new Worker<{ webhookEventId: string }>(
       STRIPE_WEBHOOKS_QUEUE,
       async (job) => processor.process(job.data.webhookEventId),
-      { connection: redisConnectionFromUrl(redisUrl), concurrency: 4 },
+      { connection, concurrency: 4 },
     );
     webhookWorker.on('failed', (job, error) => {
       console.error(
@@ -43,16 +51,50 @@ async function bootstrap(): Promise<void> {
         error.message,
       );
     });
-    console.log(`[workers] File « ${STRIPE_WEBHOOKS_QUEUE} » consommée (Redis).`);
+
+    // Génération des factures PDF (tâche 12) — enchaîne le courriel de confirmation.
+    const invoiceWorker = new Worker<{ orderId: string }>(
+      INVOICES_QUEUE,
+      async (job) => {
+        await invoices.generateForOrder(job.data.orderId);
+      },
+      { connection, concurrency: 2 },
+    );
+    invoiceWorker.on('failed', (job, error) => {
+      console.error(
+        `[workers] Facture (commande ${job?.data?.orderId ?? '?'}) en échec (tentative ${job?.attemptsMade ?? '?'})`,
+        error.message,
+      );
+    });
+
+    // Courriels transactionnels (tâche 12) — retries + trace idempotente.
+    const mailWorker = new Worker<MailJob>(
+      MAIL_QUEUE,
+      async (job) => {
+        await mail.send(job.data);
+      },
+      { connection, concurrency: 4 },
+    );
+    mailWorker.on('failed', (job, error) => {
+      console.error(
+        `[workers] Courriel ${job?.data?.templateKey ?? '?'} en échec (tentative ${job?.attemptsMade ?? '?'})`,
+        error.message,
+      );
+    });
+
+    workers.push(webhookWorker, invoiceWorker, mailWorker);
+    console.log(
+      `[workers] Files consommées (Redis) : ${STRIPE_WEBHOOKS_QUEUE}, ${INVOICES_QUEUE}, ${MAIL_QUEUE}.`,
+    );
   } else {
     console.warn(
-      '[workers] REDIS_URL absente — aucune file à consommer (les webhooks sont traités par l’API elle-même).',
+      '[workers] REDIS_URL absente — aucune file à consommer (les effets sont traités par l’API elle-même).',
     );
   }
 
   const shutdown = async (signal: string): Promise<void> => {
     console.log(`[workers] Signal ${signal} reçu — arrêt en cours…`);
-    await webhookWorker?.close();
+    await Promise.all(workers.map((worker) => worker.close()));
     await app.close();
     process.exit(0);
   };

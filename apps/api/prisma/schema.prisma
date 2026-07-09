@@ -1316,6 +1316,10 @@ model Notification {
   /// Identifiant externe (SES message id, ticket Expo push).
   externalId          String?              @map("external_id")
   failureReason       String?              @map("failure_reason")
+  /// Clé d'idempotence d'envoi (ex. « order_confirmation:<orderId> ») : un
+  /// même courriel rejoué (webhook, retry BullMQ) ne part qu'une fois. Null
+  /// pour les envois non idempotents (courriels de sécurité, tâche 05).
+  idempotencyKey      String?              @unique @map("idempotency_key")
   sentAt              DateTime?            @map("sent_at")
   createdAt           DateTime             @default(now()) @map("created_at")
 

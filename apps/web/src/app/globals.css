@@ -1121,3 +1121,228 @@ svg {
   max-width: 34rem;
   margin-block: 1.5rem;
 }
+
+/* ------------------------- Mes commandes (tâche 12) ------------------- */
+
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--brand-dark);
+}
+.btn-danger {
+  background: #b3261e;
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #8f1d17;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.account-page {
+  max-width: 56rem;
+}
+
+.account-muted {
+  color: var(--muted);
+}
+
+.account-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.account-error {
+  background: #fdecea;
+  border: 1px solid #f5c6c2;
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1.1rem;
+  margin-block: 1rem;
+}
+
+.account-notice {
+  background: var(--brand-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1rem;
+  margin-block: 1rem;
+}
+
+.account-signin {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-width: 22rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.5rem;
+}
+
+.account-signin label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: var(--muted);
+}
+
+.account-signin input {
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.account-signin input:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+
+/* Tableau des commandes — responsive (cartes en mobile). */
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-block: 1rem;
+}
+
+.orders-table th,
+.orders-table td {
+  text-align: left;
+  padding: 0.7rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.orders-table th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+.order-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  white-space: nowrap;
+}
+.order-badge.is-shipped,
+.order-badge.is-delivered {
+  background: #e6f4ea;
+  color: #1e7d34;
+}
+.order-badge.is-cancelled {
+  background: #fdecea;
+  color: #b3261e;
+}
+.order-badge.is-refunded {
+  background: #fff4e5;
+  color: #8a5a00;
+}
+
+.order-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block: 0.5rem 1rem;
+}
+
+.order-detail-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-block: 1rem;
+}
+
+.order-detail section {
+  margin-block: 1.5rem;
+}
+
+.order-totals {
+  max-width: 24rem;
+  margin-left: auto;
+}
+
+.order-total-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.3rem 0;
+}
+.order-total-row.is-strong {
+  font-weight: 700;
+  border-top: 1px solid var(--line);
+  margin-top: 0.3rem;
+  padding-top: 0.6rem;
+}
+
+.order-address {
+  font-style: normal;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.order-timeline {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.order-timeline li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--line);
+}
+.order-timeline-note {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .orders-table thead {
+    display: none;
+  }
+  .orders-table,
+  .orders-table tbody,
+  .orders-table tr,
+  .orders-table td {
+    display: block;
+    width: 100%;
+  }
+  .orders-table tr {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.8rem;
+    padding: 0.4rem 0.7rem;
+  }
+  .orders-table td {
+    border: 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.35rem 0;
+  }
+  .orders-table td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 650;
+    color: var(--muted);
+  }
+}

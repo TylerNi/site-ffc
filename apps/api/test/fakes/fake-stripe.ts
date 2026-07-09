@@ -83,29 +83,50 @@ export class FakeStripeService {
       .map((refund) => structuredClone(refund));
   }
 
-  async createRefund(paymentIntentId: string, reason: string): Promise<Stripe.Refund> {
-    const intent = this.require(paymentIntentId);
+  /** Clé d'idempotence → remboursement déjà émis (rejeu = même objet). */
+  private readonly refundsByKey = new Map<string, Stripe.Refund>();
+
+  async createRefund(params: {
+    paymentIntentId: string;
+    reason: string;
+    amountCents?: number;
+    idempotencyKey?: string;
+  }): Promise<Stripe.Refund> {
+    // Idempotence Stripe : même clé ⇒ même remboursement, aucun second effet.
+    if (params.idempotencyKey) {
+      const already = this.refundsByKey.get(params.idempotencyKey);
+      if (already) return structuredClone(already);
+    }
+
+    const intent = this.require(params.paymentIntentId);
     const charge =
       intent.latest_charge && typeof intent.latest_charge === 'object'
         ? this.charges.get(intent.latest_charge.id)
         : null;
-    if (!charge) throw new Error(`No charge to refund on ${paymentIntentId}`);
+    if (!charge) throw new Error(`No charge to refund on ${params.paymentIntentId}`);
+
+    const remaining = charge.amount - charge.amount_refunded;
+    const amount = params.amountCents ?? remaining;
+    if (amount <= 0 || amount > remaining) {
+      throw new Error(`Refund amount ${amount} invalid (remaining ${remaining}).`);
+    }
 
     this.sequence += 1;
     const refund = {
       id: `re_test_${this.runId}_${String(this.sequence).padStart(6, '0')}`,
       object: 'refund',
-      amount: charge.amount - charge.amount_refunded,
+      amount,
       charge: charge.id,
-      payment_intent: paymentIntentId,
+      payment_intent: params.paymentIntentId,
       currency: charge.currency,
       status: 'succeeded',
       reason: null,
-      metadata: { reason },
+      metadata: { reason: params.reason },
     } as unknown as Stripe.Refund;
     this.refunds.set(refund.id, refund);
-    charge.amount_refunded = charge.amount;
-    (charge as { refunded: boolean }).refunded = true;
+    if (params.idempotencyKey) this.refundsByKey.set(params.idempotencyKey, refund);
+    charge.amount_refunded += amount;
+    (charge as { refunded: boolean }).refunded = charge.amount_refunded >= charge.amount;
     return structuredClone(refund);
   }
 

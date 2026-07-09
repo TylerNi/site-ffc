@@ -58,6 +58,7 @@ export async function Header({ locale }: { locale: Locale }) {
 
         <nav className="site-nav" aria-label={t('a11y.mainNav')}>
           <Link href="/sizes">{t('nav.sizes')}</Link>
+          <Link href="/account/orders">{t('nav.account')}</Link>
           <LocaleSwitcher
             targetLocale={target}
             fallbackHref={localizedPath(target, '/')}

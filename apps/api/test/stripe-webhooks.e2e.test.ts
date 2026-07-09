@@ -168,7 +168,10 @@ describe('webhooks Stripe — signature, idempotence, rejeu', () => {
     await postWebhook(ctx, 'payment_intent.succeeded', intent);
 
     // Remboursement intégral côté Stripe (Dashboard, par exemple).
-    await ctx.stripe.createRefund(session.paymentIntentId, 'demande_client');
+    await ctx.stripe.createRefund({
+      paymentIntentId: session.paymentIntentId,
+      reason: 'demande_client',
+    });
     const charge = intent.latest_charge;
     if (!charge || typeof charge !== 'object') throw new Error('charge manquante');
 

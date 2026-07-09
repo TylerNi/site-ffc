@@ -4,6 +4,7 @@ import type Stripe from 'stripe';
 import { PrismaService } from '../../../database';
 import { AuditService } from '../../audit/audit.service';
 import { OrderFinalizerService } from '../finalize/order-finalizer.service';
+import { OrderMailService } from '../invoices/order-mail.service';
 import { StripeService } from '../stripe/stripe.service';
 
 /** Événements traités — tout autre type est consigné IGNORED. */
@@ -47,6 +48,7 @@ export class StripeWebhookProcessorService {
     private readonly prisma: PrismaService,
     private readonly stripe: StripeService,
     private readonly finalizer: OrderFinalizerService,
+    private readonly orderMail: OrderMailService,
     private readonly audit: AuditService,
   ) {}
 
@@ -129,7 +131,7 @@ export class StripeWebhookProcessorService {
 
   private async onPaymentFailed(intent: Stripe.PaymentIntent): Promise<boolean> {
     const failure = intent.last_payment_error;
-    const updated = await this.prisma.payment.updateMany({
+    await this.prisma.payment.updateMany({
       where: {
         provider: 'STRIPE',
         externalId: intent.id,
@@ -141,9 +143,22 @@ export class StripeWebhookProcessorService {
         failureMessage: failure?.message?.slice(0, 500) ?? null,
       },
     });
-    // La commande reste PENDING : le client peut représenter un moyen de
-    // paiement sur le même intent ; la session redevient PENDING alors.
-    return updated.count > 0 || Boolean(intent.metadata?.orderId);
+
+    // Courriel « paiement échoué » (idempotent par intent : un rejeu du même
+    // événement n'envoie qu'un courriel). La commande reste PENDING — le
+    // client peut représenter un moyen de paiement sur le même intent.
+    const orderId = intent.metadata?.orderId;
+    if (orderId) {
+      const order = await this.prisma.order.findUnique({
+        where: { id: orderId },
+        select: { status: true },
+      });
+      if (order?.status === 'PENDING') {
+        await this.orderMail.sendPaymentFailed(orderId, failure?.message ?? null, intent.id);
+      }
+      return true;
+    }
+    return false;
   }
 
   /* ------------------------------ charge.refunded ------------------------ */

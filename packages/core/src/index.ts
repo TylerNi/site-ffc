@@ -1,6 +1,7 @@
 export * from './enums';
 export * from './rbac';
 export * from './locales';
+export * from './orders';
 export * from './filters';
 export * from './dimensions';
 export * from './merv';

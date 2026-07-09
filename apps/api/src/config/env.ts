@@ -142,6 +142,30 @@ export const envSchema = z
       .default('Filtration Montréal <no-reply@filtrationmontreal.com>')
       .describe('Expéditeur des courriels transactionnels'),
     AWS_REGION: z.string().default('ca-central-1').describe('Région AWS (SES, S3…)'),
+
+    /* ------------------------- Factures (S3, tâche 12) ------------------ */
+    // Bucket privé des factures PDF. Absent (dev/test) : stockage mémoire
+    // (aucun réseau). Obligatoire en production (superRefine).
+    S3_INVOICES_BUCKET: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .optional()
+        .describe(
+          'Bucket S3 privé des factures PDF (invoices). Absent : stockage mémoire dev/test.',
+        ),
+    ),
+    PUBLIC_API_URL: z
+      .url()
+      .default('http://localhost:4000')
+      .describe('URL publique de l’API — liens de téléchargement de facture dans les courriels'),
+    INVOICE_DOWNLOAD_TTL_HOURS: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(24 * 366)
+      .default(24 * 30)
+      .describe('Durée de validité des liens signés de téléchargement de facture (30 jours)'),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== 'production') return;
@@ -185,6 +209,13 @@ export const envSchema = z
         code: 'custom',
         path: ['REDIS_URL'],
         message: 'REDIS_URL est obligatoire en production (files BullMQ)',
+      });
+    }
+    if (!env.S3_INVOICES_BUCKET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['S3_INVOICES_BUCKET'],
+        message: 'S3_INVOICES_BUCKET est obligatoire en production (stockage des factures PDF)',
       });
     }
   });

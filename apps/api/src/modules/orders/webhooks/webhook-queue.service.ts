@@ -1,26 +1,15 @@
 import { Injectable, Logger, type OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Queue, type ConnectionOptions } from 'bullmq';
+import { Queue } from 'bullmq';
+import { redisConnectionFromUrl } from '../../../config/bullmq';
 import { type Env } from '../../../config/env';
 import { StripeWebhookProcessorService } from './stripe-webhook-processor.service';
 
 /** Nom de la file BullMQ des webhooks Stripe (producteur ici, worker.ts consomme). */
 export const STRIPE_WEBHOOKS_QUEUE = 'stripe-webhooks';
 
-/** `redis[s]://user:pass@host:port/db` → options de connexion BullMQ. */
-export function redisConnectionFromUrl(url: string): ConnectionOptions {
-  const parsed = new URL(url);
-  return {
-    host: parsed.hostname,
-    port: parsed.port ? Number(parsed.port) : 6379,
-    username: parsed.username || undefined,
-    password: parsed.password || undefined,
-    db: parsed.pathname && parsed.pathname !== '/' ? Number(parsed.pathname.slice(1)) : 0,
-    tls: parsed.protocol === 'rediss:' ? {} : undefined,
-    // Requis par BullMQ : pas de plafond de retentatives sur les commandes bloquantes.
-    maxRetriesPerRequest: null,
-  };
-}
+// Ré-export pour compatibilité (worker.ts) — la définition vit dans config/bullmq.
+export { redisConnectionFromUrl };
 
 /**
  * Producteur de la file de webhooks (tâche 11).
