@@ -166,6 +166,48 @@ export const envSchema = z
       .max(24 * 366)
       .default(24 * 30)
       .describe('Durée de validité des liens signés de téléchargement de facture (30 jours)'),
+
+    /* ------------------------ ShipStation (tâche 13) -------------------- */
+    // Sans clé : la synchronisation reste EN FILE (rien n'est perdu), les
+    // appels réseau sont refusés proprement. Obligatoire en production.
+    SHIPSTATION_API_KEY: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Clé API ShipStation (authentification Basic).'),
+    ),
+    SHIPSTATION_API_SECRET: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Secret API ShipStation (authentification Basic).'),
+    ),
+    SHIPSTATION_BASE_URL: z
+      .url()
+      .default('https://ssapi.shipstation.com')
+      .describe('Racine de l’API ShipStation V1'),
+    SHIPSTATION_STORE_ID: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.coerce
+        .number()
+        .int()
+        .positive()
+        .optional()
+        .describe('Identifiant de la boutique personnalisée ShipStation (advancedOptions.storeId)'),
+    ),
+    SHIPSTATION_WEBHOOK_SECRET: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .min(16, 'SHIPSTATION_WEBHOOK_SECRET doit faire au moins 16 caractères')
+        .optional()
+        .describe(
+          'Secret partagé du webhook ShipStation (jeton dans l’URL — ShipStation ne signe pas ses appels).',
+        ),
+    ),
+    SHIPSTATION_RATE_LIMIT_PER_MINUTE: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(240)
+      .default(40)
+      .describe('Limite de débit de l’API ShipStation (40 requêtes/minute par compte).'),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== 'production') return;
@@ -216,6 +258,22 @@ export const envSchema = z
         code: 'custom',
         path: ['S3_INVOICES_BUCKET'],
         message: 'S3_INVOICES_BUCKET est obligatoire en production (stockage des factures PDF)',
+      });
+    }
+    if (!env.SHIPSTATION_API_KEY || !env.SHIPSTATION_API_SECRET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['SHIPSTATION_API_KEY'],
+        message:
+          'SHIPSTATION_API_KEY et SHIPSTATION_API_SECRET sont obligatoires en production (poussée des commandes)',
+      });
+    }
+    if (!env.SHIPSTATION_WEBHOOK_SECRET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['SHIPSTATION_WEBHOOK_SECRET'],
+        message:
+          'SHIPSTATION_WEBHOOK_SECRET est obligatoire en production (le webhook doit être authentifié)',
       });
     }
   });

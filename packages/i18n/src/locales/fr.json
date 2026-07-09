@@ -341,6 +341,7 @@
     },
     "nav": {
       "dashboard": "Tableau de bord",
+      "shipstation": "ShipStation",
       "users": "Utilisateurs",
       "audit": "Journal d'audit",
       "languageSwitch": "English",
@@ -382,6 +383,30 @@
       "lowStock": "Stock bas",
       "soon": "Bientôt",
       "sectionsHint": "Les modules Catalogue, Commandes, Marketing et autres se brancheront ici."
+    },
+    "shipstation": {
+      "title": "Synchronisation ShipStation",
+      "subtitle": "Commandes poussées vers ShipStation, et celles dont la synchronisation a échoué.",
+      "notConfigured": "Les clés API ShipStation ne sont pas configurées sur ce serveur : les commandes payées restent en file et seront poussées dès que les clés seront en place.",
+      "empty": "Aucune commande dans cet état.",
+      "retry": "Repousser",
+      "colOrder": "Commande",
+      "colOperation": "Opération",
+      "colAttempts": "Tentatives",
+      "colCause": "Cause du dernier échec",
+      "colUpdated": "Mise à jour",
+      "hint": "« Repousser » rejoue l’opération. La création est idempotente : ShipStation ne recevra jamais de commande en double.",
+      "status": {
+        "SYNC_FAILED": "En échec",
+        "PENDING": "En file",
+        "SYNCED": "Synchronisées",
+        "CANCELLED": "Annulées",
+        "SKIPPED": "Sans objet"
+      },
+      "operation": {
+        "CREATE": "Création",
+        "CANCEL": "Annulation"
+      }
     },
     "users": {
       "title": "Comptes du personnel",

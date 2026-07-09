@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
+import { ShippingModule } from '../shipping/shipping.module';
 import { AdminController } from './admin.controller';
+import { AdminShipstationController } from './admin-shipstation.controller';
 import { AdminAuditController } from './admin-audit.controller';
 import { AdminAuditInterceptor } from './admin-audit.interceptor';
 import { AdminAuditService } from './admin-audit.service';
@@ -28,9 +30,11 @@ import { StepUpService } from './step-up.service';
  * Importe AuthModule pour réutiliser tout le socle d'authentification
  * (AuthService, TokenService, OneTimeTokenService, CookieService) — le login
  * admin, le step-up et la révocation de sessions ne réimplémentent rien.
+ * Importe ShippingModule pour la vue de resynchronisation ShipStation
+ * (tâche 13) : les gardes et l'audit restent ici, la logique reste là-bas.
  */
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, ShippingModule],
   controllers: [
     AdminController,
     AdminAuthController,
@@ -39,6 +43,7 @@ import { StepUpService } from './step-up.service';
     AdminInvitationController,
     AdminAuditController,
     AdminDashboardController,
+    AdminShipstationController,
   ],
   providers: [
     PermissionService,

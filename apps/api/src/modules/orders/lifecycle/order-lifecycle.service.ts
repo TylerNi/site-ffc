@@ -3,6 +3,10 @@ import { type Order, type OrderStatus } from '@prisma/client';
 import { canTransitionOrder, isClientCancellable } from '@ffc/core';
 import { PrismaService } from '../../../database';
 import { AuditService } from '../../audit/audit.service';
+import {
+  hasShipstationLabel,
+  requestShipstationCancellation,
+} from '../../shipping/shipstation/shipstation-outbox';
 import { OrderMailService } from '../invoices/order-mail.service';
 import { RefundService } from '../refunds/refund.service';
 
@@ -156,6 +160,10 @@ export class OrderLifecycleService {
    * Annule une commande (avant expédition), rembourse et restocke. Idempotent
    * par le verrou de transition : un second appel trouve la commande déjà
    * CANCELLED et sort proprement.
+   *
+   * Refuse l'annulation dès qu'une ÉTIQUETTE a été créée dans ShipStation
+   * (tâche 13) : le colis est prêt à partir, son retrait relève d'un
+   * processus manuel — jamais d'une annulation automatique.
    */
   async cancel(
     orderId: string,
@@ -168,6 +176,15 @@ export class OrderLifecycleService {
 
     if (order.status === 'CANCELLED') {
       return { orderId, status: 'CANCELLED', refundAmountCents: null, alreadyCancelled: true };
+    }
+    if (await hasShipstationLabel(this.prisma, orderId)) {
+      throw new ConflictException({
+        code: 'LABEL_ALREADY_CREATED',
+        message:
+          'Une étiquette d’expédition a déjà été créée pour cette commande : ' +
+          'elle ne peut plus être annulée automatiquement. Contactez le soutien — ' +
+          'le colis doit être retiré manuellement puis remboursé.',
+      });
     }
     if (opts.clientRestricted && !isClientCancellable(order.status)) {
       throw new ConflictException({
@@ -208,7 +225,15 @@ export class OrderLifecycleService {
       });
     });
 
-    // 2) Remboursement intégral + restock + note de crédit (l'ordre est
+    // 2) ShipStation (tâche 13) : la commande y a peut-être déjà été poussée.
+    //    On arme son annulation dans la boîte d'envoi — le drain s'en charge,
+    //    avec ses retentatives. Sans étiquette (vérifié plus haut), c'est sûr.
+    const cancellation = await requestShipstationCancellation(this.prisma, orderId);
+    if (cancellation === 'CANCEL_QUEUED') {
+      this.logger.log(`Annulation de la commande ${order.number} demandée à ShipStation.`);
+    }
+
+    // 3) Remboursement intégral + restock + note de crédit (l'ordre est
     //    déjà CANCELLED : RefundService conserve ce statut). Sans paiement
     //    capté (commande PENDING annulée par l'admin), rien à rembourser.
     let refundAmountCents: number | null = null;
@@ -223,7 +248,7 @@ export class OrderLifecycleService {
       refundAmountCents = result.amountCents;
     }
 
-    // 3) Courriel d'annulation (idempotent) — mentionne le remboursement.
+    // 4) Courriel d'annulation (idempotent) — mentionne le remboursement.
     if (wasPaid) await this.orderMail.sendCancelled(orderId, refundAmountCents);
 
     await this.audit.log({

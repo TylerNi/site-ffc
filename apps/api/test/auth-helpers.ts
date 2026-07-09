@@ -10,6 +10,7 @@ import { configureApp } from '../src/bootstrap-app';
 import { PrismaService } from '../src/database';
 import { MailService, type OutboxEntry } from '../src/modules/mail/mail.service';
 import { StripeService } from '../src/modules/orders/stripe/stripe.service';
+import { ShipstationClient } from '../src/modules/shipping/shipstation/shipstation.client';
 import { hashPassword } from '../src/modules/auth/password';
 import {
   OIDC_VERIFIERS,
@@ -41,13 +42,19 @@ export interface CreateTestAppOptions {
   verifiers?: OidcVerifier[];
   /** Substitut de StripeService (FakeStripeService pour le checkout). */
   stripe?: unknown;
+  /** Substitut de ShipstationClient (FakeShipstationClient, tâche 13). */
+  shipstation?: unknown;
 }
+
+/** Secret partagé du webhook ShipStation en test (tâche 13). */
+export const TEST_SHIPSTATION_WEBHOOK_SECRET = 'secret-webhook-shipstation-de-test';
 
 export async function createTestApp(options: CreateTestAppOptions = {}): Promise<AuthTestContext> {
   process.env.NODE_ENV = 'test';
   process.env.DATABASE_URL = getTestDatabaseUrl();
   process.env.MAIL_DRIVER = 'log';
   process.env.AUTH_THROTTLE_DISABLED = options.throttleEnabled ? '0' : '1';
+  process.env.SHIPSTATION_WEBHOOK_SECRET = TEST_SHIPSTATION_WEBHOOK_SECRET;
   // Webhooks traités inline et attendus (déterminisme) — jamais de vraie
   // file BullMQ dans les tests, même si le .env local a un REDIS_URL.
   process.env.REDIS_URL = '';
@@ -57,6 +64,9 @@ export async function createTestApp(options: CreateTestAppOptions = {}): Promise
     .useValue(options.verifiers ?? []);
   if (options.stripe !== undefined) {
     builder = builder.overrideProvider(StripeService).useValue(options.stripe);
+  }
+  if (options.shipstation !== undefined) {
+    builder = builder.overrideProvider(ShipstationClient).useValue(options.shipstation);
   }
   const moduleRef = await builder.compile();
 

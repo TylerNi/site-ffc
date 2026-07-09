@@ -341,6 +341,7 @@
     },
     "nav": {
       "dashboard": "Dashboard",
+      "shipstation": "ShipStation",
       "users": "Users",
       "audit": "Audit log",
       "languageSwitch": "Français",
@@ -382,6 +383,30 @@
       "lowStock": "Low stock",
       "soon": "Soon",
       "sectionsHint": "Catalog, Orders, Marketing and other modules will plug in here."
+    },
+    "shipstation": {
+      "title": "ShipStation sync",
+      "subtitle": "Orders pushed to ShipStation, and those whose sync failed.",
+      "notConfigured": "ShipStation API keys are not configured on this server: paid orders stay queued and will be pushed as soon as the keys are in place.",
+      "empty": "No orders in this state.",
+      "retry": "Push again",
+      "colOrder": "Order",
+      "colOperation": "Operation",
+      "colAttempts": "Attempts",
+      "colCause": "Last failure cause",
+      "colUpdated": "Updated",
+      "hint": "“Push again” replays the operation. Creation is idempotent: ShipStation will never receive a duplicate order.",
+      "status": {
+        "SYNC_FAILED": "Failed",
+        "PENDING": "Queued",
+        "SYNCED": "Synced",
+        "CANCELLED": "Cancelled",
+        "SKIPPED": "Not applicable"
+      },
+      "operation": {
+        "CREATE": "Creation",
+        "CANCEL": "Cancellation"
+      }
     },
     "users": {
       "title": "Staff accounts",

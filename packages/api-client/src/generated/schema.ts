@@ -705,6 +705,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liste paginée de mes commandes */
+        get: operations["listMyOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Détail d’une commande (articles, taxes, adresse, chronologie) */
+        get: operations["getMyOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Annuler ma commande (avant expédition) — remboursement + restock
+         * @description Permise tant que la commande n’est pas poussée à l’expédition. Déclenche un remboursement Stripe intégral, la remise en inventaire, une note de crédit et un courriel d’annulation.
+         */
+        post: operations["cancelMyOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/orders/{id}/invoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Télécharger la facture de ma commande (PDF) */
+        get: operations["downloadMyInvoice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/invoices/{id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Télécharger une facture via un lien signé (courriel) */
+        get: operations["downloadInvoiceByToken"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/ping": {
         parameters: {
             query?: never;
@@ -977,6 +1065,40 @@ export interface paths {
         get: operations["adminDashboardSummary"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/shipstation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** File de synchronisation ShipStation (échecs par défaut) */
+        get: operations["adminListShipstationSyncs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/shipstation/{orderId}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Repousse une commande vers ShipStation */
+        post: operations["adminRetryShipstationSync"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1628,6 +1750,99 @@ export interface components {
             /** @description Message d’échec de paiement (déjà localisé par Stripe quand disponible) */
             failureMessage?: string | null;
         };
+        MyOrderListItemDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example FFC-100042 */
+            number: string;
+            /** @enum {string} */
+            status: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED" | "PARTIALLY_REFUNDED";
+            statusLabel: string;
+            /** Format: date-time */
+            placedAt: string;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            totalCents: number;
+            /** @description Nombre total d’articles */
+            itemCount: number;
+            /** @description Le client peut annuler (avant expédition) */
+            canCancel: boolean;
+            /** @description Une facture est disponible au téléchargement */
+            hasInvoice: boolean;
+        };
+        MyOrdersPageDto: {
+            items: components["schemas"]["MyOrderListItemDto"][];
+            /** @description Curseur de la page suivante */
+            nextCursor?: string | null;
+        };
+        OrderStatusEventDto: {
+            /** @enum {string} */
+            status: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED" | "PARTIALLY_REFUNDED";
+            /** @description Libellé localisé du statut */
+            label: string;
+            note?: string | null;
+            /**
+             * @description Auteur de la transition
+             * @enum {string}
+             */
+            actor: "client" | "admin" | "system";
+            /** Format: date-time */
+            at: string;
+        };
+        RefundLineDto: {
+            amountCents: number;
+            /** Format: date-time */
+            at: string;
+            reason?: string | null;
+        };
+        MyOrderDetailDto: {
+            /** Format: uuid */
+            id: string;
+            number: string;
+            /** @enum {string} */
+            status: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED" | "PARTIALLY_REFUNDED";
+            statusLabel: string;
+            /** Format: date-time */
+            placedAt: string;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            lines: components["schemas"]["OrderLineSummaryDto"][];
+            subtotalCents: number;
+            discountCents: number;
+            shippingCents: number;
+            /** @description TPS (cents) */
+            taxGstCents: number;
+            /** @description TVQ (cents) */
+            taxQstCents: number;
+            /** @description TVH (cents) */
+            taxHstCents: number;
+            /** @description TVP/TVD (cents) */
+            taxPstCents: number;
+            /** @description Total des taxes (cents) */
+            totalTaxCents: number;
+            totalCents: number;
+            couponCode?: string | null;
+            shippingAddress: components["schemas"]["OrderAddressDto"];
+            /** @description Marque de carte (reçu) */
+            cardBrand?: string | null;
+            /** @description 4 derniers chiffres */
+            cardLast4?: string | null;
+            /** @description Chronologie datée avec acteurs */
+            timeline: components["schemas"]["OrderStatusEventDto"][];
+            refunds: components["schemas"]["RefundLineDto"][];
+            /** @description Numéro de facture */
+            invoiceNumber?: string | null;
+            /** @description Une facture est disponible au téléchargement */
+            hasInvoice: boolean;
+            /** @description Le client peut annuler (avant expédition) */
+            canCancel: boolean;
+        };
+        CancelOrderResponseDto: {
+            /** @enum {string} */
+            status: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED" | "PARTIALLY_REFUNDED";
+            /** @description Montant remboursé (cents) — null si rien à rembourser */
+            refundAmountCents?: number | null;
+        };
         AdminPingResponseDto: {
             /** @enum {string} */
             status: "ok";
@@ -1780,6 +1995,51 @@ export interface components {
             lowStock: number;
             /** @enum {string} */
             currency: "CAD" | "USD";
+        };
+        ShipstationSyncDto: {
+            /** Format: uuid */
+            orderId: string;
+            /** @example FFC-100042 */
+            orderNumber: string;
+            /** @enum {string} */
+            orderStatus: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED" | "PARTIALLY_REFUNDED";
+            /** @description Total de la commande (cents) */
+            totalCents: number;
+            /** @example CAD */
+            currency: string;
+            /** Format: date-time */
+            paidAt: string | null;
+            /** @enum {string} */
+            status: "PENDING" | "SYNCED" | "SYNC_FAILED" | "CANCELLED" | "SKIPPED";
+            /** @enum {string} */
+            operation: "CREATE" | "CANCEL";
+            /** @description Tentatives consommées */
+            attempts: number;
+            /** @description Cause du dernier échec */
+            lastError: string | null;
+            /** Format: date-time */
+            lastAttemptAt: string | null;
+            /** Format: date-time */
+            nextAttemptAt: string | null;
+            /** @description Identifiant de la commande ShipStation */
+            shipstationOrderId: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ShipstationSyncCountsDto: {
+            PENDING: number;
+            SYNCED: number;
+            SYNC_FAILED: number;
+            CANCELLED: number;
+            SKIPPED: number;
+        };
+        ShipstationSyncPageDto: {
+            items: components["schemas"]["ShipstationSyncDto"][];
+            /** @description Curseur de la page suivante */
+            nextCursor: string | null;
+            counts: components["schemas"]["ShipstationSyncCountsDto"];
+            /** @description Les clés API ShipStation sont configurées sur ce serveur */
+            configured: boolean;
         };
     };
     responses: never;
@@ -2775,6 +3035,110 @@ export interface operations {
             };
         };
     };
+    listMyOrders: {
+        parameters: {
+            query?: {
+                /** @description Nombre max de commandes (défaut 20) */
+                limit?: number;
+                /** @description Curseur : id de la dernière commande de la page précédente */
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyOrdersPageDto"];
+                };
+            };
+        };
+    };
+    getMyOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyOrderDetailDto"];
+                };
+            };
+        };
+    };
+    cancelMyOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CancelOrderResponseDto"];
+                };
+            };
+        };
+    };
+    downloadMyInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    downloadInvoiceByToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     adminPing: {
         parameters: {
             query?: never;
@@ -3121,6 +3485,52 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DashboardSummaryDto"];
+                };
+            };
+        };
+    };
+    adminListShipstationSyncs: {
+        parameters: {
+            query?: {
+                /** @description Statut de synchronisation (défaut : la file d’échec) */
+                status?: "PENDING" | "SYNCED" | "SYNC_FAILED" | "CANCELLED" | "SKIPPED";
+                limit?: number;
+                /** @description Curseur : id de la dernière ligne reçue */
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShipstationSyncPageDto"];
+                };
+            };
+        };
+    };
+    adminRetryShipstationSync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShipstationSyncDto"];
                 };
             };
         };

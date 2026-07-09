@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import type Stripe from 'stripe';
 import { PrismaService } from '../../../database';
 import { AuditService } from '../../audit/audit.service';
+import { enqueueShipstationPush } from '../../shipping/shipstation/shipstation-outbox';
 import { InvoiceQueueService } from '../invoices/invoice-queue.service';
 import { OrderMailService } from '../invoices/order-mail.service';
 import { StripeService } from '../stripe/stripe.service';
@@ -144,6 +145,13 @@ export class OrderFinalizerService {
             note: 'Paiement Stripe confirmé',
           },
         });
+
+        // BOÎTE D'ENVOI ShipStation (tâche 13) : armée DANS la transaction du
+        // passage à PAID. Une commande payée ne peut donc pas être « oubliée »,
+        // même si le processus meurt juste après le commit — le drain la
+        // reprendra. La poussée elle-même est asynchrone (aucun appel réseau
+        // ne bloque la finalisation d'un paiement).
+        await enqueueShipstationPush(tx, order.id);
 
         return 'FINALIZED' as const;
       });

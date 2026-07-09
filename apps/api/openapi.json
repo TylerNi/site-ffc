@@ -1685,6 +1685,180 @@
         ]
       }
     },
+    "/v1/me/orders": {
+      "get": {
+        "operationId": "listMyOrders",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Nombre max de commandes (défaut 20)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Curseur : id de la dernière commande de la page précédente",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyOrdersPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Liste paginée de mes commandes",
+        "tags": [
+          "mes-commandes"
+        ]
+      }
+    },
+    "/v1/me/orders/{id}": {
+      "get": {
+        "operationId": "getMyOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyOrderDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Détail d’une commande (articles, taxes, adresse, chronologie)",
+        "tags": [
+          "mes-commandes"
+        ]
+      }
+    },
+    "/v1/me/orders/{id}/cancel": {
+      "post": {
+        "description": "Permise tant que la commande n’est pas poussée à l’expédition. Déclenche un remboursement Stripe intégral, la remise en inventaire, une note de crédit et un courriel d’annulation.",
+        "operationId": "cancelMyOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelOrderResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Annuler ma commande (avant expédition) — remboursement + restock",
+        "tags": [
+          "mes-commandes"
+        ]
+      }
+    },
+    "/v1/me/orders/{id}/invoice": {
+      "get": {
+        "operationId": "downloadMyInvoice",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Télécharger la facture de ma commande (PDF)",
+        "tags": [
+          "mes-commandes"
+        ]
+      }
+    },
+    "/v1/invoices/{id}/download": {
+      "get": {
+        "operationId": "downloadInvoiceByToken",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Télécharger une facture via un lien signé (courriel)",
+        "tags": [
+          "factures"
+        ]
+      }
+    },
     "/v1/admin/ping": {
       "get": {
         "operationId": "adminPing",
@@ -2272,6 +2446,108 @@
           }
         ],
         "summary": "Tuiles du tableau de bord (ventes, files, stock)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/shipstation": {
+      "get": {
+        "operationId": "adminListShipstationSyncs",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Statut de synchronisation (défaut : la file d’échec)",
+            "schema": {
+              "default": "SYNC_FAILED",
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "SYNCED",
+                "SYNC_FAILED",
+                "CANCELLED",
+                "SKIPPED"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Curseur : id de la dernière ligne reçue",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShipstationSyncPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "File de synchronisation ShipStation (échecs par défaut)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/shipstation/{orderId}/retry": {
+      "post": {
+        "operationId": "adminRetryShipstationSync",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShipstationSyncDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Repousse une commande vers ShipStation",
         "tags": [
           "admin"
         ]
@@ -4323,6 +4599,326 @@
           "status"
         ]
       },
+      "MyOrderListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string",
+            "example": "FFC-100042"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED",
+              "PARTIALLY_REFUNDED"
+            ]
+          },
+          "statusLabel": {
+            "type": "string"
+          },
+          "placedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "totalCents": {
+            "type": "number"
+          },
+          "itemCount": {
+            "type": "number",
+            "description": "Nombre total d’articles"
+          },
+          "canCancel": {
+            "type": "boolean",
+            "description": "Le client peut annuler (avant expédition)"
+          },
+          "hasInvoice": {
+            "type": "boolean",
+            "description": "Une facture est disponible au téléchargement"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "status",
+          "statusLabel",
+          "placedAt",
+          "currency",
+          "totalCents",
+          "itemCount",
+          "canCancel",
+          "hasInvoice"
+        ]
+      },
+      "MyOrdersPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyOrderListItemDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Curseur de la page suivante"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "OrderStatusEventDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED",
+              "PARTIALLY_REFUNDED"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "description": "Libellé localisé du statut"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "actor": {
+            "type": "string",
+            "enum": [
+              "client",
+              "admin",
+              "system"
+            ],
+            "description": "Auteur de la transition"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "label",
+          "actor",
+          "at"
+        ]
+      },
+      "RefundLineDto": {
+        "type": "object",
+        "properties": {
+          "amountCents": {
+            "type": "number"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "amountCents",
+          "at"
+        ]
+      },
+      "MyOrderDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED",
+              "PARTIALLY_REFUNDED"
+            ]
+          },
+          "statusLabel": {
+            "type": "string"
+          },
+          "placedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineSummaryDto"
+            }
+          },
+          "subtotalCents": {
+            "type": "number"
+          },
+          "discountCents": {
+            "type": "number"
+          },
+          "shippingCents": {
+            "type": "number"
+          },
+          "taxGstCents": {
+            "type": "number",
+            "description": "TPS (cents)"
+          },
+          "taxQstCents": {
+            "type": "number",
+            "description": "TVQ (cents)"
+          },
+          "taxHstCents": {
+            "type": "number",
+            "description": "TVH (cents)"
+          },
+          "taxPstCents": {
+            "type": "number",
+            "description": "TVP/TVD (cents)"
+          },
+          "totalTaxCents": {
+            "type": "number",
+            "description": "Total des taxes (cents)"
+          },
+          "totalCents": {
+            "type": "number"
+          },
+          "couponCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "shippingAddress": {
+            "$ref": "#/components/schemas/OrderAddressDto"
+          },
+          "cardBrand": {
+            "type": "string",
+            "nullable": true,
+            "description": "Marque de carte (reçu)"
+          },
+          "cardLast4": {
+            "type": "string",
+            "nullable": true,
+            "description": "4 derniers chiffres"
+          },
+          "timeline": {
+            "description": "Chronologie datée avec acteurs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderStatusEventDto"
+            }
+          },
+          "refunds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundLineDto"
+            }
+          },
+          "invoiceNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Numéro de facture"
+          },
+          "hasInvoice": {
+            "type": "boolean",
+            "description": "Une facture est disponible au téléchargement"
+          },
+          "canCancel": {
+            "type": "boolean",
+            "description": "Le client peut annuler (avant expédition)"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "status",
+          "statusLabel",
+          "placedAt",
+          "currency",
+          "lines",
+          "subtotalCents",
+          "discountCents",
+          "shippingCents",
+          "taxGstCents",
+          "taxQstCents",
+          "taxHstCents",
+          "taxPstCents",
+          "totalTaxCents",
+          "totalCents",
+          "shippingAddress",
+          "timeline",
+          "refunds",
+          "hasInvoice",
+          "canCancel"
+        ]
+      },
+      "CancelOrderResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED",
+              "PARTIALLY_REFUNDED"
+            ]
+          },
+          "refundAmountCents": {
+            "type": "number",
+            "nullable": true,
+            "description": "Montant remboursé (cents) — null si rien à rembourser"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
       "AdminPingResponseDto": {
         "type": "object",
         "properties": {
@@ -4838,6 +5434,162 @@
           "aiReviewQueue",
           "lowStock",
           "currency"
+        ]
+      },
+      "ShipstationSyncDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderNumber": {
+            "type": "string",
+            "example": "FFC-100042"
+          },
+          "orderStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED",
+              "PARTIALLY_REFUNDED"
+            ]
+          },
+          "totalCents": {
+            "type": "number",
+            "description": "Total de la commande (cents)"
+          },
+          "currency": {
+            "type": "string",
+            "example": "CAD"
+          },
+          "paidAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SYNCED",
+              "SYNC_FAILED",
+              "CANCELLED",
+              "SKIPPED"
+            ]
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "CREATE",
+              "CANCEL"
+            ]
+          },
+          "attempts": {
+            "type": "number",
+            "description": "Tentatives consommées"
+          },
+          "lastError": {
+            "type": "string",
+            "nullable": true,
+            "description": "Cause du dernier échec"
+          },
+          "lastAttemptAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "nextAttemptAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "shipstationOrderId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Identifiant de la commande ShipStation"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "orderId",
+          "orderNumber",
+          "orderStatus",
+          "totalCents",
+          "currency",
+          "paidAt",
+          "status",
+          "operation",
+          "attempts",
+          "lastError",
+          "lastAttemptAt",
+          "nextAttemptAt",
+          "shipstationOrderId",
+          "updatedAt"
+        ]
+      },
+      "ShipstationSyncCountsDto": {
+        "type": "object",
+        "properties": {
+          "PENDING": {
+            "type": "number"
+          },
+          "SYNCED": {
+            "type": "number"
+          },
+          "SYNC_FAILED": {
+            "type": "number"
+          },
+          "CANCELLED": {
+            "type": "number"
+          },
+          "SKIPPED": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "PENDING",
+          "SYNCED",
+          "SYNC_FAILED",
+          "CANCELLED",
+          "SKIPPED"
+        ]
+      },
+      "ShipstationSyncPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShipstationSyncDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Curseur de la page suivante"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/ShipstationSyncCountsDto"
+          },
+          "configured": {
+            "type": "boolean",
+            "description": "Les clés API ShipStation sont configurées sur ce serveur"
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor",
+          "counts",
+          "configured"
         ]
       }
     }

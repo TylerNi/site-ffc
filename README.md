@@ -140,8 +140,22 @@ tolérante aux fautes, avec normalisation des dimensions (« 16x25x1 », « 16 x
 25 x 1 », « 16-25-1 », « 15 3/4 x 24 3/4 »…) et autocomplétion `< 50 ms`.
 Détails et décisions dans **[`docs/catalog.md`](docs/catalog.md)**.
 
+## Expédition (ShipStation)
+
+Les commandes payées sont poussées vers **ShipStation** (boîte d'envoi écrite
+dans la transaction du paiement, drain avec retentatives exponentielles et file
+d'échec repoussable), où l'équipe crée les étiquettes et compare les tarifs des
+quatre transporteurs (Postes Canada, Nationex, Canpar, Purolator). Le
+transporteur et le numéro de suivi reviennent par webhook — avec un polling de
+repli si un appel se perd — créent les `shipments` et font passer la commande à
+« expédiée ». Procédure de configuration et correspondance des champs dans
+**[`docs/shipstation.md`](docs/shipstation.md)**.
+
 ## État
 
 En construction — fondations du monorepo (tâche 02), infrastructure/CI-CD
-(tâche 03), schéma de base de données (tâche 04), authentification (tâche 05)
-et API catalogue/recherche (tâche 06) en place.
+(tâche 03), schéma de base de données (tâche 04), authentification (tâche 05),
+API catalogue/recherche (tâche 06), vitrine (tâche 07), import BigCommerce
+(tâche 08), admin et RBAC (tâche 09), panier/checkout Stripe (tâche 11),
+commandes/factures/courriels (tâche 12) et intégration ShipStation (tâche 13)
+en place.

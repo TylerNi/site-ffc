@@ -76,3 +76,32 @@ export interface AuditLogPage {
   items: AuditLogEntry[];
   nextCursor: string | null;
 }
+
+/* ------------------------- ShipStation (tâche 13) ------------------------- */
+
+export type ShipstationSyncStatus = 'PENDING' | 'SYNCED' | 'SYNC_FAILED' | 'CANCELLED' | 'SKIPPED';
+
+export interface ShipstationSync {
+  orderId: string;
+  orderNumber: string;
+  orderStatus: string;
+  totalCents: number;
+  currency: string;
+  paidAt: string | null;
+  status: ShipstationSyncStatus;
+  operation: 'CREATE' | 'CANCEL';
+  attempts: number;
+  lastError: string | null;
+  lastAttemptAt: string | null;
+  nextAttemptAt: string | null;
+  shipstationOrderId: string | null;
+  updatedAt: string;
+}
+
+export interface ShipstationSyncPage {
+  items: ShipstationSync[];
+  nextCursor: string | null;
+  counts: Record<ShipstationSyncStatus, number>;
+  /** Les clés API ShipStation sont configurées sur le serveur. */
+  configured: boolean;
+}

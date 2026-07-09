@@ -177,8 +177,11 @@ export type CouponType = z.infer<typeof couponTypeSchema>;
 /* Expédition                                                          */
 /* ------------------------------------------------------------------ */
 
-/** Transporteurs intégrés via ShipStation (tâches 13–14). */
-export const CARRIERS = ['CANADA_POST', 'NATIONEX', 'CANPAR', 'OTHER'] as const;
+/**
+ * Transporteurs intégrés via ShipStation (tâches 13–14). Purolator n'est
+ * accessible QUE par ShipStation (pas d'API de repérage directe côté tâche 14).
+ */
+export const CARRIERS = ['CANADA_POST', 'NATIONEX', 'CANPAR', 'PUROLATOR', 'OTHER'] as const;
 export const carrierSchema = z.enum(CARRIERS);
 export type Carrier = z.infer<typeof carrierSchema>;
 
@@ -197,6 +200,27 @@ export const SHIPMENT_STATUSES = [
 ] as const;
 export const shipmentStatusSchema = z.enum(SHIPMENT_STATUSES);
 export type ShipmentStatus = z.infer<typeof shipmentStatusSchema>;
+
+/**
+ * État de la synchronisation d'une commande vers ShipStation (tâche 13).
+ * `SYNC_FAILED` = retentatives épuisées : la commande apparaît dans la file
+ * d'échec de l'admin avec sa cause, avec l'action « repousser ».
+ * `SKIPPED` = plus rien à pousser (commande annulée avant toute poussée).
+ */
+export const SHIPSTATION_SYNC_STATUSES = [
+  'PENDING',
+  'SYNCED',
+  'SYNC_FAILED',
+  'CANCELLED',
+  'SKIPPED',
+] as const;
+export const shipstationSyncStatusSchema = z.enum(SHIPSTATION_SYNC_STATUSES);
+export type ShipstationSyncStatus = z.infer<typeof shipstationSyncStatusSchema>;
+
+/** Opération en attente sur la file de synchronisation ShipStation. */
+export const SHIPSTATION_SYNC_OPERATIONS = ['CREATE', 'CANCEL'] as const;
+export const shipstationSyncOperationSchema = z.enum(SHIPSTATION_SYNC_OPERATIONS);
+export type ShipstationSyncOperation = z.infer<typeof shipstationSyncOperationSchema>;
 
 /* ------------------------------------------------------------------ */
 /* Notifications / rappels                                             */
@@ -276,6 +300,8 @@ export const PRISMA_ENUMS = {
   CouponType: COUPON_TYPES,
   Carrier: CARRIERS,
   ShipmentStatus: SHIPMENT_STATUSES,
+  ShipstationSyncStatus: SHIPSTATION_SYNC_STATUSES,
+  ShipstationSyncOperation: SHIPSTATION_SYNC_OPERATIONS,
   NotificationCategory: NOTIFICATION_CATEGORIES,
   NotificationChannel: NOTIFICATION_CHANNELS,
   NotificationStatus: NOTIFICATION_STATUSES,

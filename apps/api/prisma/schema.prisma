@@ -222,9 +222,29 @@ enum Carrier {
   CANADA_POST
   NATIONEX
   CANPAR
+  PUROLATOR
   OTHER
 
   @@map("carrier")
+}
+
+/// File de synchronisation vers ShipStation (tâche 13). SYNC_FAILED =
+/// retentatives épuisées : visible dans l'admin avec sa cause et « repousser ».
+enum ShipstationSyncStatus {
+  PENDING
+  SYNCED
+  SYNC_FAILED
+  CANCELLED
+  SKIPPED
+
+  @@map("shipstation_sync_status")
+}
+
+enum ShipstationSyncOperation {
+  CREATE
+  CANCEL
+
+  @@map("shipstation_sync_operation")
 }
 
 enum ShipmentStatus {
@@ -939,6 +959,7 @@ model Order {
   refunds           Refund[]
   invoices          Invoice[]
   shipments         Shipment[]
+  shipstationSync   ShipstationSync?
   couponRedemptions CouponRedemption[]
   reviews           Review[]
 
@@ -1238,6 +1259,47 @@ model ShipmentEvent {
   @@unique([shipmentId, dedupKey])
   @@index([shipmentId, occurredAt])
   @@map("shipment_events")
+}
+
+/// BOÎTE D'ENVOI vers ShipStation (tâche 13) — une ligne par commande.
+///
+/// Écrite dans LA MÊME transaction que le passage à `PAID` : une commande
+/// payée ne peut pas être « oubliée » même si le processus meurt juste après
+/// le commit. Un travailleur draine les lignes dues (`PENDING` et
+/// `next_attempt_at <= now()`) avec des retentatives exponentielles ; après
+/// épuisement la ligne passe `SYNC_FAILED` avec sa cause et devient visible
+/// dans la file d'échec de l'admin (`/v1/admin/shipstation`).
+model ShipstationSync {
+  id      String @id @default(uuid(7)) @db.Uuid
+  orderId String @unique @map("order_id") @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  status    ShipstationSyncStatus    @default(PENDING)
+  /// Opération en attente (ou dernière tentée quand SYNC_FAILED).
+  operation ShipstationSyncOperation @default(CREATE)
+
+  /// Référence externe : `orderKey` = notre numéro de commande — la création
+  /// ShipStation est un upsert sur cette clé (aucun doublon si un job rejoue).
+  shipstationOrderId  String? @map("shipstation_order_id")
+  shipstationOrderKey String? @map("shipstation_order_key")
+
+  attempts      Int       @default(0)
+  lastError     String?   @map("last_error")
+  lastAttemptAt DateTime? @map("last_attempt_at")
+  /// Prochaine tentative (recul exponentiel). Null = rien à faire.
+  nextAttemptAt DateTime? @map("next_attempt_at")
+
+  syncedAt    DateTime? @map("synced_at")
+  cancelledAt DateTime? @map("cancelled_at")
+  /// Horodatage de la première étiquette vue pour cette commande : à partir
+  /// de là, l'annulation automatique est BLOQUÉE (processus manuel).
+  labelCreatedAt DateTime? @map("label_created_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status, nextAttemptAt])
+  @@map("shipstation_syncs")
 }
 
 /**

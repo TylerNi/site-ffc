@@ -10,7 +10,7 @@ import { Spinner } from './ui';
 const IDLE_LOGOUT_MS = 15 * 60_000;
 
 interface NavItem {
-  href: '/tableau-de-bord' | '/utilisateurs' | '/journal';
+  href: '/tableau-de-bord' | '/utilisateurs' | '/journal' | '/shipstation';
   label: string;
   permission?: string;
 }
@@ -54,6 +54,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const navItems: NavItem[] = [
     { href: '/tableau-de-bord', label: t('nav.dashboard') },
+    { href: '/shipstation', label: t('nav.shipstation'), permission: 'shipments.read' },
     { href: '/utilisateurs', label: t('nav.users'), permission: 'admin_users.read' },
     { href: '/journal', label: t('nav.audit'), permission: 'audit.read' },
   ];

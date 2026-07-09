@@ -1,17 +1,24 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { Worker } from 'bullmq';
+import { Queue, Worker } from 'bullmq';
 import { AppModule } from './app.module';
+import { redisConnectionFromUrl } from './config/bullmq';
 import { type Env } from './config/env';
 import { MAIL_QUEUE, type MailJob } from './modules/mail/mail-queue.service';
 import { MailService } from './modules/mail/mail.service';
 import { INVOICES_QUEUE } from './modules/orders/invoices/invoice-queue.service';
 import { InvoiceService } from './modules/orders/invoices/invoice.service';
 import { StripeWebhookProcessorService } from './modules/orders/webhooks/stripe-webhook-processor.service';
+import { STRIPE_WEBHOOKS_QUEUE } from './modules/orders/webhooks/webhook-queue.service';
 import {
-  redisConnectionFromUrl,
-  STRIPE_WEBHOOKS_QUEUE,
-} from './modules/orders/webhooks/webhook-queue.service';
+  DRAIN_INTERVAL_MS,
+  POLL_INTERVAL_MS,
+  SHIPSTATION_JOBS,
+  SHIPSTATION_QUEUE,
+} from './modules/shipping/shipstation/shipstation-queue.service';
+import { ShipstationShipmentsService } from './modules/shipping/shipstation/shipstation-shipments.service';
+import { ShipstationSyncService } from './modules/shipping/shipstation/shipstation-sync.service';
+import { ShipstationWebhookProcessorService } from './modules/shipping/shipstation/shipstation-webhook-processor.service';
 
 /**
  * Point d'entrée du service « workers » (ECS Fargate).
@@ -21,8 +28,12 @@ import {
  * BullMQ. Files actives :
  *   - stripe-webhooks (tâche 11) : traitement idempotent des événements
  *     Stripe, retentatives exponentielles (les échecs restent visibles en
- *     base via webhook_events.status = FAILED).
- * (Suivi de colis et rappels arrivent aux tâches 14 et 20.)
+ *     base via webhook_events.status = FAILED) ;
+ *   - invoices, mail (tâche 12) ;
+ *   - shipstation (tâche 13) : webhooks à la demande, plus DEUX travaux
+ *     répétables — le drain de la boîte d'envoi (commandes payées) et le
+ *     polling de repli des expéditions (webhook perdu).
+ * (Rappels de réachat : tâche 20.)
  */
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.createApplicationContext(AppModule, {
@@ -82,9 +93,55 @@ async function bootstrap(): Promise<void> {
       );
     });
 
-    workers.push(webhookWorker, invoiceWorker, mailWorker);
+    // ShipStation (tâche 13). Concurrence 1 : l'API ShipStation est limitée
+    // à 40 requêtes/minute et le client sérialise déjà ses appels.
+    const shipstationSync = app.get(ShipstationSyncService);
+    const shipstationShipments = app.get(ShipstationShipmentsService);
+    const shipstationWebhooks = app.get(ShipstationWebhookProcessorService);
+
+    const shipstationWorker = new Worker<{ webhookEventId?: string }>(
+      SHIPSTATION_QUEUE,
+      async (job) => {
+        switch (job.name) {
+          case SHIPSTATION_JOBS.webhook:
+            await shipstationWebhooks.process(job.data.webhookEventId!);
+            return;
+          case SHIPSTATION_JOBS.drain:
+            await shipstationSync.drain();
+            return;
+          case SHIPSTATION_JOBS.poll:
+            await shipstationShipments.pollRecentShipments();
+            return;
+          default:
+            console.warn(`[workers] Travail ShipStation inconnu : ${job.name}`);
+        }
+      },
+      { connection, concurrency: 1 },
+    );
+    shipstationWorker.on('failed', (job, error) => {
+      console.error(
+        `[workers] ShipStation ${job?.name ?? '?'} en échec (tentative ${job?.attemptsMade ?? '?'})`,
+        error.message,
+      );
+    });
+
+    // Travaux répétables : ré-enregistrés à chaque démarrage (idempotent).
+    const shipstationQueue = new Queue(SHIPSTATION_QUEUE, { connection });
+    await shipstationQueue.upsertJobScheduler(
+      'shipstation-drain',
+      { every: DRAIN_INTERVAL_MS },
+      { name: SHIPSTATION_JOBS.drain, opts: { attempts: 1, removeOnComplete: { count: 50 } } },
+    );
+    await shipstationQueue.upsertJobScheduler(
+      'shipstation-poll',
+      { every: POLL_INTERVAL_MS },
+      { name: SHIPSTATION_JOBS.poll, opts: { attempts: 1, removeOnComplete: { count: 50 } } },
+    );
+    await shipstationQueue.close();
+
+    workers.push(webhookWorker, invoiceWorker, mailWorker, shipstationWorker);
     console.log(
-      `[workers] Files consommées (Redis) : ${STRIPE_WEBHOOKS_QUEUE}, ${INVOICES_QUEUE}, ${MAIL_QUEUE}.`,
+      `[workers] Files consommées (Redis) : ${STRIPE_WEBHOOKS_QUEUE}, ${INVOICES_QUEUE}, ${MAIL_QUEUE}, ${SHIPSTATION_QUEUE}.`,
     );
   } else {
     console.warn(
