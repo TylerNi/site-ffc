@@ -1,4 +1,4 @@
-import { type Carrier } from './enums';
+import { type Carrier, type ShipmentStatus } from './enums';
 import { type Locale, type LocalizedText } from './locales';
 
 /**
@@ -59,6 +59,38 @@ export function normalizeCarrierCode(code: string | null | undefined): Carrier {
     if (flat.includes(known)) return carrier;
   }
   return 'OTHER';
+}
+
+/* ------------------------- Statuts d'expédition ------------------------- */
+
+/**
+ * Libellés bilingues des statuts de colis (page « Mes colis », courriels,
+ * admin, mobile). L'enum vient de la tâche 04 ; les adapters de repérage
+ * (tâche 14) y ramènent tous les codes transporteur.
+ */
+export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus, LocalizedText> = {
+  CREATED: { fr: 'Étiquette créée', en: 'Label created' },
+  PICKED_UP: { fr: 'Pris en charge', en: 'Picked up' },
+  IN_TRANSIT: { fr: 'En transit', en: 'In transit' },
+  OUT_FOR_DELIVERY: { fr: 'En livraison', en: 'Out for delivery' },
+  DELIVERED: { fr: 'Livré', en: 'Delivered' },
+  EXCEPTION: { fr: 'Incident de livraison', en: 'Delivery exception' },
+  RETURNED: { fr: 'Retourné à l’expéditeur', en: 'Returned to sender' },
+};
+
+export function shipmentStatusLabel(status: ShipmentStatus, locale: Locale): string {
+  return SHIPMENT_STATUS_LABELS[status][locale];
+}
+
+/**
+ * Statuts FINAUX : le colis ne bougera plus, le polling de repérage s'arrête
+ * définitivement (tâche 14). `EXCEPTION` n'est PAS final : un colis en
+ * incident peut repartir (reprise en transit, nouvelle tentative, retour).
+ */
+export const FINAL_SHIPMENT_STATUSES: readonly ShipmentStatus[] = ['DELIVERED', 'RETURNED'];
+
+export function isFinalShipmentStatus(status: ShipmentStatus): boolean {
+  return FINAL_SHIPMENT_STATUSES.includes(status);
 }
 
 /**

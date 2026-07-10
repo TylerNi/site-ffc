@@ -38,6 +38,8 @@ export default async function MyOrderDetailPage({
         orderId={id}
         ordersPath={localizedPath(locale, '/account/orders')}
         browsePath={localizedPath(locale, '/')}
+        shipmentsPath={localizedPath(locale, '/account/shipments')}
+        shipmentsLabel={t('shipments.title')}
       />
     </main>
   );

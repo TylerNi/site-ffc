@@ -1316,6 +1316,81 @@ svg {
   color: var(--muted);
 }
 
+/* « Mes colis » (tâche 14) — cartes de suivi par colis. */
+.order-badge.is-exception {
+  background: #fdecea;
+  color: #b3261e;
+}
+
+.shipments section {
+  margin-block: 1.5rem;
+}
+
+.shipment-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  margin-block: 0.9rem;
+}
+
+.shipment-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.shipment-carrier {
+  margin: 0;
+  font-weight: 700;
+}
+
+.shipment-order-line {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+}
+
+.shipment-eta {
+  margin: 0.6rem 0 0;
+  font-weight: 600;
+}
+
+.shipment-timeline {
+  margin-top: 0.8rem;
+}
+
+.shipment-timeline summary {
+  cursor: pointer;
+  font-weight: 650;
+  margin-bottom: 0.6rem;
+}
+
+.shipment-event-label {
+  font-weight: 650;
+}
+
+.shipment-external {
+  margin: 0.7rem 0 0;
+  font-size: 0.9rem;
+}
+
+.shipments-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  padding: 2.5rem 1rem;
+  background: var(--surface);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+.shipments-empty-icon {
+  font-size: 2.2rem;
+}
+
 @media (max-width: 560px) {
   .orders-table thead {
     display: none;

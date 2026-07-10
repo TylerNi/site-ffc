@@ -208,6 +208,73 @@ export const envSchema = z
       .max(240)
       .default(40)
       .describe('Limite de débit de l’API ShipStation (40 requêtes/minute par compte).'),
+
+    /* -------------------- Repérage transporteurs (tâche 14) ------------- */
+    // Comptes PROPRES par transporteur (checklist tâche 01). Tous optionnels,
+    // même en production : un adapter sans clés est simplement inactif — les
+    // colis gardent leur lien de repérage public (tâche 13) et la file de
+    // polling reste intacte jusqu'à l'arrivée des accès.
+    CANADA_POST_API_USERNAME: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Clé API Postes Canada (programme développeur).'),
+    ),
+    CANADA_POST_API_PASSWORD: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Secret API Postes Canada.'),
+    ),
+    CANADA_POST_BASE_URL: z
+      .url()
+      .default('https://soa-gw.canadapost.ca')
+      .describe('Passerelle Postes Canada (ct.soa-gw.canadapost.ca en développement).'),
+    NATIONEX_CUSTOMER_ID: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Numéro de client Nationex (authentification Basic).'),
+    ),
+    NATIONEX_API_KEY: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Clé API Nationex.'),
+    ),
+    NATIONEX_BASE_URL: z
+      .url()
+      .default('https://api.nationex.com')
+      .describe('Racine de l’API REST Nationex.'),
+    CANPAR_API_USERNAME: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Utilisateur du service web Canpar.'),
+    ),
+    CANPAR_API_PASSWORD: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Mot de passe du service web Canpar.'),
+    ),
+    CANPAR_BASE_URL: z
+      .url()
+      .default('https://canship.canpar.com')
+      .describe('Racine des services web Canpar (sandbox : sandbox.canpar.com).'),
+    PUROLATOR_API_KEY: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Clé API Purolator E-Ship (selon l’accès disponible).'),
+    ),
+    PUROLATOR_API_PASSWORD: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Mot de passe API Purolator.'),
+    ),
+    PUROLATOR_BASE_URL: z
+      .url()
+      .default('https://webservices.purolator.com')
+      .describe('Racine des services web Purolator (devwebservices… en développement).'),
+
+    /* ----------------------- Push Expo (tâche 14) ----------------------- */
+    PUSH_DRIVER: z
+      .enum(['log', 'expo'])
+      .default('log')
+      .describe('log = boîte mémoire + console (dev/test) ; expo = envoi réel via Expo Push.'),
+    EXPO_ACCESS_TOKEN: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .optional()
+        .describe('Jeton d’accès Expo (« Enhanced Security for Push Notifications »).'),
+    ),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== 'production') return;

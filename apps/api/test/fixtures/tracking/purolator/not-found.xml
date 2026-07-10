@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Body>
+    <TrackPackagesByPinResponse xmlns="http://purolator.com/pws/datatypes/v1" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+      <ResponseInformation>
+        <Errors/>
+        <InformationalMessages i:nil="true"/>
+      </ResponseInformation>
+      <TrackingInformationList/>
+    </TrackPackagesByPinResponse>
+  </s:Body>
+</s:Envelope>

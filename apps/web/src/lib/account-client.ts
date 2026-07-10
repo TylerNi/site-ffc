@@ -69,6 +69,48 @@ export interface OrderLine {
   totalCents: number;
 }
 
+export type ShipmentStatus =
+  | 'CREATED'
+  | 'PICKED_UP'
+  | 'IN_TRANSIT'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'EXCEPTION'
+  | 'RETURNED';
+
+export type Carrier = 'CANADA_POST' | 'NATIONEX' | 'CANPAR' | 'PUROLATOR' | 'OTHER';
+
+export interface ShipmentEvent {
+  code?: string | null;
+  status?: ShipmentStatus | null;
+  statusLabel?: string | null;
+  description?: string | null;
+  location?: string | null;
+  occurredAt: string;
+}
+
+export interface MyShipment {
+  id: string;
+  orderId: string;
+  orderNumber: string;
+  carrier?: Carrier | null;
+  carrierLabel?: string | null;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
+  status: ShipmentStatus;
+  statusLabel: string;
+  isActive: boolean;
+  shippedAt?: string | null;
+  estimatedDeliveryAt?: string | null;
+  deliveredAt?: string | null;
+  events: ShipmentEvent[];
+}
+
+export interface MyShipmentsPage {
+  items: MyShipment[];
+  nextCursor: string | null;
+}
+
 export interface MyOrderDetail {
   id: string;
   number: string;
@@ -250,6 +292,13 @@ export function cancelMyOrder(
   id: string,
 ): Promise<{ status: OrderStatus; refundAmountCents: number | null }> {
   return authJson('POST', `/v1/me/orders/${id}/cancel`);
+}
+
+/* -------------------------------- Mes colis ------------------------------- */
+
+export function listMyShipments(cursor?: string): Promise<MyShipmentsPage> {
+  const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : '';
+  return authJson<MyShipmentsPage>('GET', `/v1/me/shipments${query}`);
 }
 
 /** Télécharge la facture (PDF) via un fetch authentifié → téléchargement navigateur. */

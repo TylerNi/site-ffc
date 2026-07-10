@@ -49,6 +49,7 @@ export const routing = defineRouting({
     '/checkout/success': { en: '/checkout/success', fr: '/caisse/confirmation' },
     '/account/orders': { en: '/account/orders', fr: '/compte/commandes' },
     '/account/orders/[id]': { en: '/account/orders/[id]', fr: '/compte/commandes/[id]' },
+    '/account/shipments': { en: '/account/shipments', fr: '/compte/colis' },
   },
 });
 

@@ -1226,8 +1226,11 @@ model Shipment {
   estimatedDeliveryAt DateTime? @map("estimated_delivery_at")
   deliveredAt         DateTime? @map("delivered_at")
   /// File de repérage adaptatif (tâche 14) : prochain passage du poller.
+  /// `poll_failures` compte les échecs CONSÉCUTIFS (recul exponentiel par
+  /// colis) — remis à zéro au premier repérage réussi.
   lastPolledAt        DateTime? @map("last_polled_at")
   nextPollAt          DateTime? @map("next_poll_at")
+  pollFailures        Int       @default(0) @map("poll_failures")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

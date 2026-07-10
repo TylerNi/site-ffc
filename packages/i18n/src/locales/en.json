@@ -322,7 +322,21 @@
       "signOut": "Sign out",
       "actorClient": "you",
       "actorAdmin": "our team",
-      "actorSystem": "automatic"
+      "actorSystem": "automatic",
+      "shipments": {
+        "metaTitle": "My packages",
+        "title": "My packages",
+        "empty": "No packages to track yet.",
+        "emptyHint": "As soon as an order ships, its tracking shows up here — across all carriers.",
+        "active": "On the way",
+        "history": "History",
+        "trackOnCarrier": "Track on the carrier's site",
+        "eta": "Estimated delivery:",
+        "deliveredOn": "Delivered on",
+        "timeline": "Timeline",
+        "noEvents": "No tracking events yet — the carrier has not scanned the package.",
+        "loadError": "Could not load your packages."
+      }
     }
   },
   "admin": {

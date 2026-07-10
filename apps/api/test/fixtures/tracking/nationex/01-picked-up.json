@@ -1,0 +1,13 @@
+{
+  "trackingNumber": "NX100200300",
+  "expectedDeliveryDate": "2026-07-16",
+  "trackingHistories": [
+    {
+      "dateTime": "2026-07-13T15:02:11-04:00",
+      "status": "RA",
+      "statusDescription": "Ramassage effectué",
+      "city": "Longueuil",
+      "province": "QC"
+    }
+  ]
+}

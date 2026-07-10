@@ -7,6 +7,7 @@ import { OrderLifecycleService } from '../../orders/lifecycle/order-lifecycle.se
 import { ShipstationClient } from './shipstation.client';
 import { markShipstationLabelCreated } from './shipstation-outbox';
 import { type ShipstationShipment } from './shipstation.types';
+import { TRACKING_FIRST_POLL_DELAY_MS } from '../tracking/tracking-poller.service';
 
 /**
  * Fenêtre du polling de repli. Généreuse à dessein : réingérer une
@@ -152,7 +153,7 @@ export class ShipstationShipmentsService {
       select: { id: true },
     });
 
-    await this.prisma.shipment.upsert({
+    const shipment = await this.prisma.shipment.upsert({
       where: { shipstationShipmentId: String(raw.shipmentId) },
       update: data,
       create: {
@@ -162,6 +163,22 @@ export class ShipstationShipmentsService {
         status: 'CREATED',
       },
     });
+
+    // ARME le suivi (tâche 14) : premier repérage sous peu — sans écraser
+    // une planification déjà en cours (réingestion webhook + polling).
+    if (
+      shipment.trackingNumber &&
+      shipment.carrier &&
+      shipment.carrier !== 'OTHER' &&
+      !shipment.nextPollAt &&
+      shipment.status !== 'DELIVERED' &&
+      shipment.status !== 'RETURNED'
+    ) {
+      await this.prisma.shipment.update({
+        where: { id: shipment.id },
+        data: { nextPollAt: new Date(Date.now() + TRACKING_FIRST_POLL_DELAY_MS) },
+      });
+    }
 
     // À partir d'ici, l'annulation automatique de la commande est bloquée.
     await markShipstationLabelCreated(this.prisma, order.id, shippedAt);

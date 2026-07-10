@@ -3,6 +3,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ShippingModule } from '../shipping/shipping.module';
 import { AdminController } from './admin.controller';
 import { AdminShipstationController } from './admin-shipstation.controller';
+import { AdminTrackingController } from './admin-tracking.controller';
 import { AdminAuditController } from './admin-audit.controller';
 import { AdminAuditInterceptor } from './admin-audit.interceptor';
 import { AdminAuditService } from './admin-audit.service';
@@ -44,6 +45,7 @@ import { StepUpService } from './step-up.service';
     AdminAuditController,
     AdminDashboardController,
     AdminShipstationController,
+    AdminTrackingController,
   ],
   providers: [
     PermissionService,

@@ -322,7 +322,21 @@
       "signOut": "Se déconnecter",
       "actorClient": "vous",
       "actorAdmin": "notre équipe",
-      "actorSystem": "automatique"
+      "actorSystem": "automatique",
+      "shipments": {
+        "metaTitle": "Mes colis",
+        "title": "Mes colis",
+        "empty": "Aucun colis à suivre pour le moment.",
+        "emptyHint": "Dès qu'une commande est expédiée, son suivi apparaît ici — tous transporteurs confondus.",
+        "active": "Colis en cours",
+        "history": "Historique",
+        "trackOnCarrier": "Suivre sur le site du transporteur",
+        "eta": "Livraison estimée :",
+        "deliveredOn": "Livré le",
+        "timeline": "Chronologie",
+        "noEvents": "Aucun événement de suivi pour l'instant — le transporteur n'a pas encore scanné le colis.",
+        "loadError": "Impossible de charger vos colis."
+      }
     }
   },
   "admin": {

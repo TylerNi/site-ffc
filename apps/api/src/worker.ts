@@ -19,6 +19,12 @@ import {
 import { ShipstationShipmentsService } from './modules/shipping/shipstation/shipstation-shipments.service';
 import { ShipstationSyncService } from './modules/shipping/shipstation/shipstation-sync.service';
 import { ShipstationWebhookProcessorService } from './modules/shipping/shipstation/shipstation-webhook-processor.service';
+import {
+  TRACKING_JOBS,
+  TRACKING_QUEUE,
+  TRACKING_SCAN_INTERVAL_MS,
+} from './modules/shipping/tracking/tracking-queue.service';
+import { TrackingPollerService } from './modules/shipping/tracking/tracking-poller.service';
 
 /**
  * Point d'entrée du service « workers » (ECS Fargate).
@@ -32,7 +38,10 @@ import { ShipstationWebhookProcessorService } from './modules/shipping/shipstati
  *   - invoices, mail (tâche 12) ;
  *   - shipstation (tâche 13) : webhooks à la demande, plus DEUX travaux
  *     répétables — le drain de la boîte d'envoi (commandes payées) et le
- *     polling de repli des expéditions (webhook perdu).
+ *     polling de repli des expéditions (webhook perdu) ;
+ *   - tracking (tâche 14) : scan répétable du polling de repérage — la
+ *     cadence PAR COLIS (6 h / 1 h / arrêt) vit dans shipments.next_poll_at,
+ *     l'isolation par transporteur dans le poller lui-même.
  * (Rappels de réachat : tâche 20.)
  */
 async function bootstrap(): Promise<void> {
@@ -125,6 +134,27 @@ async function bootstrap(): Promise<void> {
       );
     });
 
+    // Suivi de colis (tâche 14). Concurrence 1 : le scan est single-flight
+    // et le throttling par transporteur vit dans TrackingHttp.
+    const trackingPoller = app.get(TrackingPollerService);
+    const trackingWorker = new Worker(
+      TRACKING_QUEUE,
+      async (job) => {
+        if (job.name === TRACKING_JOBS.scan) {
+          await trackingPoller.scan();
+          return;
+        }
+        console.warn(`[workers] Travail de repérage inconnu : ${job.name}`);
+      },
+      { connection, concurrency: 1 },
+    );
+    trackingWorker.on('failed', (job, error) => {
+      console.error(
+        `[workers] Repérage ${job?.name ?? '?'} en échec (tentative ${job?.attemptsMade ?? '?'})`,
+        error.message,
+      );
+    });
+
     // Travaux répétables : ré-enregistrés à chaque démarrage (idempotent).
     const shipstationQueue = new Queue(SHIPSTATION_QUEUE, { connection });
     await shipstationQueue.upsertJobScheduler(
@@ -139,9 +169,17 @@ async function bootstrap(): Promise<void> {
     );
     await shipstationQueue.close();
 
-    workers.push(webhookWorker, invoiceWorker, mailWorker, shipstationWorker);
+    const trackingQueue = new Queue(TRACKING_QUEUE, { connection });
+    await trackingQueue.upsertJobScheduler(
+      'tracking-scan',
+      { every: TRACKING_SCAN_INTERVAL_MS },
+      { name: TRACKING_JOBS.scan, opts: { attempts: 1, removeOnComplete: { count: 50 } } },
+    );
+    await trackingQueue.close();
+
+    workers.push(webhookWorker, invoiceWorker, mailWorker, shipstationWorker, trackingWorker);
     console.log(
-      `[workers] Files consommées (Redis) : ${STRIPE_WEBHOOKS_QUEUE}, ${INVOICES_QUEUE}, ${MAIL_QUEUE}, ${SHIPSTATION_QUEUE}.`,
+      `[workers] Files consommées (Redis) : ${STRIPE_WEBHOOKS_QUEUE}, ${INVOICES_QUEUE}, ${MAIL_QUEUE}, ${SHIPSTATION_QUEUE}, ${TRACKING_QUEUE}.`,
     );
   } else {
     console.warn(

@@ -32,6 +32,8 @@ export default async function MyOrdersPage({ params }: { params: Promise<{ local
         labels={labels}
         ordersPath={localizedPath(locale, '/account/orders')}
         browsePath={localizedPath(locale, '/')}
+        shipmentsPath={localizedPath(locale, '/account/shipments')}
+        shipmentsLabel={t('shipments.title')}
       />
     </main>
   );

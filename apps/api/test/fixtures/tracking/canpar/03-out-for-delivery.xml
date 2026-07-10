@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Body>
+    <ns:trackByBarcodeV2Response xmlns:ns="http://ws.business.canshipws.canpar.com">
+      <ns:return xmlns:ax25="http://dto.canshipws.canpar.com/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <ax25:error xsi:nil="true"/>
+        <ax25:result>
+          <ax25:barcode>D420001122334455</ax25:barcode>
+          <ax25:estimated_delivery_date>20260715 000000</ax25:estimated_delivery_date>
+          <ax25:events>
+            <ax25:code>OFD</ax25:code>
+            <ax25:description>OUT FOR DELIVERY</ax25:description>
+            <ax25:local_date_time>20260715 084500</ax25:local_date_time>
+            <ax25:address>
+              <ax25:city>MONTREAL</ax25:city>
+              <ax25:province>PQ</ax25:province>
+            </ax25:address>
+          </ax25:events>
+          <ax25:events>
+            <ax25:code>ARR</ax25:code>
+            <ax25:description>ARRIVAL AT TERMINAL</ax25:description>
+            <ax25:local_date_time>20260714 052210</ax25:local_date_time>
+            <ax25:address>
+              <ax25:city>MONTREAL</ax25:city>
+              <ax25:province>PQ</ax25:province>
+            </ax25:address>
+          </ax25:events>
+          <ax25:events>
+            <ax25:code>DEP</ax25:code>
+            <ax25:description>DEPARTED TERMINAL</ax25:description>
+            <ax25:local_date_time>20260713 231540</ax25:local_date_time>
+            <ax25:address>
+              <ax25:city>VILLE ST-LAURENT</ax25:city>
+              <ax25:province>PQ</ax25:province>
+            </ax25:address>
+          </ax25:events>
+          <ax25:events>
+            <ax25:code>PIC</ax25:code>
+            <ax25:description>PICKUP FROM CUSTOMER</ax25:description>
+            <ax25:local_date_time>20260713 171502</ax25:local_date_time>
+            <ax25:address>
+              <ax25:city>VILLE ST-LAURENT</ax25:city>
+              <ax25:province>PQ</ax25:province>
+            </ax25:address>
+          </ax25:events>
+        </ax25:result>
+      </ns:return>
+    </ns:trackByBarcodeV2Response>
+  </soapenv:Body>
+</soapenv:Envelope>

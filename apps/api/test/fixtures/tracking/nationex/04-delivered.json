@@ -1,0 +1,41 @@
+{
+  "trackingNumber": "NX100200300",
+  "expectedDeliveryDate": "2026-07-15",
+  "trackingHistories": [
+    {
+      "dateTime": "2026-07-15T13:44:09-04:00",
+      "status": "LV",
+      "statusDescription": "Livré — signature au dossier",
+      "city": "Montréal",
+      "province": "QC"
+    },
+    {
+      "dateTime": "2026-07-15T08:12:00-04:00",
+      "status": "LI",
+      "statusDescription": "En livraison",
+      "city": "Montréal",
+      "province": "QC"
+    },
+    {
+      "dateTime": "2026-07-14T04:20:00-04:00",
+      "status": "SC",
+      "statusDescription": "Tri automatisé",
+      "city": "Montréal",
+      "province": "QC"
+    },
+    {
+      "dateTime": "2026-07-14T02:45:30-04:00",
+      "status": "TR",
+      "statusDescription": "En transit vers le terminal de destination",
+      "city": "Montréal",
+      "province": "QC"
+    },
+    {
+      "dateTime": "2026-07-13T15:02:11-04:00",
+      "status": "RA",
+      "statusDescription": "Ramassage effectué",
+      "city": "Longueuil",
+      "province": "QC"
+    }
+  ]
+}

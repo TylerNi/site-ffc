@@ -67,6 +67,9 @@ interface Props {
   labels: MesCommandesLabels;
   ordersPath: string;
   browsePath: string;
+  /** Lien croisé vers « Mes colis » (tâche 14). */
+  shipmentsPath?: string;
+  shipmentsLabel?: string;
   /** Présent = vue détail ; absent = vue liste. */
   orderId?: string;
 }
@@ -95,7 +98,15 @@ function StatusBadge({ status, label }: { status: OrderStatus; label: string }) 
 }
 
 /** Espace « Mes commandes » : porte de connexion, puis liste ou détail. */
-export function MesCommandes({ locale, labels, ordersPath, browsePath, orderId }: Props) {
+export function MesCommandes({
+  locale,
+  labels,
+  ordersPath,
+  browsePath,
+  shipmentsPath,
+  shipmentsLabel,
+  orderId,
+}: Props) {
   const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -113,6 +124,11 @@ export function MesCommandes({ locale, labels, ordersPath, browsePath, orderId }
   return (
     <>
       <div className="account-toolbar">
+        {shipmentsPath && shipmentsLabel ? (
+          <Link className="btn btn-ghost" href={shipmentsPath}>
+            {shipmentsLabel}
+          </Link>
+        ) : null}
         <button type="button" className="btn btn-ghost" onClick={() => signOutLocal()}>
           {labels.signOut}
         </button>

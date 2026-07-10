@@ -11,6 +11,7 @@ import { PrismaService } from '../src/database';
 import { MailService, type OutboxEntry } from '../src/modules/mail/mail.service';
 import { StripeService } from '../src/modules/orders/stripe/stripe.service';
 import { ShipstationClient } from '../src/modules/shipping/shipstation/shipstation.client';
+import { TrackingHttp } from '../src/modules/shipping/tracking/tracking-http';
 import { hashPassword } from '../src/modules/auth/password';
 import {
   OIDC_VERIFIERS,
@@ -44,6 +45,8 @@ export interface CreateTestAppOptions {
   stripe?: unknown;
   /** Substitut de ShipstationClient (FakeShipstationClient, tâche 13). */
   shipstation?: unknown;
+  /** Substitut de TrackingHttp (FakeTrackingHttp, tâche 14). */
+  trackingHttp?: unknown;
 }
 
 /** Secret partagé du webhook ShipStation en test (tâche 13). */
@@ -67,6 +70,9 @@ export async function createTestApp(options: CreateTestAppOptions = {}): Promise
   }
   if (options.shipstation !== undefined) {
     builder = builder.overrideProvider(ShipstationClient).useValue(options.shipstation);
+  }
+  if (options.trackingHttp !== undefined) {
+    builder = builder.overrideProvider(TrackingHttp).useValue(options.trackingHttp);
   }
   const moduleRef = await builder.compile();
 

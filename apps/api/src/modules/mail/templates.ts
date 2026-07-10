@@ -26,7 +26,9 @@ export type MailTemplateKey =
   | 'order_cancelled'
   | 'order_refunded'
   | 'order_shipped'
-  | 'order_delivered';
+  | 'order_delivered'
+  | 'shipment_out_for_delivery'
+  | 'shipment_exception';
 
 export interface RenderedMail {
   subject: string;
@@ -434,6 +436,95 @@ const TEMPLATES: Record<MailTemplateKey, Record<Locale, (vars: Vars) => Rendered
         `Your order ${v.orderNumber} was delivered`,
         p('Your order has been <strong>delivered</strong>. We hope everything is just right!') +
           p('Any questions? Just reply to this email.'),
+      ),
+    }),
+  },
+  // Jalons de suivi de colis (tâche 14). Un envoi PAR COLIS (clé
+  // d'idempotence sur le colis) : un envoi multi-colis peut légitimement
+  // produire deux courriels « en livraison » à deux jours d'écart.
+  shipment_out_for_delivery: {
+    fr: (v) => ({
+      subject: `Votre commande ${v.orderNumber} arrive aujourd’hui`,
+      text:
+        `Bonjour,\n\nVotre colis est dans le véhicule de livraison${v.carrier ? ` de ${v.carrier}` : ''} : ` +
+        `votre commande ${v.orderNumber} devrait arriver aujourd'hui.\n\n` +
+        `${v.trackingNumber ? `Numéro de suivi : ${v.trackingNumber}\n` : ''}${v.trackingUrl ? `Suivi : ${v.trackingUrl}\n` : ''}\n${SIGNATURE.fr}`,
+      html: mailLayout(
+        'fr',
+        `Votre commande ${v.orderNumber} arrive aujourd’hui`,
+        p(
+          `Votre colis est dans le véhicule de livraison${v.carrier ? ` de <strong>${v.carrier}</strong>` : ''} — il devrait arriver aujourd'hui.`,
+        ) +
+          (v.trackingNumber
+            ? summaryBox(`Numéro de suivi : <strong>${v.trackingNumber}</strong>`)
+            : '') +
+          (v.trackingUrl ? button(v.trackingUrl, 'Suivre mon colis') : ''),
+      ),
+    }),
+    en: (v) => ({
+      subject: `Your order ${v.orderNumber} arrives today`,
+      text:
+        `Hello,\n\nYour package is on the delivery vehicle${v.carrier ? ` with ${v.carrier}` : ''}: ` +
+        `your order ${v.orderNumber} should arrive today.\n\n` +
+        `${v.trackingNumber ? `Tracking number: ${v.trackingNumber}\n` : ''}${v.trackingUrl ? `Tracking: ${v.trackingUrl}\n` : ''}\n${SIGNATURE.en}`,
+      html: mailLayout(
+        'en',
+        `Your order ${v.orderNumber} arrives today`,
+        p(
+          `Your package is on the delivery vehicle${v.carrier ? ` with <strong>${v.carrier}</strong>` : ''} — it should arrive today.`,
+        ) +
+          (v.trackingNumber
+            ? summaryBox(`Tracking number: <strong>${v.trackingNumber}</strong>`)
+            : '') +
+          (v.trackingUrl ? button(v.trackingUrl, 'Track my package') : ''),
+      ),
+    }),
+  },
+  shipment_exception: {
+    fr: (v) => ({
+      subject: `Incident de livraison — commande ${v.orderNumber}`,
+      text:
+        `Bonjour,\n\nLe transporteur${v.carrier ? ` ${v.carrier}` : ''} signale un incident de livraison ` +
+        `pour votre commande ${v.orderNumber} (adresse introuvable, absence, avis de passage…).\n\n` +
+        `${v.trackingNumber ? `Numéro de suivi : ${v.trackingNumber}\n` : ''}${v.trackingUrl ? `Détails et instructions : ${v.trackingUrl}\n` : ''}\n` +
+        `Notre équipe surveille la situation ; si le colis ne repart pas sous peu, nous vous recontacterons. ` +
+        `Une question ? Répondez simplement à ce courriel.\n\n${SIGNATURE.fr}`,
+      html: mailLayout(
+        'fr',
+        `Incident de livraison — commande ${v.orderNumber}`,
+        p(
+          `Le transporteur${v.carrier ? ` <strong>${v.carrier}</strong>` : ''} signale un incident de livraison pour votre commande <strong>${v.orderNumber}</strong> (adresse introuvable, absence, avis de passage…).`,
+        ) +
+          (v.trackingNumber
+            ? summaryBox(`Numéro de suivi : <strong>${v.trackingNumber}</strong>`)
+            : '') +
+          (v.trackingUrl ? button(v.trackingUrl, 'Voir les détails du suivi') : '') +
+          p(
+            'Notre équipe surveille la situation ; si le colis ne repart pas sous peu, nous vous recontacterons. Une question ? Répondez simplement à ce courriel.',
+          ),
+      ),
+    }),
+    en: (v) => ({
+      subject: `Delivery exception — order ${v.orderNumber}`,
+      text:
+        `Hello,\n\nThe carrier${v.carrier ? ` ${v.carrier}` : ''} reported a delivery exception ` +
+        `for your order ${v.orderNumber} (address issue, missed delivery, notice card…).\n\n` +
+        `${v.trackingNumber ? `Tracking number: ${v.trackingNumber}\n` : ''}${v.trackingUrl ? `Details and instructions: ${v.trackingUrl}\n` : ''}\n` +
+        `Our team is monitoring the situation; if the package does not move again shortly, we will reach out. ` +
+        `Any questions? Just reply to this email.\n\n${SIGNATURE.en}`,
+      html: mailLayout(
+        'en',
+        `Delivery exception — order ${v.orderNumber}`,
+        p(
+          `The carrier${v.carrier ? ` <strong>${v.carrier}</strong>` : ''} reported a delivery exception for your order <strong>${v.orderNumber}</strong> (address issue, missed delivery, notice card…).`,
+        ) +
+          (v.trackingNumber
+            ? summaryBox(`Tracking number: <strong>${v.trackingNumber}</strong>`)
+            : '') +
+          (v.trackingUrl ? button(v.trackingUrl, 'View tracking details') : '') +
+          p(
+            'Our team is monitoring the situation; if the package does not move again shortly, we will reach out. Any questions? Just reply to this email.',
+          ),
       ),
     }),
   },

@@ -11,6 +11,7 @@ import { CatalogModule } from './modules/catalog/catalog.module';
 import { HealthModule } from './modules/health/health.module';
 import { MailModule } from './modules/mail/mail.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { PushModule } from './modules/push/push.module';
 import { ShippingModule } from './modules/shipping/shipping.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { ShippingModule } from './modules/shipping/shipping.module';
     PrismaModule,
     AuditModule,
     MailModule,
+    PushModule,
     HealthModule,
     AuthModule,
     AccountModule,

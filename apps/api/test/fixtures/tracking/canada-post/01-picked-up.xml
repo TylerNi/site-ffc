@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tracking-detail xmlns="http://www.canadapost.ca/ws/track-v2">
+  <pin>7023210039414604</pin>
+  <active-exists>1</active-exists>
+  <archive-exists/>
+  <changed-expected-date/>
+  <destination-postal-id>H2L</destination-postal-id>
+  <expected-delivery-date>2026-07-16</expected-delivery-date>
+  <changed-expected-delivery-reason/>
+  <mailed-by-customer-number>0001111111</mailed-by-customer-number>
+  <mailed-on-behalf-of-customer-number>0001111111</mailed-on-behalf-of-customer-number>
+  <original-pin/>
+  <service-name>Expedited Parcels</service-name>
+  <service-name-2>Colis accélérés</service-name-2>
+  <customer-ref-1>FFC-100042</customer-ref-1>
+  <customer-ref-2/>
+  <return-pin/>
+  <signature-image-exists>false</signature-image-exists>
+  <suppress-signature>true</suppress-signature>
+  <delivery-options>
+    <item>
+      <delivery-option/>
+      <delivery-option-description/>
+    </item>
+  </delivery-options>
+  <significant-events>
+    <occurrence>
+      <event-identifier>3000</event-identifier>
+      <event-date>2026-07-13</event-date>
+      <event-time>16:22:33</event-time>
+      <event-time-zone>EDT</event-time-zone>
+      <event-description>Item picked up by Canada Post</event-description>
+      <signatory-name/>
+      <event-site>VILLE ST-LAURENT</event-site>
+      <event-province>QC</event-province>
+      <event-retail-location-id/>
+      <event-retail-name/>
+    </occurrence>
+  </significant-events>
+</tracking-detail>

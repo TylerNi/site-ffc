@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Body>
+    <TrackPackagesByPinResponse xmlns="http://purolator.com/pws/datatypes/v1" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+      <ResponseInformation>
+        <Errors/>
+        <InformationalMessages i:nil="true"/>
+      </ResponseInformation>
+      <TrackingInformationList>
+        <TrackingInformation>
+          <PIN>
+            <Value>331200000001</Value>
+          </PIN>
+          <Scans>
+            <Scan>
+              <ScanType>ProofOfPickUp</ScanType>
+              <Depot>
+                <Name>Montreal (Ahuntsic) QC</Name>
+              </Depot>
+              <ScanDate>2026-07-13</ScanDate>
+              <ScanTime>163455</ScanTime>
+              <Description>Picked up by Purolator</Description>
+            </Scan>
+          </Scans>
+        </TrackingInformation>
+      </TrackingInformationList>
+    </TrackPackagesByPinResponse>
+  </s:Body>
+</s:Envelope>
