@@ -9,6 +9,7 @@ import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/bootstrap-app';
 import { PrismaService } from '../src/database';
 import { MailService, type OutboxEntry } from '../src/modules/mail/mail.service';
+import { RevalidationClient } from '../src/modules/catalog/revalidation.client';
 import { StripeService } from '../src/modules/orders/stripe/stripe.service';
 import { ShipstationClient } from '../src/modules/shipping/shipstation/shipstation.client';
 import { TrackingHttp } from '../src/modules/shipping/tracking/tracking-http';
@@ -47,6 +48,8 @@ export interface CreateTestAppOptions {
   shipstation?: unknown;
   /** Substitut de TrackingHttp (FakeTrackingHttp, tâche 14). */
   trackingHttp?: unknown;
+  /** Substitut de RevalidationClient (FakeRevalidationClient, tâche 10). */
+  revalidation?: unknown;
 }
 
 /** Secret partagé du webhook ShipStation en test (tâche 13). */
@@ -73,6 +76,9 @@ export async function createTestApp(options: CreateTestAppOptions = {}): Promise
   }
   if (options.trackingHttp !== undefined) {
     builder = builder.overrideProvider(TrackingHttp).useValue(options.trackingHttp);
+  }
+  if (options.revalidation !== undefined) {
+    builder = builder.overrideProvider(RevalidationClient).useValue(options.revalidation);
   }
   const moduleRef = await builder.compile();
 
@@ -195,6 +201,81 @@ export function totpCode(secretBase32: string, stepOffset = 0): string {
     secret: OTPAuth.Secret.fromBase32(secretBase32),
   });
   return totp.generate({ timestamp: Date.now() + stepOffset * 30_000 });
+}
+
+/* ---------------------------------- Admin -------------------------------- */
+
+/** Enrôle la MFA sur un compte STAFF/ADMIN de test et lui attribue des rôles fins. */
+export async function makeAdminWithMfa(
+  ctx: AuthTestContext,
+  roleKeys: string[],
+): Promise<{ id: string; email: string; password: string; recoveryCodes: string[] }> {
+  const { user, email, password } = await createUserInDb(ctx, {
+    email: uniqueEmail('adm'),
+    role: 'ADMIN',
+  });
+  const session = await login(ctx, email, password);
+  const enroll = await ctx
+    .http()
+    .post('/v1/auth/mfa/enroll')
+    .set('Authorization', bearer(session.accessToken))
+    .expect(200);
+  const secret = enroll.body.secretBase32 as string;
+  const activated = await ctx
+    .http()
+    .post('/v1/auth/mfa/activate')
+    .set('Authorization', bearer(session.accessToken))
+    .send({ code: totpCode(secret) })
+    .expect(200);
+  await assignRolesInDb(ctx, user.id, roleKeys);
+  return { id: user.id, email, password, recoveryCodes: activated.body.recoveryCodes as string[] };
+}
+
+/** Remplace en base les rôles fins (RBAC, tâche 09) d'un compte du personnel. */
+export async function assignRolesInDb(
+  ctx: AuthTestContext,
+  userId: string,
+  roleKeys: string[],
+): Promise<void> {
+  const roles = await ctx.prisma.role.findMany({ where: { key: { in: roleKeys } } });
+  if (roles.length !== roleKeys.length) {
+    throw new Error(`Rôle(s) introuvable(s) parmi : ${roleKeys.join(', ')}`);
+  }
+  await ctx.prisma.userRoleAssignment.deleteMany({ where: { userId } });
+  await ctx.prisma.userRoleAssignment.createMany({
+    data: roles.map((role) => ({ userId, roleId: role.id })),
+  });
+}
+
+/** Connexion admin complète (courriel + mot de passe + second facteur). */
+export async function adminLogin(
+  ctx: AuthTestContext,
+  email: string,
+  password: string,
+  code: string,
+): Promise<string> {
+  const step1 = await ctx.http().post('/v1/admin/auth/login').send({ email, password }).expect(200);
+  const step2 = await ctx
+    .http()
+    .post('/v1/admin/auth/login/mfa')
+    .send({ challengeToken: step1.body.challengeToken, code })
+    .expect(200);
+  return step2.body.accessToken as string;
+}
+
+/** Jeton de step-up (ré-authentification récente, tâche 09) pour une session admin. */
+export async function requestStepUp(
+  ctx: AuthTestContext,
+  accessToken: string,
+  code: string,
+): Promise<string> {
+  const res = await ctx
+    .http()
+    .post('/v1/admin/auth/step-up')
+    .set('Authorization', bearer(accessToken))
+    .send({ code })
+    .expect(200);
+  return res.body.stepUpToken as string;
 }
 
 /* --------------------------------- OIDC -------------------------------- */

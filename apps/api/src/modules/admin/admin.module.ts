@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
+import { CatalogModule } from '../catalog/catalog.module';
 import { ShippingModule } from '../shipping/shipping.module';
 import { AdminController } from './admin.controller';
 import { AdminShipstationController } from './admin-shipstation.controller';
@@ -8,8 +9,19 @@ import { AdminAuditController } from './admin-audit.controller';
 import { AdminAuditInterceptor } from './admin-audit.interceptor';
 import { AdminAuditService } from './admin-audit.service';
 import { AdminAuthController } from './admin-auth.controller';
+import { AdminBrandsController } from './admin-brands.controller';
+import { AdminBrandsService } from './admin-brands.service';
+import { AdminCategoriesController } from './admin-categories.controller';
+import { AdminCategoriesService } from './admin-categories.service';
 import { AdminDashboardController } from './admin-dashboard.controller';
 import { AdminDashboardService } from './admin-dashboard.service';
+import { DevUploadController } from './dev-upload.controller';
+import { AdminInventoryController } from './admin-inventory.controller';
+import { AdminInventoryService } from './admin-inventory.service';
+import { AdminProductImagesController } from './admin-product-images.controller';
+import { AdminProductImagesService } from './admin-product-images.service';
+import { AdminProductsController } from './admin-products.controller';
+import { AdminProductsService } from './admin-products.service';
 import {
   AdminInvitationController,
   AdminRolesController,
@@ -19,6 +31,7 @@ import { AdminUsersService } from './admin-users.service';
 import { PermissionsGuard } from './guards/permissions.guard';
 import { StepUpGuard } from './guards/step-up.guard';
 import { PermissionService } from './permission.service';
+import { productImageStorageProvider } from './product-image-storage';
 import { StepUpService } from './step-up.service';
 
 /**
@@ -35,7 +48,7 @@ import { StepUpService } from './step-up.service';
  * (tâche 13) : les gardes et l'audit restent ici, la logique reste là-bas.
  */
 @Module({
-  imports: [AuthModule, ShippingModule],
+  imports: [AuthModule, ShippingModule, CatalogModule],
   controllers: [
     AdminController,
     AdminAuthController,
@@ -46,6 +59,12 @@ import { StepUpService } from './step-up.service';
     AdminDashboardController,
     AdminShipstationController,
     AdminTrackingController,
+    AdminProductsController,
+    AdminProductImagesController,
+    AdminCategoriesController,
+    AdminBrandsController,
+    AdminInventoryController,
+    DevUploadController,
   ],
   providers: [
     PermissionService,
@@ -56,6 +75,12 @@ import { StepUpService } from './step-up.service';
     AdminUsersService,
     AdminAuditService,
     AdminDashboardService,
+    AdminProductsService,
+    AdminProductImagesService,
+    AdminCategoriesService,
+    AdminBrandsService,
+    AdminInventoryService,
+    productImageStorageProvider,
   ],
 })
 export class AdminModule {}

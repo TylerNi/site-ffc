@@ -1,14 +1,15 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
+  adminLogin,
   type AuthTestContext,
   bearer,
   createTestApp,
-  createUserInDb,
   lastMail,
-  login,
+  makeAdminWithMfa,
+  requestStepUp,
   tokenFromMail,
-  totpCode,
   uniqueEmail,
+  createUserInDb,
 } from './auth-helpers';
 
 /**
@@ -28,72 +29,6 @@ describe('admin — socle et RBAC', () => {
   afterAll(async () => {
     await ctx.close();
   });
-
-  /** Enrôle la MFA sur un compte et lui attribue des rôles fins en base. */
-  async function makeAdminWithMfa(
-    roleKeys: string[],
-  ): Promise<{ id: string; email: string; password: string; recoveryCodes: string[] }> {
-    const { user, email, password } = await createUserInDb(ctx, {
-      email: uniqueEmail('adm'),
-      role: 'ADMIN',
-    });
-    const session = await login(ctx, email, password);
-    const enroll = await ctx
-      .http()
-      .post('/v1/auth/mfa/enroll')
-      .set('Authorization', bearer(session.accessToken))
-      .expect(200);
-    const secret = enroll.body.secretBase32 as string;
-    const activated = await ctx
-      .http()
-      .post('/v1/auth/mfa/activate')
-      .set('Authorization', bearer(session.accessToken))
-      .send({ code: totpCode(secret) })
-      .expect(200);
-    await assignRolesInDb(user.id, roleKeys);
-    return {
-      id: user.id,
-      email,
-      password,
-      recoveryCodes: activated.body.recoveryCodes as string[],
-    };
-  }
-
-  async function assignRolesInDb(userId: string, roleKeys: string[]): Promise<void> {
-    const roles = await ctx.prisma.role.findMany({ where: { key: { in: roleKeys } } });
-    expect(roles).toHaveLength(roleKeys.length);
-    await ctx.prisma.userRoleAssignment.deleteMany({ where: { userId } });
-    await ctx.prisma.userRoleAssignment.createMany({
-      data: roles.map((role) => ({ userId, roleId: role.id })),
-    });
-  }
-
-  /** Connexion admin complète (courriel + mot de passe + second facteur). */
-  async function adminLogin(email: string, password: string, code: string): Promise<string> {
-    const step1 = await ctx
-      .http()
-      .post('/v1/admin/auth/login')
-      .send({ email, password })
-      .expect(200);
-    expect(step1.body.challengeToken).toBeDefined();
-    const step2 = await ctx
-      .http()
-      .post('/v1/admin/auth/login/mfa')
-      .send({ challengeToken: step1.body.challengeToken, code })
-      .expect(200);
-    expect(step2.body.accessToken).toBeDefined();
-    return step2.body.accessToken as string;
-  }
-
-  async function requestStepUp(accessToken: string, code: string): Promise<string> {
-    const res = await ctx
-      .http()
-      .post('/v1/admin/auth/step-up')
-      .set('Authorization', bearer(accessToken))
-      .send({ code })
-      .expect(200);
-    return res.body.stepUpToken as string;
-  }
 
   /* --------------------------- Critère 2 : MFA obligatoire ------------------- */
 
@@ -125,8 +60,8 @@ describe('admin — socle et RBAC', () => {
   /* --------------------------- Critère 1 : RBAC lecture_seule ---------------- */
 
   it('CRITÈRE 1 : lecture_seule ne peut ni voir ni muter (403 même en forçant)', async () => {
-    const reader = await makeAdminWithMfa(['lecture_seule']);
-    const token = await adminLogin(reader.email, reader.password, reader.recoveryCodes[0]!);
+    const reader = await makeAdminWithMfa(ctx, ['lecture_seule']);
+    const token = await adminLogin(ctx, reader.email, reader.password, reader.recoveryCodes[0]!);
 
     // Le profil expose des permissions de lecture seulement (aucune écriture).
     const me = await ctx
@@ -162,8 +97,8 @@ describe('admin — socle et RBAC', () => {
   });
 
   it('un super_admin, lui, voit et administre', async () => {
-    const admin = await makeAdminWithMfa(['super_admin']);
-    const token = await adminLogin(admin.email, admin.password, admin.recoveryCodes[0]!);
+    const admin = await makeAdminWithMfa(ctx, ['super_admin']);
+    const token = await adminLogin(ctx, admin.email, admin.password, admin.recoveryCodes[0]!);
 
     const me = await ctx
       .http()
@@ -192,11 +127,11 @@ describe('admin — socle et RBAC', () => {
   /* --------------------------- Critère 3 : step-up --------------------------- */
 
   it('CRITÈRE 3 : action sensible refusée sans step-up, acceptée avec, auditée avant/après', async () => {
-    const admin = await makeAdminWithMfa(['super_admin']);
-    const token = await adminLogin(admin.email, admin.password, admin.recoveryCodes[0]!);
+    const admin = await makeAdminWithMfa(ctx, ['super_admin']);
+    const token = await adminLogin(ctx, admin.email, admin.password, admin.recoveryCodes[0]!);
 
     // Une cible du personnel à faire évoluer.
-    const target = await makeAdminWithMfa(['lecture_seule']);
+    const target = await makeAdminWithMfa(ctx, ['lecture_seule']);
 
     // Sans step-up → 403 avec code distinctif.
     const refused = await ctx
@@ -208,7 +143,7 @@ describe('admin — socle et RBAC', () => {
     expect(refused.body.code).toBe('STEP_UP_REQUIRED');
 
     // Avec un step-up récent → accepté.
-    const stepUpToken = await requestStepUp(token, admin.recoveryCodes[1]!);
+    const stepUpToken = await requestStepUp(ctx, token, admin.recoveryCodes[1]!);
     const updated = await ctx
       .http()
       .patch(`/v1/admin/users/${target.id}/roles`)
@@ -230,13 +165,13 @@ describe('admin — socle et RBAC', () => {
   });
 
   it('un jeton de step-up d’une autre session est refusé', async () => {
-    const admin = await makeAdminWithMfa(['super_admin']);
-    const tokenA = await adminLogin(admin.email, admin.password, admin.recoveryCodes[0]!);
-    const stepUp = await requestStepUp(tokenA, admin.recoveryCodes[1]!);
+    const admin = await makeAdminWithMfa(ctx, ['super_admin']);
+    const tokenA = await adminLogin(ctx, admin.email, admin.password, admin.recoveryCodes[0]!);
+    const stepUp = await requestStepUp(ctx, tokenA, admin.recoveryCodes[1]!);
 
     // Nouvelle session (autre sid) : le step-up de la session A n'est pas valide ici.
-    const tokenB = await adminLogin(admin.email, admin.password, admin.recoveryCodes[2]!);
-    const target = await makeAdminWithMfa(['lecture_seule']);
+    const tokenB = await adminLogin(ctx, admin.email, admin.password, admin.recoveryCodes[2]!);
+    const target = await makeAdminWithMfa(ctx, ['lecture_seule']);
     await ctx
       .http()
       .patch(`/v1/admin/users/${target.id}/roles`)
@@ -249,9 +184,9 @@ describe('admin — socle et RBAC', () => {
   /* --------------------------- Critère 4 : cycle de vie ---------------------- */
 
   it('CRITÈRE 4 : invitation → acceptation → attribution de rôle → désactivation', async () => {
-    const admin = await makeAdminWithMfa(['super_admin']);
-    const token = await adminLogin(admin.email, admin.password, admin.recoveryCodes[0]!);
-    const stepUpToken = await requestStepUp(token, admin.recoveryCodes[1]!);
+    const admin = await makeAdminWithMfa(ctx, ['super_admin']);
+    const token = await adminLogin(ctx, admin.email, admin.password, admin.recoveryCodes[0]!);
+    const stepUpToken = await requestStepUp(ctx, token, admin.recoveryCodes[1]!);
 
     // 1. Invitation.
     const inviteeEmail = uniqueEmail('invite');
@@ -326,12 +261,17 @@ describe('admin — socle et RBAC', () => {
   });
 
   it('la désactivation révoque l’accès immédiatement (compte rechargé à chaque requête)', async () => {
-    const admin = await makeAdminWithMfa(['super_admin']);
-    const adminToken = await adminLogin(admin.email, admin.password, admin.recoveryCodes[0]!);
-    const stepUpToken = await requestStepUp(adminToken, admin.recoveryCodes[1]!);
+    const admin = await makeAdminWithMfa(ctx, ['super_admin']);
+    const adminToken = await adminLogin(ctx, admin.email, admin.password, admin.recoveryCodes[0]!);
+    const stepUpToken = await requestStepUp(ctx, adminToken, admin.recoveryCodes[1]!);
 
-    const victim = await makeAdminWithMfa(['commandes']);
-    const victimToken = await adminLogin(victim.email, victim.password, victim.recoveryCodes[0]!);
+    const victim = await makeAdminWithMfa(ctx, ['commandes']);
+    const victimToken = await adminLogin(
+      ctx,
+      victim.email,
+      victim.password,
+      victim.recoveryCodes[0]!,
+    );
     // La session fonctionne...
     await ctx.http().get('/v1/admin/auth/me').set('Authorization', bearer(victimToken)).expect(200);
 
@@ -349,8 +289,8 @@ describe('admin — socle et RBAC', () => {
   /* --------------------------- Audit : journal en lecture seule -------------- */
 
   it('le journal d’audit est consultable, filtrable et en lecture seule', async () => {
-    const admin = await makeAdminWithMfa(['super_admin']);
-    const token = await adminLogin(admin.email, admin.password, admin.recoveryCodes[0]!);
+    const admin = await makeAdminWithMfa(ctx, ['super_admin']);
+    const token = await adminLogin(ctx, admin.email, admin.password, admin.recoveryCodes[0]!);
 
     const page = await ctx
       .http()

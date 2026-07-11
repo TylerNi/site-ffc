@@ -1,6 +1,12 @@
 'use client';
 
-import { type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
+import {
+  type ButtonHTMLAttributes,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+} from 'react';
 
 /* ---------------------------------- Boutons -------------------------------- */
 
@@ -48,6 +54,21 @@ export function Field({
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input className="input" {...props} />;
+}
+
+export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return <textarea className="input textarea" {...props} />;
+}
+
+export function Select({
+  children,
+  ...rest
+}: SelectHTMLAttributes<HTMLSelectElement> & { children: ReactNode }) {
+  return (
+    <select className="input select" {...rest}>
+      {children}
+    </select>
+  );
 }
 
 /* ---------------------------------- Divers --------------------------------- */

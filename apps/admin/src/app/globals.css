@@ -148,6 +148,14 @@ h2 {
   outline: 2px solid var(--color-accent);
   outline-offset: 1px;
 }
+.textarea {
+  resize: vertical;
+  min-height: 5rem;
+  font-family: inherit;
+}
+.select {
+  cursor: pointer;
+}
 
 /* --------------------------------- Alertes -------------------------------- */
 
@@ -599,4 +607,127 @@ h2 {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ----------------------------- Catalogue (tâche 10) ------------------------ */
+
+.section-title {
+  margin: 0 0 0.9rem;
+  font-size: 1rem;
+}
+.section-hint {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  margin: -0.5rem 0 1rem;
+}
+
+.locale-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+@media (max-width: 760px) {
+  .locale-columns {
+    grid-template-columns: 1fr;
+  }
+}
+.locale-column-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.locale-column-head strong {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+.image-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-panel);
+  overflow: hidden;
+  cursor: grab;
+}
+.image-card.dragging {
+  opacity: 0.4;
+}
+.image-card.drop-target {
+  border-color: var(--color-accent);
+}
+.image-card-thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  background: var(--color-elevated);
+}
+.image-card-body {
+  padding: 0.5rem 0.6rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.image-card-body input {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.5rem;
+}
+.image-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.variant-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+@media (max-width: 640px) {
+  .variant-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tree-node {
+  margin: 0.15rem 0;
+}
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-panel);
+}
+.tree-children {
+  list-style: none;
+  margin: 0.3rem 0 0.3rem 1.5rem;
+  padding: 0;
+  border-left: 1px dashed var(--color-border);
+  padding-left: 0.75rem;
+}
+.tree-row-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }

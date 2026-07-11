@@ -28,7 +28,8 @@ export type MailTemplateKey =
   | 'order_shipped'
   | 'order_delivered'
   | 'shipment_out_for_delivery'
-  | 'shipment_exception';
+  | 'shipment_exception'
+  | 'inventory_low_stock';
 
 export interface RenderedMail {
   subject: string;
@@ -526,6 +527,27 @@ const TEMPLATES: Record<MailTemplateKey, Record<Locale, (vars: Vars) => Rendered
             'Our team is monitoring the situation; if the package does not move again shortly, we will reach out. Any questions? Just reply to this email.',
           ),
       ),
+    }),
+  },
+  // Alerte de seuil de stock bas (tâche 10) — envoyée à l'équipe (courriel
+  // configuré, `INVENTORY_ALERT_EMAIL`) quand un ajustement d'inventaire
+  // fait passer la quantité en main SOUS le seuil d'alerte de la variante.
+  inventory_low_stock: {
+    fr: (v) => ({
+      subject: `Stock bas — ${v.sku} (${v.productName})`,
+      text:
+        `Bonjour,\n\nLe stock de la variante ${v.sku} (${v.productName}, ${v.nominalLabel}) ` +
+        `vient de passer sous son seuil d'alerte.\n\n` +
+        `Quantité en main : ${v.quantityOnHand}\nSeuil d'alerte : ${v.threshold}\n\n` +
+        `Gérer l'inventaire : ${v.inventoryUrl}\n\n${SIGNATURE.fr}`,
+    }),
+    en: (v) => ({
+      subject: `Low stock — ${v.sku} (${v.productName})`,
+      text:
+        `Hello,\n\nThe stock of variant ${v.sku} (${v.productName}, ${v.nominalLabel}) ` +
+        `just crossed below its alert threshold.\n\n` +
+        `Quantity on hand: ${v.quantityOnHand}\nAlert threshold: ${v.threshold}\n\n` +
+        `Manage inventory: ${v.inventoryUrl}\n\n${SIGNATURE.en}`,
     }),
   },
 };

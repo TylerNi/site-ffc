@@ -263,6 +263,33 @@ export const envSchema = z
       .default('https://webservices.purolator.com')
       .describe('Racine des services web Purolator (devwebservices… en développement).'),
 
+    /* ------------------- Catalogue admin (tâche 10) ---------------------- */
+    // Bucket S3 des images produit — le MÊME que l'import BigCommerce
+    // (tâche 08 : `S3_BUCKET_PRODUCT_IMAGES`, provisionné tâche 03). Absent
+    // (dev/test) : téléversement simulé en mémoire (aucun réseau).
+    // OBLIGATOIRE en production.
+    S3_BUCKET_PRODUCT_IMAGES: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .optional()
+        .describe(
+          'Bucket S3 public/CDN des images produit. Absent : téléversement simulé (dev/test).',
+        ),
+    ),
+    // Secret partagé avec la vitrine web (APP_WEB_URL + /api/revalidate) :
+    // l'admin déclenche la revalidation ISR à la publication/dépublication
+    // d'un produit (tâche 07/10). OBLIGATOIRE en production.
+    REVALIDATE_SECRET: z
+      .string()
+      .default('dev-secret-revalidate-ffc-ne-jamais-utiliser-en-production')
+      .describe('Secret partagé avec la vitrine web pour POST /api/revalidate'),
+    // Destinataire des alertes de stock bas (tâche 10). OBLIGATOIRE en production.
+    INVENTORY_ALERT_EMAIL: z
+      .string()
+      .default('inventaire@filtrationmontreal.com')
+      .describe('Adresse courriel de l’équipe notifiée quand un seuil de stock est franchi'),
+
     /* ----------------------- Push Expo (tâche 14) ----------------------- */
     PUSH_DRIVER: z
       .enum(['log', 'expo'])
@@ -341,6 +368,20 @@ export const envSchema = z
         path: ['SHIPSTATION_WEBHOOK_SECRET'],
         message:
           'SHIPSTATION_WEBHOOK_SECRET est obligatoire en production (le webhook doit être authentifié)',
+      });
+    }
+    if (!env.S3_BUCKET_PRODUCT_IMAGES) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['S3_BUCKET_PRODUCT_IMAGES'],
+        message: 'S3_BUCKET_PRODUCT_IMAGES est obligatoire en production (images produit)',
+      });
+    }
+    if (env.REVALIDATE_SECRET === 'dev-secret-revalidate-ffc-ne-jamais-utiliser-en-production') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['REVALIDATE_SECRET'],
+        message: 'Le secret de revalidation de développement est interdit en production',
       });
     }
   });

@@ -69,11 +69,23 @@ async function call<T>(fn: () => Promise<{ data?: T; response: Response }>): Pro
   }
 }
 
+/**
+ * Étiquettes de revalidation à la demande (tâche 10) : `products` couvre
+ * tout ce qui liste/agrège des produits (accueil, listes, recherche,
+ * sitemap) ; `product:<slug>:<locale>` cible la fiche d'un produit précis.
+ * L'admin appelle `POST /api/revalidate` avec ces mêmes étiquettes à la
+ * publication/dépublication — sans redéploiement.
+ */
+export const REVALIDATE_TAGS = {
+  products: 'products',
+  product: (slug: string, locale: Locale): string => `product:${locale}:${slug}`,
+} as const;
+
 export function getCategories(locale: Locale): Promise<Result<CategoryTree>> {
   return call(() =>
     client.GET('/v1/catalog/categories', {
       params: { query: { locale } },
-      next: { revalidate: REVALIDATE.listing },
+      next: { revalidate: REVALIDATE.listing, tags: [REVALIDATE_TAGS.products] },
     }),
   );
 }
@@ -85,7 +97,7 @@ export function listProducts(
   return call(() =>
     client.GET('/v1/catalog/products', {
       params: { query: { locale, ...filters } },
-      next: { revalidate: REVALIDATE.listing },
+      next: { revalidate: REVALIDATE.listing, tags: [REVALIDATE_TAGS.products] },
     }),
   );
 }
@@ -94,20 +106,27 @@ export function getProduct(slug: string, locale: Locale): Promise<Result<Product
   return call(() =>
     client.GET('/v1/catalog/products/{slug}', {
       params: { path: { slug }, query: { locale } },
-      next: { revalidate: REVALIDATE.product },
+      next: {
+        revalidate: REVALIDATE.product,
+        tags: [REVALIDATE_TAGS.products, REVALIDATE_TAGS.product(slug, locale)],
+      },
     }),
   );
 }
 
 export function getSizeIndex(): Promise<Result<SizeIndex>> {
-  return call(() => client.GET('/v1/catalog/sizes', { next: { revalidate: REVALIDATE.sizes } }));
+  return call(() =>
+    client.GET('/v1/catalog/sizes', {
+      next: { revalidate: REVALIDATE.sizes, tags: [REVALIDATE_TAGS.products] },
+    }),
+  );
 }
 
 export function getSizeEquivalents(label: string): Promise<Result<SizeEquivalents>> {
   return call(() =>
     client.GET('/v1/catalog/sizes/{label}/equivalents', {
       params: { path: { label } },
-      next: { revalidate: REVALIDATE.size },
+      next: { revalidate: REVALIDATE.size, tags: [REVALIDATE_TAGS.products] },
     }),
   );
 }
@@ -120,13 +139,15 @@ export function searchProducts(
   return call(() =>
     client.GET('/v1/catalog/search', {
       params: { query: { locale, q, ...filters } },
-      next: { revalidate: REVALIDATE.search },
+      next: { revalidate: REVALIDATE.search, tags: [REVALIDATE_TAGS.products] },
     }),
   );
 }
 
 export function getSitemapData(): Promise<Result<SitemapData>> {
   return call(() =>
-    client.GET('/v1/catalog/sitemap', { next: { revalidate: REVALIDATE.sitemap } }),
+    client.GET('/v1/catalog/sitemap', {
+      next: { revalidate: REVALIDATE.sitemap, tags: [REVALIDATE_TAGS.products] },
+    }),
   );
 }
