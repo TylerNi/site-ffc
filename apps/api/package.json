@@ -17,12 +17,14 @@
     "db:seed": "prisma db seed",
     "db:erd": "prisma generate && tsx scripts/generate-erd.ts",
     "bigcommerce:export": "tsx scripts/bigcommerce/export.ts",
-    "bigcommerce:import": "tsx scripts/bigcommerce/import.ts"
+    "bigcommerce:import": "tsx scripts/bigcommerce/import.ts",
+    "ai:bench": "tsx --env-file-if-exists=.env scripts/ai-bench.ts"
   },
   "prisma": {
     "seed": "pnpm exec tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.111.0",
     "@aws-sdk/client-s3": "^3.1079.0",
     "@aws-sdk/client-sesv2": "^3.1079.0",
     "@aws-sdk/s3-presigned-post": "3.1079.0",
@@ -40,9 +42,11 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
+    "express": "^5.2.1",
     "fast-xml-parser": "^5.9.3",
     "helmet": "^8.2.0",
     "jose": "^6.2.3",
+    "openai": "^6.46.0",
     "otpauth": "^9.5.1",
     "pdfkit": "^0.19.1",
     "prisma": "^6.19.3",

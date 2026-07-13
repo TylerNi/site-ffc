@@ -746,6 +746,17 @@ async function seedCouponAndSettings(prisma: PrismaClient): Promise<void> {
       description: 'Seuil d’alerte de stock bas par défaut (tâche 10).',
     },
     {
+      key: 'ia.seuil_confiance',
+      value: 0.85,
+      description:
+        'Seuil de confiance globale des identifications IA (tâche 17) : au-dessus → COMPLETED, en dessous ou sans correspondance → NEEDS_REVIEW.',
+    },
+    {
+      key: 'ia.quota_quotidien',
+      value: 10,
+      description: 'Nombre maximal d’analyses IA par utilisateur et par jour (tâche 17).',
+    },
+    {
       // Coordonnées légales de l'entreprise — affichées sur les factures et
       // notes de crédit (tâche 12). Numéros d'inscription TPS/TVQ CONFIGURABLES
       // ici (le brief l'exige) ; valeurs de démonstration, à remplacer par les

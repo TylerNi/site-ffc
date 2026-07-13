@@ -1859,6 +1859,165 @@
         ]
       }
     },
+    "/v1/me/shipments": {
+      "get": {
+        "operationId": "listMyShipments",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Nombre max de colis (défaut 20)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Curseur : id du dernier colis de la page précédente",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyShipmentsPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mes colis (actifs et historique), chronologie normalisée incluse",
+        "tags": [
+          "mes-colis"
+        ]
+      }
+    },
+    "/v1/ai/identifications": {
+      "post": {
+        "description": "Exige un consentement explicite (consent: true — refus 400, tracé au journal d’audit). Répond 429 au-delà du quota quotidien, 503 si le fournisseur de vision n’est pas configuré.",
+        "operationId": "createAiIdentification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAiIdentificationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAiIdentificationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer une identification et obtenir l’URL de téléversement présignée",
+        "tags": [
+          "ia"
+        ]
+      }
+    },
+    "/v1/ai/identifications/{id}/submit": {
+      "post": {
+        "description": "Valide le CONTENU réel (octets magiques JPEG/PNG/WebP/HEIC), ré-encode l’image sans EXIF (GPS), remplace l’objet S3 puis met l’analyse en file.",
+        "operationId": "submitAiIdentification",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiIdentificationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soumettre la photo téléversée à l’analyse",
+        "tags": [
+          "ia"
+        ]
+      }
+    },
+    "/v1/ai/identifications/{id}": {
+      "get": {
+        "operationId": "getAiIdentification",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiIdentificationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Statut et résultat d’une identification (propriétaire seulement)",
+        "tags": [
+          "ia"
+        ]
+      }
+    },
     "/v1/admin/ping": {
       "get": {
         "operationId": "adminPing",
@@ -2548,6 +2707,1367 @@
           }
         ],
         "summary": "Repousse une commande vers ShipStation",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/tracking": {
+      "get": {
+        "operationId": "adminTrackingOverview",
+        "parameters": [
+          {
+            "name": "staleDays",
+            "required": false,
+            "in": "query",
+            "description": "Un colis actif sans mise à jour depuis N jours est « bloqué » (défaut 5)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 60,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Observabilité du suivi de colis (métriques par transporteur, colis bloqués)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products": {
+      "get": {
+        "operationId": "adminListProducts",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Recherche libre (nom, SKU)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dimension",
+            "required": false,
+            "in": "query",
+            "description": "Dimension nominale (n’importe quelle graphie)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "merv",
+            "required": false,
+            "in": "query",
+            "description": "Cote MERV exacte",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "brandId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "ACTIVE",
+                "ARCHIVED"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Curseur : id du dernier produit reçu",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Liste des produits (recherche, filtres)",
+        "tags": [
+          "admin"
+        ]
+      },
+      "post": {
+        "operationId": "adminCreateProduct",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crée un produit (brouillon)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}": {
+      "get": {
+        "operationId": "adminGetProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fiche produit complète",
+        "tags": [
+          "admin"
+        ]
+      },
+      "patch": {
+        "operationId": "adminUpdateProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifie marque/catégorie/vedette",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/duplicate": {
+      "post": {
+        "operationId": "adminDuplicateProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Duplique un produit comme gabarit (brouillon, slugs/SKU renommés)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/publish": {
+      "post": {
+        "operationId": "adminPublishProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Publie le produit (revalidation ISR de la vitrine)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/unpublish": {
+      "post": {
+        "operationId": "adminUnpublishProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Repasse le produit en brouillon",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/archive": {
+      "post": {
+        "operationId": "adminArchiveProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive le produit (jamais de suppression dure)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/restore": {
+      "post": {
+        "operationId": "adminRestoreProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restaure un produit archivé en brouillon",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/translations/{locale}": {
+      "patch": {
+        "operationId": "adminUpsertProductTranslation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "enum": [
+                "fr",
+                "en"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertProductTranslationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crée ou remplace la traduction d’une locale",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/variants": {
+      "post": {
+        "operationId": "adminCreateVariant",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVariantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminVariantDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajoute une variante",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/variants/{variantId}": {
+      "patch": {
+        "operationId": "adminUpdateVariant",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVariantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminVariantDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifie une variante",
+        "tags": [
+          "admin"
+        ]
+      },
+      "delete": {
+        "operationId": "adminDeleteVariant",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprime une variante jamais commandée",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{productId}/images/upload-url": {
+      "post": {
+        "operationId": "adminPresignProductImage",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresignImageUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresignImageUploadResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "URL présignée S3 (type + taille validés côté S3)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{productId}/images": {
+      "post": {
+        "operationId": "adminRegisterProductImage",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterImageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductImageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enregistre l’image téléversée (valide + extrait les dimensions)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{productId}/images/{imageId}": {
+      "patch": {
+        "operationId": "adminUpdateProductImage",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "imageId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateImageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductImageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifie le texte alternatif / la variante liée",
+        "tags": [
+          "admin"
+        ]
+      },
+      "delete": {
+        "operationId": "adminDeleteProductImage",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "imageId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprime une image",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/products/{productId}/images/order": {
+      "put": {
+        "operationId": "adminReorderProductImages",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderImagesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminProductImageDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Réordonnance les images (glisser-déposer) — la position 0 est l’image principale",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/categories": {
+      "get": {
+        "operationId": "adminCategoryTree",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryTreeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Arbre complet des catégories (actives et inactives)",
+        "tags": [
+          "admin"
+        ]
+      },
+      "post": {
+        "operationId": "adminCreateCategory",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryNodeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crée une catégorie",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/categories/{id}": {
+      "patch": {
+        "operationId": "adminUpdateCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryNodeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifie traductions/statut/ordre",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/categories/{id}/move": {
+      "patch": {
+        "operationId": "adminMoveCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Déplace la catégorie sous un nouveau parent",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/brands": {
+      "get": {
+        "operationId": "adminListBrands",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminBrandDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Liste des marques",
+        "tags": [
+          "admin"
+        ]
+      },
+      "post": {
+        "operationId": "adminCreateBrand",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBrandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBrandDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crée une marque",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/brands/{id}": {
+      "patch": {
+        "operationId": "adminUpdateBrand",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBrandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBrandDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifie une marque",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/inventory": {
+      "get": {
+        "operationId": "adminListInventory",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Recherche par SKU ou nom de produit",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lowStockOnly",
+            "required": false,
+            "in": "query",
+            "description": "Ne garder que les variantes sous leur seuil d’alerte",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminInventoryPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Niveaux de stock par variante",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/inventory/{variantId}/movements": {
+      "get": {
+        "operationId": "adminInventoryMovements",
+        "parameters": [
+          {
+            "name": "variantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminInventoryMovementPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Historique des mouvements d’une variante",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/inventory/{variantId}/threshold": {
+      "patch": {
+        "operationId": "adminSetInventoryThreshold",
+        "parameters": [
+          {
+            "name": "variantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetThresholdDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminInventoryItemDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fixe le seuil d’alerte de stock bas",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/admin/inventory/{variantId}/adjustments": {
+      "post": {
+        "operationId": "adminAdjustInventory",
+        "parameters": [
+          {
+            "name": "variantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdjustInventoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminInventoryItemDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajuste le stock (motif obligatoire) — crée un mouvement tracé",
         "tags": [
           "admin"
         ]
@@ -4919,6 +6439,544 @@
           "status"
         ]
       },
+      "ShipmentEventDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Code source du transporteur"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CREATED",
+              "PICKED_UP",
+              "IN_TRANSIT",
+              "OUT_FOR_DELIVERY",
+              "DELIVERED",
+              "EXCEPTION",
+              "RETURNED"
+            ],
+            "nullable": true,
+            "description": "Statut normalisé (null : événement informatif)"
+          },
+          "statusLabel": {
+            "type": "string",
+            "nullable": true,
+            "description": "Libellé localisé du statut"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "occurredAt"
+        ]
+      },
+      "MyShipmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Commande liée (page « Mes commandes »)"
+          },
+          "orderNumber": {
+            "type": "string",
+            "example": "FFC-100042"
+          },
+          "carrier": {
+            "type": "string",
+            "enum": [
+              "CANADA_POST",
+              "NATIONEX",
+              "CANPAR",
+              "PUROLATOR",
+              "OTHER"
+            ],
+            "nullable": true
+          },
+          "carrierLabel": {
+            "type": "string",
+            "nullable": true,
+            "description": "Libellé localisé du transporteur"
+          },
+          "trackingNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "trackingUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "Page de repérage publique du transporteur"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CREATED",
+              "PICKED_UP",
+              "IN_TRANSIT",
+              "OUT_FOR_DELIVERY",
+              "DELIVERED",
+              "EXCEPTION",
+              "RETURNED"
+            ]
+          },
+          "statusLabel": {
+            "type": "string",
+            "description": "Libellé localisé du statut"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "false : livré ou retourné (historique)"
+          },
+          "shippedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "estimatedDeliveryAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "deliveredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "events": {
+            "description": "Chronologie normalisée, du plus récent au plus ancien",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShipmentEventDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "orderId",
+          "orderNumber",
+          "status",
+          "statusLabel",
+          "isActive",
+          "events"
+        ]
+      },
+      "MyShipmentsPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyShipmentDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Curseur de la page suivante"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "CreateAiIdentificationDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "EQUIPMENT_LABEL",
+              "FILTER_FRAME"
+            ],
+            "description": "Mode d’analyse : EQUIPMENT_LABEL (plaque signalétique — mode A) ou FILTER_FRAME (cadre du filtre — mode B, le plus fiable)."
+          },
+          "consent": {
+            "type": "boolean",
+            "description": "Consentement EXPLICITE à l’analyse de la photo par un fournisseur d’IA (transfert hors Québec — Loi 25). Doit être true."
+          }
+        },
+        "required": [
+          "mode",
+          "consent"
+        ]
+      },
+      "AiVisionFieldDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confiance 0–1."
+          }
+        },
+        "required": [
+          "value",
+          "confidence"
+        ]
+      },
+      "AiVisionDimensionsDto": {
+        "type": "object",
+        "properties": {
+          "widthIn": {
+            "type": "number",
+            "nullable": true
+          },
+          "heightIn": {
+            "type": "number",
+            "nullable": true
+          },
+          "depthIn": {
+            "type": "number",
+            "nullable": true
+          },
+          "label": {
+            "type": "string",
+            "nullable": true,
+            "description": "Libellé canonique « LxHxP » si largeur et hauteur sont lues."
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confiance 0–1."
+          }
+        },
+        "required": [
+          "widthIn",
+          "heightIn",
+          "depthIn",
+          "confidence"
+        ]
+      },
+      "AiVisionMervDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number",
+            "nullable": true
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confiance 0–1."
+          }
+        },
+        "required": [
+          "value",
+          "confidence"
+        ]
+      },
+      "AiExtractionResultDto": {
+        "type": "object",
+        "properties": {
+          "manufacturer": {
+            "$ref": "#/components/schemas/AiVisionFieldDto"
+          },
+          "modelNumber": {
+            "$ref": "#/components/schemas/AiVisionFieldDto"
+          },
+          "dimensions": {
+            "$ref": "#/components/schemas/AiVisionDimensionsDto"
+          },
+          "merv": {
+            "$ref": "#/components/schemas/AiVisionMervDto"
+          },
+          "readableText": {
+            "type": "string",
+            "nullable": true,
+            "description": "Texte lisible transcrit de la photo."
+          },
+          "suggestedMode": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "EQUIPMENT_LABEL",
+              "FILTER_FRAME",
+              null
+            ],
+            "description": "Mode suggéré si la photo ressemble manifestement à l’autre mode."
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "manufacturer",
+          "modelNumber",
+          "dimensions",
+          "merv",
+          "readableText",
+          "suggestedMode",
+          "notes"
+        ]
+      },
+      "AiMatchCandidateDto": {
+        "type": "object",
+        "properties": {
+          "equipmentModelId": {
+            "type": "string"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "modelNumber": {
+            "type": "string"
+          },
+          "similarity": {
+            "type": "number",
+            "description": "Similarité pg_trgm 0–1."
+          }
+        },
+        "required": [
+          "equipmentModelId",
+          "manufacturer",
+          "modelNumber",
+          "similarity"
+        ]
+      },
+      "AiMatchDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "alias",
+              "fuzzy",
+              "none"
+            ]
+          },
+          "score": {
+            "type": "number",
+            "nullable": true
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiMatchCandidateDto"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "score",
+          "candidates"
+        ]
+      },
+      "AiMatchedEquipmentModelDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "modelNumber": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "manufacturer",
+          "modelNumber"
+        ]
+      },
+      "AiSuggestedVariantDto": {
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "nominalLabel": {
+            "type": "string",
+            "example": "16x25x1"
+          },
+          "merv": {
+            "type": "number",
+            "nullable": true
+          },
+          "packSize": {
+            "type": "number"
+          },
+          "mervMatches": {
+            "type": "boolean",
+            "description": "true si la cote MERV extraite correspond exactement."
+          }
+        },
+        "required": [
+          "variantId",
+          "sku",
+          "nominalLabel",
+          "merv",
+          "packSize",
+          "mervMatches"
+        ]
+      },
+      "AiIdentificationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "EQUIPMENT_LABEL",
+              "FILTER_FRAME"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "NEEDS_REVIEW",
+              "CONFIRMED",
+              "REJECTED",
+              "FAILED"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "nullable": true,
+            "description": "Confiance globale 0–1."
+          },
+          "failureReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "result": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiExtractionResultDto"
+              }
+            ]
+          },
+          "match": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiMatchDto"
+              }
+            ]
+          },
+          "matchedEquipmentModel": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiMatchedEquipmentModelDto"
+              }
+            ]
+          },
+          "suggestedVariants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiSuggestedVariantDto"
+            }
+          },
+          "purgeAt": {
+            "type": "string",
+            "description": "Date de purge planifiée de la photo et de l’extraction (Loi 25)."
+          },
+          "purgedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "mode",
+          "status",
+          "confidence",
+          "failureReason",
+          "result",
+          "match",
+          "matchedEquipmentModel",
+          "suggestedVariants",
+          "purgeAt",
+          "purgedAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AiPhotoUploadDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL cible du POST multipart (S3 présigné, ou relais local en dev)."
+          },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Champs à joindre au formulaire multipart, avant le fichier."
+          },
+          "maxBytes": {
+            "type": "number",
+            "description": "Taille maximale acceptée (octets), imposée par la politique S3."
+          },
+          "expiresInSeconds": {
+            "type": "number",
+            "description": "Durée de validité de l’URL présignée (secondes)."
+          }
+        },
+        "required": [
+          "url",
+          "fields",
+          "maxBytes",
+          "expiresInSeconds"
+        ]
+      },
+      "CreateAiIdentificationResponseDto": {
+        "type": "object",
+        "properties": {
+          "identification": {
+            "$ref": "#/components/schemas/AiIdentificationDto"
+          },
+          "upload": {
+            "$ref": "#/components/schemas/AiPhotoUploadDto"
+          }
+        },
+        "required": [
+          "identification",
+          "upload"
+        ]
+      },
       "AdminPingResponseDto": {
         "type": "object",
         "properties": {
@@ -5590,6 +7648,1311 @@
           "nextCursor",
           "counts",
           "configured"
+        ]
+      },
+      "CarrierMetricsDto": {
+        "type": "object",
+        "properties": {
+          "polls": {
+            "type": "number",
+            "description": "Appels de repérage depuis le démarrage du worker"
+          },
+          "ok": {
+            "type": "number"
+          },
+          "notFound": {
+            "type": "number",
+            "description": "Réponses « numéro inconnu » (normales au début)"
+          },
+          "failures": {
+            "type": "number"
+          },
+          "consecutiveFailures": {
+            "type": "number"
+          },
+          "alertActive": {
+            "type": "boolean",
+            "description": "Alerte levée : l’adapter échoue en série"
+          },
+          "lastLatencyMs": {
+            "type": "number",
+            "nullable": true
+          },
+          "avgLatencyMs": {
+            "type": "number",
+            "nullable": true
+          },
+          "lastSuccessAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "lastErrorAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "lastError": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "polls",
+          "ok",
+          "notFound",
+          "failures",
+          "consecutiveFailures",
+          "alertActive"
+        ]
+      },
+      "CarrierOverviewDto": {
+        "type": "object",
+        "properties": {
+          "carrier": {
+            "type": "string",
+            "enum": [
+              "CANADA_POST",
+              "NATIONEX",
+              "CANPAR",
+              "PUROLATOR",
+              "OTHER"
+            ]
+          },
+          "configured": {
+            "type": "boolean",
+            "description": "Clés d’accès configurées (adapter opérationnel)"
+          },
+          "active": {
+            "type": "number",
+            "description": "Colis actifs suivis (ni livrés ni retournés)"
+          },
+          "byStatus": {
+            "type": "object",
+            "description": "Colis actifs par statut"
+          },
+          "stale": {
+            "type": "number",
+            "description": "Colis actifs sans mise à jour depuis N jours"
+          },
+          "metrics": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CarrierMetricsDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "carrier",
+          "configured",
+          "active",
+          "byStatus",
+          "stale"
+        ]
+      },
+      "StaleShipmentDto": {
+        "type": "object",
+        "properties": {
+          "shipmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderNumber": {
+            "type": "string"
+          },
+          "carrier": {
+            "type": "string",
+            "enum": [
+              "CANADA_POST",
+              "NATIONEX",
+              "CANPAR",
+              "PUROLATOR",
+              "OTHER"
+            ],
+            "nullable": true
+          },
+          "trackingNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CREATED",
+              "PICKED_UP",
+              "IN_TRANSIT",
+              "OUT_FOR_DELIVERY",
+              "DELIVERED",
+              "EXCEPTION",
+              "RETURNED"
+            ]
+          },
+          "lastMovementAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Dernier mouvement connu"
+          },
+          "daysWithoutUpdate": {
+            "type": "number"
+          },
+          "nextPollAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "pollFailures": {
+            "type": "number",
+            "description": "Échecs de repérage consécutifs"
+          }
+        },
+        "required": [
+          "shipmentId",
+          "orderId",
+          "orderNumber",
+          "status",
+          "lastMovementAt",
+          "daysWithoutUpdate",
+          "pollFailures"
+        ]
+      },
+      "TrackingOverviewDto": {
+        "type": "object",
+        "properties": {
+          "staleDays": {
+            "type": "number"
+          },
+          "carriers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CarrierOverviewDto"
+            }
+          },
+          "staleShipments": {
+            "description": "Colis bloqués, les plus anciens d’abord",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StaleShipmentDto"
+            }
+          }
+        },
+        "required": [
+          "staleDays",
+          "carriers",
+          "staleShipments"
+        ]
+      },
+      "AdminBrandRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name"
+        ]
+      },
+      "AdminCategoryRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "AdminProductImageDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string",
+            "description": "Clé S3 (relative) ou URL"
+          },
+          "altFr": {
+            "type": "string",
+            "nullable": true
+          },
+          "altEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "width": {
+            "type": "number",
+            "nullable": true
+          },
+          "height": {
+            "type": "number",
+            "nullable": true
+          },
+          "position": {
+            "type": "number"
+          },
+          "variantId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "position"
+        ]
+      },
+      "AdminProductListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "ARCHIVED"
+            ]
+          },
+          "isFeatured": {
+            "type": "boolean"
+          },
+          "brand": {
+            "$ref": "#/components/schemas/AdminBrandRefDto"
+          },
+          "category": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminCategoryRefDto"
+              }
+            ]
+          },
+          "translatedLocales": {
+            "description": "Locales traduites (badge « traduction manquante » côté interface)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Nom affiché (première traduction disponible)"
+          },
+          "image": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminProductImageDto"
+              }
+            ]
+          },
+          "variantCount": {
+            "type": "number"
+          },
+          "priceFromCents": {
+            "type": "number",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "isFeatured",
+          "brand",
+          "translatedLocales",
+          "name",
+          "variantCount",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AdminProductListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminProductListItemDto"
+            }
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "items",
+          "hasMore"
+        ]
+      },
+      "AdminProductTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaDescription": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "locale",
+          "name",
+          "slug"
+        ]
+      },
+      "AdminInventorySummaryDto": {
+        "type": "object",
+        "properties": {
+          "quantityOnHand": {
+            "type": "number"
+          },
+          "quantityReserved": {
+            "type": "number"
+          },
+          "lowStockThreshold": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "quantityOnHand",
+          "quantityReserved"
+        ]
+      },
+      "AdminVariantDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "nominalLabel": {
+            "type": "string"
+          },
+          "nominalWidthIn": {
+            "type": "number"
+          },
+          "nominalHeightIn": {
+            "type": "number"
+          },
+          "nominalDepthIn": {
+            "type": "number"
+          },
+          "actualWidthIn": {
+            "type": "number"
+          },
+          "actualHeightIn": {
+            "type": "number"
+          },
+          "actualDepthIn": {
+            "type": "number"
+          },
+          "merv": {
+            "type": "number",
+            "nullable": true
+          },
+          "packSize": {
+            "type": "number"
+          },
+          "priceCents": {
+            "type": "number"
+          },
+          "compareAtPriceCents": {
+            "type": "number",
+            "nullable": true
+          },
+          "costCents": {
+            "type": "number",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "weightGrams": {
+            "type": "number",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "position": {
+            "type": "number"
+          },
+          "inventory": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminInventorySummaryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "nominalLabel",
+          "nominalWidthIn",
+          "nominalHeightIn",
+          "nominalDepthIn",
+          "actualWidthIn",
+          "actualHeightIn",
+          "actualDepthIn",
+          "packSize",
+          "priceCents",
+          "currency",
+          "isActive",
+          "position"
+        ]
+      },
+      "AdminProductDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "ARCHIVED"
+            ]
+          },
+          "isFeatured": {
+            "type": "boolean"
+          },
+          "brand": {
+            "$ref": "#/components/schemas/AdminBrandRefDto"
+          },
+          "category": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminCategoryRefDto"
+              }
+            ]
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminProductTranslationDto"
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminVariantDto"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminProductImageDto"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "isFeatured",
+          "brand",
+          "translations",
+          "variants",
+          "images",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateProductDto": {
+        "type": "object",
+        "properties": {
+          "brandId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isFeatured": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "brandId"
+        ]
+      },
+      "UpdateProductDto": {
+        "type": "object",
+        "properties": {
+          "brandId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isFeatured": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpsertProductTranslationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string",
+            "description": "minuscules, chiffres, tirets simples",
+            "example": "filtre-16x25x1"
+          },
+          "shortDescription": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "metaTitle": {
+            "type": "string"
+          },
+          "metaDescription": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "slug"
+        ]
+      },
+      "CreateVariantDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "nominalLabel": {
+            "type": "string",
+            "example": "16x25x1"
+          },
+          "nominalWidthIn": {
+            "type": "number"
+          },
+          "nominalHeightIn": {
+            "type": "number"
+          },
+          "nominalDepthIn": {
+            "type": "number"
+          },
+          "actualWidthIn": {
+            "type": "number"
+          },
+          "actualHeightIn": {
+            "type": "number"
+          },
+          "actualDepthIn": {
+            "type": "number"
+          },
+          "merv": {
+            "type": "number",
+            "nullable": true
+          },
+          "packSize": {
+            "type": "number",
+            "default": 1
+          },
+          "priceCents": {
+            "type": "number",
+            "description": "Prix en CENTS"
+          },
+          "compareAtPriceCents": {
+            "type": "number",
+            "description": "Prix barré en CENTS"
+          },
+          "costCents": {
+            "type": "number",
+            "description": "Coût d’achat en CENTS"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ],
+            "default": "CAD"
+          },
+          "weightGrams": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sku",
+          "nominalLabel",
+          "nominalWidthIn",
+          "nominalHeightIn",
+          "nominalDepthIn",
+          "actualWidthIn",
+          "actualHeightIn",
+          "actualDepthIn",
+          "priceCents"
+        ]
+      },
+      "UpdateVariantDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "nominalLabel": {
+            "type": "string"
+          },
+          "nominalWidthIn": {
+            "type": "number"
+          },
+          "nominalHeightIn": {
+            "type": "number"
+          },
+          "nominalDepthIn": {
+            "type": "number"
+          },
+          "actualWidthIn": {
+            "type": "number"
+          },
+          "actualHeightIn": {
+            "type": "number"
+          },
+          "actualDepthIn": {
+            "type": "number"
+          },
+          "merv": {
+            "type": "number",
+            "nullable": true
+          },
+          "packSize": {
+            "type": "number"
+          },
+          "priceCents": {
+            "type": "number",
+            "description": "Prix en CENTS"
+          },
+          "compareAtPriceCents": {
+            "type": "number",
+            "nullable": true
+          },
+          "costCents": {
+            "type": "number",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CAD",
+              "USD"
+            ]
+          },
+          "weightGrams": {
+            "type": "number",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PresignImageUploadDto": {
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": "string",
+            "enum": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ]
+          }
+        },
+        "required": [
+          "contentType"
+        ]
+      },
+      "PresignImageUploadResponseDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "object",
+            "description": "Champs multipart à joindre avant le fichier"
+          }
+        },
+        "required": [
+          "key",
+          "url",
+          "fields"
+        ]
+      },
+      "RegisterImageDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Clé S3 retournée par l’URL présignée"
+          },
+          "altFr": {
+            "type": "string"
+          },
+          "altEn": {
+            "type": "string"
+          },
+          "variantId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Image propre à une variante précise"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      },
+      "UpdateImageDto": {
+        "type": "object",
+        "properties": {
+          "altFr": {
+            "type": "string"
+          },
+          "altEn": {
+            "type": "string"
+          },
+          "variantId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "ReorderImagesDto": {
+        "type": "object",
+        "properties": {
+          "imageIds": {
+            "description": "Ensemble complet des images, dans le nouvel ordre",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "imageIds"
+        ]
+      },
+      "AdminCategoryTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "locale",
+          "name",
+          "slug"
+        ]
+      },
+      "AdminCategoryNodeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "productCount": {
+            "type": "number",
+            "description": "Produits associés (directement, hors sous-arbre)"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCategoryTranslationDto"
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCategoryNodeDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "sortOrder",
+          "isActive",
+          "productCount",
+          "translations",
+          "children"
+        ]
+      },
+      "AdminCategoryTreeDto": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCategoryNodeDto"
+            }
+          }
+        },
+        "required": [
+          "categories"
+        ]
+      },
+      "CategoryTranslationInputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "slug"
+        ]
+      },
+      "CategoryTranslationsInputDto": {
+        "type": "object",
+        "properties": {
+          "fr": {
+            "$ref": "#/components/schemas/CategoryTranslationInputDto"
+          },
+          "en": {
+            "$ref": "#/components/schemas/CategoryTranslationInputDto"
+          }
+        }
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sortOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "translations": {
+            "$ref": "#/components/schemas/CategoryTranslationsInputDto"
+          }
+        },
+        "required": [
+          "translations"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "sortOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "translations": {
+            "$ref": "#/components/schemas/CategoryTranslationsInputDto"
+          }
+        }
+      },
+      "MoveCategoryDto": {
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "null = racine"
+          }
+        }
+      },
+      "AdminBrandDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "productCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "isActive",
+          "productCount"
+        ]
+      },
+      "CreateBrandDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ]
+      },
+      "UpdateBrandDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AdminInventoryItemDto": {
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "nominalLabel": {
+            "type": "string"
+          },
+          "quantityOnHand": {
+            "type": "number"
+          },
+          "quantityReserved": {
+            "type": "number"
+          },
+          "availableQuantity": {
+            "type": "number",
+            "description": "En main − réservée"
+          },
+          "lowStockThreshold": {
+            "type": "number",
+            "nullable": true
+          },
+          "isLowStock": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "variantId",
+          "sku",
+          "productId",
+          "productName",
+          "nominalLabel",
+          "quantityOnHand",
+          "quantityReserved",
+          "availableQuantity",
+          "isLowStock"
+        ]
+      },
+      "AdminInventoryPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminInventoryItemDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "AdminInventoryMovementDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "RECEIPT",
+              "SALE",
+              "RETURN",
+              "ADJUSTMENT"
+            ]
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "createdByUserId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "createdByEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "quantity",
+          "createdAt"
+        ]
+      },
+      "AdminInventoryMovementPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminInventoryMovementDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "SetThresholdDto": {
+        "type": "object",
+        "properties": {
+          "lowStockThreshold": {
+            "type": "number",
+            "nullable": true,
+            "description": "null = aucune alerte"
+          }
+        },
+        "required": [
+          "lowStockThreshold"
+        ]
+      },
+      "AdjustInventoryDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "RECEIPT",
+              "RETURN",
+              "ADJUSTMENT"
+            ]
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Delta SIGNÉ (positif = entrée, négatif = sortie/bris/correction à la baisse)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Motif — OBLIGATOIRE (réception, correction, bris…)"
+          }
+        },
+        "required": [
+          "type",
+          "quantity",
+          "reason"
         ]
       }
     }

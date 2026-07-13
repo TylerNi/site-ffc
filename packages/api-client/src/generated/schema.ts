@@ -793,6 +793,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/shipments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mes colis (actifs et historique), chronologie normalisée incluse */
+        get: operations["listMyShipments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ai/identifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Créer une identification et obtenir l’URL de téléversement présignée
+         * @description Exige un consentement explicite (consent: true — refus 400, tracé au journal d’audit). Répond 429 au-delà du quota quotidien, 503 si le fournisseur de vision n’est pas configuré.
+         */
+        post: operations["createAiIdentification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ai/identifications/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Soumettre la photo téléversée à l’analyse
+         * @description Valide le CONTENU réel (octets magiques JPEG/PNG/WebP/HEIC), ré-encode l’image sans EXIF (GPS), remplace l’objet S3 puis met l’analyse en file.
+         */
+        post: operations["submitAiIdentification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ai/identifications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Statut et résultat d’une identification (propriétaire seulement) */
+        get: operations["getAiIdentification"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/ping": {
         parameters: {
             query?: never;
@@ -1099,6 +1173,420 @@ export interface paths {
         put?: never;
         /** Repousse une commande vers ShipStation */
         post: operations["adminRetryShipstationSync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/tracking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Observabilité du suivi de colis (métriques par transporteur, colis bloqués) */
+        get: operations["adminTrackingOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liste des produits (recherche, filtres) */
+        get: operations["adminListProducts"];
+        put?: never;
+        /** Crée un produit (brouillon) */
+        post: operations["adminCreateProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fiche produit complète */
+        get: operations["adminGetProduct"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Modifie marque/catégorie/vedette */
+        patch: operations["adminUpdateProduct"];
+        trace?: never;
+    };
+    "/v1/admin/products/{id}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Duplique un produit comme gabarit (brouillon, slugs/SKU renommés) */
+        post: operations["adminDuplicateProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publie le produit (revalidation ISR de la vitrine) */
+        post: operations["adminPublishProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Repasse le produit en brouillon */
+        post: operations["adminUnpublishProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive le produit (jamais de suppression dure) */
+        post: operations["adminArchiveProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restaure un produit archivé en brouillon */
+        post: operations["adminRestoreProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{id}/translations/{locale}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Crée ou remplace la traduction d’une locale */
+        patch: operations["adminUpsertProductTranslation"];
+        trace?: never;
+    };
+    "/v1/admin/products/{id}/variants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ajoute une variante */
+        post: operations["adminCreateVariant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{id}/variants/{variantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Supprime une variante jamais commandée */
+        delete: operations["adminDeleteVariant"];
+        options?: never;
+        head?: never;
+        /** Modifie une variante */
+        patch: operations["adminUpdateVariant"];
+        trace?: never;
+    };
+    "/v1/admin/products/{productId}/images/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** URL présignée S3 (type + taille validés côté S3) */
+        post: operations["adminPresignProductImage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{productId}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enregistre l’image téléversée (valide + extrait les dimensions) */
+        post: operations["adminRegisterProductImage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/products/{productId}/images/{imageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Supprime une image */
+        delete: operations["adminDeleteProductImage"];
+        options?: never;
+        head?: never;
+        /** Modifie le texte alternatif / la variante liée */
+        patch: operations["adminUpdateProductImage"];
+        trace?: never;
+    };
+    "/v1/admin/products/{productId}/images/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Réordonnance les images (glisser-déposer) — la position 0 est l’image principale */
+        put: operations["adminReorderProductImages"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Arbre complet des catégories (actives et inactives) */
+        get: operations["adminCategoryTree"];
+        put?: never;
+        /** Crée une catégorie */
+        post: operations["adminCreateCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Modifie traductions/statut/ordre */
+        patch: operations["adminUpdateCategory"];
+        trace?: never;
+    };
+    "/v1/admin/categories/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Déplace la catégorie sous un nouveau parent */
+        patch: operations["adminMoveCategory"];
+        trace?: never;
+    };
+    "/v1/admin/brands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liste des marques */
+        get: operations["adminListBrands"];
+        put?: never;
+        /** Crée une marque */
+        post: operations["adminCreateBrand"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/brands/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Modifie une marque */
+        patch: operations["adminUpdateBrand"];
+        trace?: never;
+    };
+    "/v1/admin/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Niveaux de stock par variante */
+        get: operations["adminListInventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/inventory/{variantId}/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historique des mouvements d’une variante */
+        get: operations["adminInventoryMovements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/inventory/{variantId}/threshold": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Fixe le seuil d’alerte de stock bas */
+        patch: operations["adminSetInventoryThreshold"];
+        trace?: never;
+    };
+    "/v1/admin/inventory/{variantId}/adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ajuste le stock (motif obligatoire) — crée un mouvement tracé */
+        post: operations["adminAdjustInventory"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1843,6 +2331,163 @@ export interface components {
             /** @description Montant remboursé (cents) — null si rien à rembourser */
             refundAmountCents?: number | null;
         };
+        ShipmentEventDto: {
+            /** @description Code source du transporteur */
+            code?: string | null;
+            /**
+             * @description Statut normalisé (null : événement informatif)
+             * @enum {string|null}
+             */
+            status?: "CREATED" | "PICKED_UP" | "IN_TRANSIT" | "OUT_FOR_DELIVERY" | "DELIVERED" | "EXCEPTION" | "RETURNED" | null;
+            /** @description Libellé localisé du statut */
+            statusLabel?: string | null;
+            description?: string | null;
+            location?: string | null;
+            /** Format: date-time */
+            occurredAt: string;
+        };
+        MyShipmentDto: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: uuid
+             * @description Commande liée (page « Mes commandes »)
+             */
+            orderId: string;
+            /** @example FFC-100042 */
+            orderNumber: string;
+            /** @enum {string|null} */
+            carrier?: "CANADA_POST" | "NATIONEX" | "CANPAR" | "PUROLATOR" | "OTHER" | null;
+            /** @description Libellé localisé du transporteur */
+            carrierLabel?: string | null;
+            trackingNumber?: string | null;
+            /** @description Page de repérage publique du transporteur */
+            trackingUrl?: string | null;
+            /** @enum {string} */
+            status: "CREATED" | "PICKED_UP" | "IN_TRANSIT" | "OUT_FOR_DELIVERY" | "DELIVERED" | "EXCEPTION" | "RETURNED";
+            /** @description Libellé localisé du statut */
+            statusLabel: string;
+            /** @description false : livré ou retourné (historique) */
+            isActive: boolean;
+            /** Format: date-time */
+            shippedAt?: string | null;
+            /** Format: date-time */
+            estimatedDeliveryAt?: string | null;
+            /** Format: date-time */
+            deliveredAt?: string | null;
+            /** @description Chronologie normalisée, du plus récent au plus ancien */
+            events: components["schemas"]["ShipmentEventDto"][];
+        };
+        MyShipmentsPageDto: {
+            items: components["schemas"]["MyShipmentDto"][];
+            /** @description Curseur de la page suivante */
+            nextCursor?: string | null;
+        };
+        CreateAiIdentificationDto: {
+            /**
+             * @description Mode d’analyse : EQUIPMENT_LABEL (plaque signalétique — mode A) ou FILTER_FRAME (cadre du filtre — mode B, le plus fiable).
+             * @enum {string}
+             */
+            mode: "EQUIPMENT_LABEL" | "FILTER_FRAME";
+            /** @description Consentement EXPLICITE à l’analyse de la photo par un fournisseur d’IA (transfert hors Québec — Loi 25). Doit être true. */
+            consent: boolean;
+        };
+        AiVisionFieldDto: {
+            value: string | null;
+            /** @description Confiance 0–1. */
+            confidence: number;
+        };
+        AiVisionDimensionsDto: {
+            widthIn: number | null;
+            heightIn: number | null;
+            depthIn: number | null;
+            /** @description Libellé canonique « LxHxP » si largeur et hauteur sont lues. */
+            label?: string | null;
+            /** @description Confiance 0–1. */
+            confidence: number;
+        };
+        AiVisionMervDto: {
+            value: number | null;
+            /** @description Confiance 0–1. */
+            confidence: number;
+        };
+        AiExtractionResultDto: {
+            manufacturer: components["schemas"]["AiVisionFieldDto"];
+            modelNumber: components["schemas"]["AiVisionFieldDto"];
+            dimensions: components["schemas"]["AiVisionDimensionsDto"];
+            merv: components["schemas"]["AiVisionMervDto"];
+            /** @description Texte lisible transcrit de la photo. */
+            readableText: string | null;
+            /**
+             * @description Mode suggéré si la photo ressemble manifestement à l’autre mode.
+             * @enum {string|null}
+             */
+            suggestedMode: "EQUIPMENT_LABEL" | "FILTER_FRAME" | null;
+            notes: string | null;
+        };
+        AiMatchCandidateDto: {
+            equipmentModelId: string;
+            manufacturer: string;
+            modelNumber: string;
+            /** @description Similarité pg_trgm 0–1. */
+            similarity: number;
+        };
+        AiMatchDto: {
+            /** @enum {string} */
+            kind: "exact" | "alias" | "fuzzy" | "none";
+            score: number | null;
+            candidates: components["schemas"]["AiMatchCandidateDto"][];
+        };
+        AiMatchedEquipmentModelDto: {
+            id: string;
+            manufacturer: string;
+            modelNumber: string;
+        };
+        AiSuggestedVariantDto: {
+            variantId: string;
+            sku: string;
+            /** @example 16x25x1 */
+            nominalLabel: string;
+            merv: number | null;
+            packSize: number;
+            /** @description true si la cote MERV extraite correspond exactement. */
+            mervMatches: boolean;
+        };
+        AiIdentificationDto: {
+            id: string;
+            /** @enum {string} */
+            mode: "EQUIPMENT_LABEL" | "FILTER_FRAME";
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "NEEDS_REVIEW" | "CONFIRMED" | "REJECTED" | "FAILED";
+            /** @description Confiance globale 0–1. */
+            confidence: number | null;
+            failureReason: string | null;
+            result: components["schemas"]["AiExtractionResultDto"] | null;
+            match: components["schemas"]["AiMatchDto"] | null;
+            matchedEquipmentModel: components["schemas"]["AiMatchedEquipmentModelDto"] | null;
+            suggestedVariants: components["schemas"]["AiSuggestedVariantDto"][];
+            /** @description Date de purge planifiée de la photo et de l’extraction (Loi 25). */
+            purgeAt: string;
+            purgedAt: string | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        AiPhotoUploadDto: {
+            /** @description URL cible du POST multipart (S3 présigné, ou relais local en dev). */
+            url: string;
+            /** @description Champs à joindre au formulaire multipart, avant le fichier. */
+            fields: {
+                [key: string]: string;
+            };
+            /** @description Taille maximale acceptée (octets), imposée par la politique S3. */
+            maxBytes: number;
+            /** @description Durée de validité de l’URL présignée (secondes). */
+            expiresInSeconds: number;
+        };
+        CreateAiIdentificationResponseDto: {
+            identification: components["schemas"]["AiIdentificationDto"];
+            upload: components["schemas"]["AiPhotoUploadDto"];
+        };
         AdminPingResponseDto: {
             /** @enum {string} */
             status: "ok";
@@ -2040,6 +2685,398 @@ export interface components {
             counts: components["schemas"]["ShipstationSyncCountsDto"];
             /** @description Les clés API ShipStation sont configurées sur ce serveur */
             configured: boolean;
+        };
+        CarrierMetricsDto: {
+            /** @description Appels de repérage depuis le démarrage du worker */
+            polls: number;
+            ok: number;
+            /** @description Réponses « numéro inconnu » (normales au début) */
+            notFound: number;
+            failures: number;
+            consecutiveFailures: number;
+            /** @description Alerte levée : l’adapter échoue en série */
+            alertActive: boolean;
+            lastLatencyMs?: number | null;
+            avgLatencyMs?: number | null;
+            /** Format: date-time */
+            lastSuccessAt?: string | null;
+            /** Format: date-time */
+            lastErrorAt?: string | null;
+            lastError?: string | null;
+        };
+        CarrierOverviewDto: {
+            /** @enum {string} */
+            carrier: "CANADA_POST" | "NATIONEX" | "CANPAR" | "PUROLATOR" | "OTHER";
+            /** @description Clés d’accès configurées (adapter opérationnel) */
+            configured: boolean;
+            /** @description Colis actifs suivis (ni livrés ni retournés) */
+            active: number;
+            /** @description Colis actifs par statut */
+            byStatus: Record<string, never>;
+            /** @description Colis actifs sans mise à jour depuis N jours */
+            stale: number;
+            metrics?: components["schemas"]["CarrierMetricsDto"] | null;
+        };
+        StaleShipmentDto: {
+            /** Format: uuid */
+            shipmentId: string;
+            /** Format: uuid */
+            orderId: string;
+            orderNumber: string;
+            /** @enum {string|null} */
+            carrier?: "CANADA_POST" | "NATIONEX" | "CANPAR" | "PUROLATOR" | "OTHER" | null;
+            trackingNumber?: string | null;
+            /** @enum {string} */
+            status: "CREATED" | "PICKED_UP" | "IN_TRANSIT" | "OUT_FOR_DELIVERY" | "DELIVERED" | "EXCEPTION" | "RETURNED";
+            /**
+             * Format: date-time
+             * @description Dernier mouvement connu
+             */
+            lastMovementAt: string;
+            daysWithoutUpdate: number;
+            /** Format: date-time */
+            nextPollAt?: string | null;
+            /** @description Échecs de repérage consécutifs */
+            pollFailures: number;
+        };
+        TrackingOverviewDto: {
+            staleDays: number;
+            carriers: components["schemas"]["CarrierOverviewDto"][];
+            /** @description Colis bloqués, les plus anciens d’abord */
+            staleShipments: components["schemas"]["StaleShipmentDto"][];
+        };
+        AdminBrandRefDto: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+        };
+        AdminCategoryRefDto: {
+            /** Format: uuid */
+            id: string;
+            name?: string | null;
+        };
+        AdminProductImageDto: {
+            /** Format: uuid */
+            id: string;
+            /** @description Clé S3 (relative) ou URL */
+            url: string;
+            altFr?: string | null;
+            altEn?: string | null;
+            width?: number | null;
+            height?: number | null;
+            position: number;
+            /** Format: uuid */
+            variantId?: string | null;
+        };
+        AdminProductListItemDto: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "DRAFT" | "ACTIVE" | "ARCHIVED";
+            isFeatured: boolean;
+            brand: components["schemas"]["AdminBrandRefDto"];
+            category?: components["schemas"]["AdminCategoryRefDto"] | null;
+            /** @description Locales traduites (badge « traduction manquante » côté interface) */
+            translatedLocales: string[];
+            /** @description Nom affiché (première traduction disponible) */
+            name: string;
+            image?: components["schemas"]["AdminProductImageDto"] | null;
+            variantCount: number;
+            priceFromCents?: number | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        AdminProductListDto: {
+            items: components["schemas"]["AdminProductListItemDto"][];
+            hasMore: boolean;
+            nextCursor?: string | null;
+        };
+        AdminProductTranslationDto: {
+            /** @enum {string} */
+            locale: "fr" | "en";
+            name: string;
+            slug: string;
+            shortDescription?: string | null;
+            description?: string | null;
+            metaTitle?: string | null;
+            metaDescription?: string | null;
+        };
+        AdminInventorySummaryDto: {
+            quantityOnHand: number;
+            quantityReserved: number;
+            lowStockThreshold?: number | null;
+        };
+        AdminVariantDto: {
+            /** Format: uuid */
+            id: string;
+            sku: string;
+            barcode?: string | null;
+            nominalLabel: string;
+            nominalWidthIn: number;
+            nominalHeightIn: number;
+            nominalDepthIn: number;
+            actualWidthIn: number;
+            actualHeightIn: number;
+            actualDepthIn: number;
+            merv?: number | null;
+            packSize: number;
+            priceCents: number;
+            compareAtPriceCents?: number | null;
+            costCents?: number | null;
+            /** @enum {string} */
+            currency: "CAD" | "USD";
+            weightGrams?: number | null;
+            isActive: boolean;
+            position: number;
+            inventory?: components["schemas"]["AdminInventorySummaryDto"] | null;
+        };
+        AdminProductDetailDto: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "DRAFT" | "ACTIVE" | "ARCHIVED";
+            isFeatured: boolean;
+            brand: components["schemas"]["AdminBrandRefDto"];
+            category?: components["schemas"]["AdminCategoryRefDto"] | null;
+            translations: components["schemas"]["AdminProductTranslationDto"][];
+            variants: components["schemas"]["AdminVariantDto"][];
+            images: components["schemas"]["AdminProductImageDto"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateProductDto: {
+            /** Format: uuid */
+            brandId: string;
+            /** Format: uuid */
+            categoryId?: string;
+            /** @default false */
+            isFeatured: boolean;
+        };
+        UpdateProductDto: {
+            /** Format: uuid */
+            brandId?: string;
+            /** Format: uuid */
+            categoryId?: string | null;
+            isFeatured?: boolean;
+        };
+        UpsertProductTranslationDto: {
+            name: string;
+            /**
+             * @description minuscules, chiffres, tirets simples
+             * @example filtre-16x25x1
+             */
+            slug: string;
+            shortDescription?: string;
+            description?: string;
+            metaTitle?: string;
+            metaDescription?: string;
+        };
+        CreateVariantDto: {
+            sku: string;
+            barcode?: string;
+            /** @example 16x25x1 */
+            nominalLabel: string;
+            nominalWidthIn: number;
+            nominalHeightIn: number;
+            nominalDepthIn: number;
+            actualWidthIn: number;
+            actualHeightIn: number;
+            actualDepthIn: number;
+            merv?: number | null;
+            /** @default 1 */
+            packSize: number;
+            /** @description Prix en CENTS */
+            priceCents: number;
+            /** @description Prix barré en CENTS */
+            compareAtPriceCents?: number;
+            /** @description Coût d’achat en CENTS */
+            costCents?: number;
+            /**
+             * @default CAD
+             * @enum {string}
+             */
+            currency: "CAD" | "USD";
+            weightGrams?: number;
+        };
+        UpdateVariantDto: {
+            sku?: string;
+            barcode?: string;
+            nominalLabel?: string;
+            nominalWidthIn?: number;
+            nominalHeightIn?: number;
+            nominalDepthIn?: number;
+            actualWidthIn?: number;
+            actualHeightIn?: number;
+            actualDepthIn?: number;
+            merv?: number | null;
+            packSize?: number;
+            /** @description Prix en CENTS */
+            priceCents?: number;
+            compareAtPriceCents?: number | null;
+            costCents?: number | null;
+            /** @enum {string} */
+            currency?: "CAD" | "USD";
+            weightGrams?: number | null;
+            isActive?: boolean;
+        };
+        PresignImageUploadDto: {
+            /** @enum {string} */
+            contentType: "image/jpeg" | "image/png" | "image/webp";
+        };
+        PresignImageUploadResponseDto: {
+            key: string;
+            url: string;
+            /** @description Champs multipart à joindre avant le fichier */
+            fields: Record<string, never>;
+        };
+        RegisterImageDto: {
+            /** @description Clé S3 retournée par l’URL présignée */
+            key: string;
+            altFr?: string;
+            altEn?: string;
+            /**
+             * Format: uuid
+             * @description Image propre à une variante précise
+             */
+            variantId?: string;
+        };
+        UpdateImageDto: {
+            altFr?: string;
+            altEn?: string;
+            /** Format: uuid */
+            variantId?: string | null;
+        };
+        ReorderImagesDto: {
+            /** @description Ensemble complet des images, dans le nouvel ordre */
+            imageIds: string[];
+        };
+        AdminCategoryTranslationDto: {
+            /** @enum {string} */
+            locale: "fr" | "en";
+            name: string;
+            slug: string;
+            description?: string | null;
+        };
+        AdminCategoryNodeDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            parentId?: string | null;
+            sortOrder: number;
+            isActive: boolean;
+            /** @description Produits associés (directement, hors sous-arbre) */
+            productCount: number;
+            translations: components["schemas"]["AdminCategoryTranslationDto"][];
+            children: components["schemas"]["AdminCategoryNodeDto"][];
+        };
+        AdminCategoryTreeDto: {
+            categories: components["schemas"]["AdminCategoryNodeDto"][];
+        };
+        CategoryTranslationInputDto: {
+            name: string;
+            slug: string;
+            description?: string;
+        };
+        CategoryTranslationsInputDto: {
+            fr?: components["schemas"]["CategoryTranslationInputDto"];
+            en?: components["schemas"]["CategoryTranslationInputDto"];
+        };
+        CreateCategoryDto: {
+            /** Format: uuid */
+            parentId?: string;
+            /** @default 0 */
+            sortOrder: number;
+            translations: components["schemas"]["CategoryTranslationsInputDto"];
+        };
+        UpdateCategoryDto: {
+            /** @default 0 */
+            sortOrder: number;
+            isActive?: boolean;
+            translations?: components["schemas"]["CategoryTranslationsInputDto"];
+        };
+        MoveCategoryDto: {
+            /**
+             * Format: uuid
+             * @description null = racine
+             */
+            parentId?: string | null;
+        };
+        AdminBrandDto: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            logoUrl?: string | null;
+            isActive: boolean;
+            productCount: number;
+        };
+        CreateBrandDto: {
+            slug: string;
+            name: string;
+            logoUrl?: string;
+        };
+        UpdateBrandDto: {
+            slug?: string;
+            name?: string;
+            logoUrl?: string | null;
+            isActive?: boolean;
+        };
+        AdminInventoryItemDto: {
+            /** Format: uuid */
+            variantId: string;
+            sku: string;
+            /** Format: uuid */
+            productId: string;
+            productName: string;
+            nominalLabel: string;
+            quantityOnHand: number;
+            quantityReserved: number;
+            /** @description En main − réservée */
+            availableQuantity: number;
+            lowStockThreshold?: number | null;
+            isLowStock: boolean;
+        };
+        AdminInventoryPageDto: {
+            items: components["schemas"]["AdminInventoryItemDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+        };
+        AdminInventoryMovementDto: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            type: "RECEIPT" | "SALE" | "RETURN" | "ADJUSTMENT";
+            quantity: number;
+            reason?: string | null;
+            /** Format: uuid */
+            orderId?: string | null;
+            /** Format: uuid */
+            createdByUserId?: string | null;
+            createdByEmail?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AdminInventoryMovementPageDto: {
+            items: components["schemas"]["AdminInventoryMovementDto"][];
+            nextCursor?: string | null;
+        };
+        SetThresholdDto: {
+            /** @description null = aucune alerte */
+            lowStockThreshold: number | null;
+        };
+        AdjustInventoryDto: {
+            /** @enum {string} */
+            type: "RECEIPT" | "RETURN" | "ADJUSTMENT";
+            /** @description Delta SIGNÉ (positif = entrée, négatif = sortie/bris/correction à la baisse) */
+            quantity: number;
+            /** @description Motif — OBLIGATOIRE (réception, correction, bris…) */
+            reason: string;
         };
     };
     responses: never;
@@ -3139,6 +4176,95 @@ export interface operations {
             };
         };
     };
+    listMyShipments: {
+        parameters: {
+            query?: {
+                /** @description Nombre max de colis (défaut 20) */
+                limit?: number;
+                /** @description Curseur : id du dernier colis de la page précédente */
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyShipmentsPageDto"];
+                };
+            };
+        };
+    };
+    createAiIdentification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAiIdentificationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateAiIdentificationResponseDto"];
+                };
+            };
+        };
+    };
+    submitAiIdentification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiIdentificationDto"];
+                };
+            };
+        };
+    };
+    getAiIdentification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiIdentificationDto"];
+                };
+            };
+        };
+    };
     adminPing: {
         parameters: {
             query?: never;
@@ -3531,6 +4657,709 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ShipstationSyncDto"];
+                };
+            };
+        };
+    };
+    adminTrackingOverview: {
+        parameters: {
+            query?: {
+                /** @description Un colis actif sans mise à jour depuis N jours est « bloqué » (défaut 5) */
+                staleDays?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackingOverviewDto"];
+                };
+            };
+        };
+    };
+    adminListProducts: {
+        parameters: {
+            query?: {
+                /** @description Recherche libre (nom, SKU) */
+                q?: string;
+                /** @description Dimension nominale (n’importe quelle graphie) */
+                dimension?: string;
+                /** @description Cote MERV exacte */
+                merv?: number;
+                brandId?: string;
+                categoryId?: string;
+                status?: "DRAFT" | "ACTIVE" | "ARCHIVED";
+                /** @description Curseur : id du dernier produit reçu */
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductListDto"];
+                };
+            };
+        };
+    };
+    adminCreateProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProductDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminGetProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminUpdateProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProductDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminDuplicateProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminPublishProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminUnpublishProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminArchiveProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminRestoreProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminUpsertProductTranslation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                locale: "fr" | "en";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpsertProductTranslationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDetailDto"];
+                };
+            };
+        };
+    };
+    adminCreateVariant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateVariantDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminVariantDto"];
+                };
+            };
+        };
+    };
+    adminDeleteVariant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    adminUpdateVariant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateVariantDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminVariantDto"];
+                };
+            };
+        };
+    };
+    adminPresignProductImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PresignImageUploadDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PresignImageUploadResponseDto"];
+                };
+            };
+        };
+    };
+    adminRegisterProductImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterImageDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductImageDto"];
+                };
+            };
+        };
+    };
+    adminDeleteProductImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+                imageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    adminUpdateProductImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+                imageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateImageDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductImageDto"];
+                };
+            };
+        };
+    };
+    adminReorderProductImages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderImagesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductImageDto"][];
+                };
+            };
+        };
+    };
+    adminCategoryTree: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCategoryTreeDto"];
+                };
+            };
+        };
+    };
+    adminCreateCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCategoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCategoryNodeDto"];
+                };
+            };
+        };
+    };
+    adminUpdateCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCategoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCategoryNodeDto"];
+                };
+            };
+        };
+    };
+    adminMoveCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveCategoryDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    adminListBrands: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBrandDto"][];
+                };
+            };
+        };
+    };
+    adminCreateBrand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBrandDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBrandDto"];
+                };
+            };
+        };
+    };
+    adminUpdateBrand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBrandDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBrandDto"];
+                };
+            };
+        };
+    };
+    adminListInventory: {
+        parameters: {
+            query?: {
+                /** @description Recherche par SKU ou nom de produit */
+                q?: string;
+                /** @description Ne garder que les variantes sous leur seuil d’alerte */
+                lowStockOnly?: boolean;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminInventoryPageDto"];
+                };
+            };
+        };
+    };
+    adminInventoryMovements: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminInventoryMovementPageDto"];
+                };
+            };
+        };
+    };
+    adminSetInventoryThreshold: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetThresholdDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminInventoryItemDto"];
+                };
+            };
+        };
+    };
+    adminAdjustInventory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdjustInventoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminInventoryItemDto"];
                 };
             };
         };

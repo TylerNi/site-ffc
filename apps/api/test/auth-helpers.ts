@@ -9,6 +9,8 @@ import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/bootstrap-app';
 import { PrismaService } from '../src/database';
 import { MailService, type OutboxEntry } from '../src/modules/mail/mail.service';
+import { AI_PHOTO_STORAGE } from '../src/modules/ai/ai-photo-storage';
+import { VISION_PROVIDER } from '../src/modules/ai/ai-vision/vision-provider';
 import { RevalidationClient } from '../src/modules/catalog/revalidation.client';
 import { StripeService } from '../src/modules/orders/stripe/stripe.service';
 import { ShipstationClient } from '../src/modules/shipping/shipstation/shipstation.client';
@@ -50,6 +52,10 @@ export interface CreateTestAppOptions {
   trackingHttp?: unknown;
   /** Substitut de RevalidationClient (FakeRevalidationClient, tâche 10). */
   revalidation?: unknown;
+  /** Substitut du fournisseur de vision (LogVisionProvider piloté, tâche 17). */
+  visionProvider?: unknown;
+  /** Substitut du stockage des photos IA (mémoire hermétique, tâche 17). */
+  aiPhotoStorage?: unknown;
 }
 
 /** Secret partagé du webhook ShipStation en test (tâche 13). */
@@ -79,6 +85,12 @@ export async function createTestApp(options: CreateTestAppOptions = {}): Promise
   }
   if (options.revalidation !== undefined) {
     builder = builder.overrideProvider(RevalidationClient).useValue(options.revalidation);
+  }
+  if (options.visionProvider !== undefined) {
+    builder = builder.overrideProvider(VISION_PROVIDER).useValue(options.visionProvider);
+  }
+  if (options.aiPhotoStorage !== undefined) {
+    builder = builder.overrideProvider(AI_PHOTO_STORAGE).useValue(options.aiPhotoStorage);
   }
   const moduleRef = await builder.compile();
 

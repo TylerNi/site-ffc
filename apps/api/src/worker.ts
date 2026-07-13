@@ -4,6 +4,9 @@ import { Queue, Worker } from 'bullmq';
 import { AppModule } from './app.module';
 import { redisConnectionFromUrl } from './config/bullmq';
 import { type Env } from './config/env';
+import { AiProcessorService } from './modules/ai/ai-processor.service';
+import { AiPurgeService } from './modules/ai/ai-purge.service';
+import { AI_JOBS, AI_PURGE_INTERVAL_MS, AI_VISION_QUEUE } from './modules/ai/ai-queue.service';
 import { MAIL_QUEUE, type MailJob } from './modules/mail/mail-queue.service';
 import { MailService } from './modules/mail/mail.service';
 import { INVOICES_QUEUE } from './modules/orders/invoices/invoice-queue.service';
@@ -41,7 +44,10 @@ import { TrackingPollerService } from './modules/shipping/tracking/tracking-poll
  *     polling de repli des expéditions (webhook perdu) ;
  *   - tracking (tâche 14) : scan répétable du polling de repérage — la
  *     cadence PAR COLIS (6 h / 1 h / arrêt) vit dans shipments.next_poll_at,
- *     l'isolation par transporteur dans le poller lui-même.
+ *     l'isolation par transporteur dans le poller lui-même ;
+ *   - ai-vision (tâche 17) : analyses d'identification par photo (transition
+ *     PENDING → PROCESSING atomique — jamais de double appel fournisseur)
+ *     plus le job répétable de purge quotidienne à 30 jours (Loi 25).
  * (Rappels de réachat : tâche 20.)
  */
 async function bootstrap(): Promise<void> {
@@ -155,6 +161,39 @@ async function bootstrap(): Promise<void> {
       );
     });
 
+    // Pipeline de vision IA (tâche 17). Concurrence 2 : les analyses sont
+    // indépendantes ; les limites de débit vivent chez le fournisseur (SDK).
+    const aiProcessor = app.get(AiProcessorService);
+    const aiPurge = app.get(AiPurgeService);
+    const aiWorker = new Worker<{ identificationId?: string }>(
+      AI_VISION_QUEUE,
+      async (job) => {
+        switch (job.name) {
+          case AI_JOBS.analyze: {
+            // BullMQ 5 : attemptsMade est 0-based PENDANT le traitement
+            // (retentative si attemptsMade + 1 < attempts) — au dernier
+            // essai, le processeur transforme l'erreur transitoire en FAILED.
+            const attempts = job.opts.attempts ?? 1;
+            const finalAttempt = job.attemptsMade + 1 >= attempts;
+            await aiProcessor.process(job.data.identificationId!, { finalAttempt });
+            return;
+          }
+          case AI_JOBS.purge:
+            await aiPurge.purgeDue();
+            return;
+          default:
+            console.warn(`[workers] Travail IA inconnu : ${job.name}`);
+        }
+      },
+      { connection, concurrency: 2 },
+    );
+    aiWorker.on('failed', (job, error) => {
+      console.error(
+        `[workers] IA ${job?.name ?? '?'} (${job?.data?.identificationId ?? '—'}) en échec (tentative ${job?.attemptsMade ?? '?'})`,
+        error.message,
+      );
+    });
+
     // Travaux répétables : ré-enregistrés à chaque démarrage (idempotent).
     const shipstationQueue = new Queue(SHIPSTATION_QUEUE, { connection });
     await shipstationQueue.upsertJobScheduler(
@@ -177,9 +216,25 @@ async function bootstrap(): Promise<void> {
     );
     await trackingQueue.close();
 
-    workers.push(webhookWorker, invoiceWorker, mailWorker, shipstationWorker, trackingWorker);
+    // Purge quotidienne des photos et extractions IA (Loi 25, tâche 17).
+    const aiQueue = new Queue(AI_VISION_QUEUE, { connection });
+    await aiQueue.upsertJobScheduler(
+      'ai-purge',
+      { every: AI_PURGE_INTERVAL_MS },
+      { name: AI_JOBS.purge, opts: { attempts: 1, removeOnComplete: { count: 50 } } },
+    );
+    await aiQueue.close();
+
+    workers.push(
+      webhookWorker,
+      invoiceWorker,
+      mailWorker,
+      shipstationWorker,
+      trackingWorker,
+      aiWorker,
+    );
     console.log(
-      `[workers] Files consommées (Redis) : ${STRIPE_WEBHOOKS_QUEUE}, ${INVOICES_QUEUE}, ${MAIL_QUEUE}, ${SHIPSTATION_QUEUE}, ${TRACKING_QUEUE}.`,
+      `[workers] Files consommées (Redis) : ${STRIPE_WEBHOOKS_QUEUE}, ${INVOICES_QUEUE}, ${MAIL_QUEUE}, ${SHIPSTATION_QUEUE}, ${TRACKING_QUEUE}, ${AI_VISION_QUEUE}.`,
     );
   } else {
     console.warn(

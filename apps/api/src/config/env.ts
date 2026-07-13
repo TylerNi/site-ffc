@@ -290,6 +290,42 @@ export const envSchema = z
       .default('inventaire@filtrationmontreal.com')
       .describe('Adresse courriel de l’équipe notifiée quand un seuil de stock est franchi'),
 
+    /* --------------------- IA : pipeline de vision (tâche 17) ----------- */
+    // Driver du fournisseur de vision. `log` = fixture déterministe (dev/test,
+    // aucun réseau). En production, `log` est REFUSÉ (superRefine) : des faux
+    // résultats en prod seraient pires qu'une panne — sans clé API, les
+    // endpoints répondent 503 proprement (pattern Stripe, tâche 11).
+    AI_VISION_DRIVER: z
+      .enum(['log', 'anthropic', 'openai'])
+      .default('log')
+      .describe('Fournisseur de vision : log (fixture dev/test) | anthropic | openai.'),
+    ANTHROPIC_API_KEY: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Clé API Anthropic (Claude). Absente : IA en 503.'),
+    ),
+    ANTHROPIC_VISION_MODEL: z
+      .string()
+      .default('claude-opus-4-8')
+      .describe('Modèle Claude utilisé pour la vision (banc d’essai : ai:bench).'),
+    OPENAI_API_KEY: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z.string().optional().describe('Clé API OpenAI (GPT). Absente : IA en 503.'),
+    ),
+    OPENAI_VISION_MODEL: z
+      .string()
+      .default('gpt-5.1')
+      .describe('Modèle GPT utilisé pour la vision (banc d’essai : ai:bench).'),
+    // Bucket S3 PRIVÉ des photos client (cycle de vie 30 jours côté S3 en
+    // filet — la purge applicative reste la source de vérité, Loi 25).
+    // Absent (dev/test) : stockage mémoire. OBLIGATOIRE en production.
+    S3_AI_PHOTOS_BUCKET: z.preprocess(
+      (value) => (value === '' ? undefined : value),
+      z
+        .string()
+        .optional()
+        .describe('Bucket S3 privé des photos IA (ai-photos). Absent : mémoire dev/test.'),
+    ),
+
     /* ----------------------- Push Expo (tâche 14) ----------------------- */
     PUSH_DRIVER: z
       .enum(['log', 'expo'])
@@ -382,6 +418,22 @@ export const envSchema = z
         code: 'custom',
         path: ['REVALIDATE_SECRET'],
         message: 'Le secret de revalidation de développement est interdit en production',
+      });
+    }
+    if (env.AI_VISION_DRIVER === 'log') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['AI_VISION_DRIVER'],
+        message:
+          'AI_VISION_DRIVER doit être « anthropic » ou « openai » en production (le driver de fixtures fabriquerait de faux résultats)',
+      });
+    }
+    if (!env.S3_AI_PHOTOS_BUCKET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['S3_AI_PHOTOS_BUCKET'],
+        message:
+          'S3_AI_PHOTOS_BUCKET est obligatoire en production (photos client — jamais en mémoire)',
       });
     }
   });
