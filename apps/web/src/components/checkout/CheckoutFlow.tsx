@@ -568,7 +568,7 @@ export function CheckoutFlow({
               locale,
               appearance: {
                 variables: {
-                  colorPrimary: '#0e5e96',
+                  colorPrimary: '#185d34',
                   borderRadius: '6px',
                   fontFamily: 'inherit',
                 },

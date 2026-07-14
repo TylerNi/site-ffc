@@ -79,9 +79,19 @@ et un 404 sur `/sitemap.xml` — rien ne s'indexe hors des domaines officiels.
   peut pas échouer pour une raison réseau** (les pages se matérialisent à la
   demande ensuite).
 
+## Thème / identité visuelle
+
+Palette, typographie (Poppins) et composants (boutons, en-tête, cartes,
+footer) suivent l'identité relevée dans **`docs/marque.md`** (tâche 28) —
+tokens centralisés dans `src/app/globals.css`. Favicon : icône unique
+(feuille d'érable stylisée, verte) servie sur les deux domaines — voir la
+section « Favicons » de `docs/marque.md` pour la correction du relevé
+initial (les deux domaines partagent en réalité le même favicon en prod).
+
 ## Core Web Vitals
 
-- Police Inter via `next/font` (auto-hébergée, `display: swap`).
+- Police Poppins via `next/font` (auto-hébergée, `display: swap`, poids
+  400/500/600/700).
 - Composants serveur par défaut; le JS client se limite à la recherche
   (autocomplétion `/search/suggest`, formulaire GET fonctionnel sans JS),
   à la bascule de langue et à `useReportWebVitals` (console en dev, GA4 si

@@ -8,23 +8,6 @@ import { SearchBox } from './SearchBox';
 
 const CLIENT_API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
-/** Pictogramme filtre à plis (logo). */
-function LogoMark() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-      <rect x="1" y="1" width="24" height="24" rx="6" fill="var(--brand)" />
-      <path
-        d="M5 8 l4 10 l4 -10 l4 10 l4 -10"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export async function Header({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: 'web' });
   const target = otherLocale(locale);
@@ -32,8 +15,8 @@ export async function Header({ locale }: { locale: Locale }) {
   return (
     <header className="site-header">
       <div className="container site-header-inner">
+        {/* Logo = texte seul (Poppins gras, majuscules) — aucune image. */}
         <Link href="/" className="logo">
-          <LogoMark />
           {t('meta.siteName')}
         </Link>
 
@@ -56,19 +39,27 @@ export async function Header({ locale }: { locale: Locale }) {
           }}
         />
 
-        <nav className="site-nav" aria-label={t('a11y.mainNav')}>
-          <Link href="/sizes">{t('nav.sizes')}</Link>
+        <div className="header-icons">
           <Link href="/account/orders">{t('nav.account')}</Link>
+          <Link href="/cart" className="cart-link">
+            <CartBadge label={t('nav.cart')} />
+          </Link>
+        </div>
+      </div>
+
+      {/* Barre secondaire (fond pâle) : navigation et bascule de langue. */}
+      <div className="site-subnav">
+        <div className="container site-subnav-inner">
+          <nav aria-label={t('a11y.mainNav')}>
+            <Link href="/sizes">{t('nav.sizes')}</Link>
+          </nav>
           <LocaleSwitcher
             targetLocale={target}
             fallbackHref={localizedPath(target, '/')}
             label={t('header.languageSwitch')}
             ariaLabel={t('header.languageSwitchLabel')}
           />
-          <Link href="/cart" className="cart-link">
-            <CartBadge label={t('nav.cart')} />
-          </Link>
-        </nav>
+        </div>
       </div>
     </header>
   );

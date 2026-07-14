@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { type Locale } from '@ffc/i18n';
 import { SearchBox } from '@/components/SearchBox';
 import { ProductGrid } from '@/components/ProductCard';
 import { CatalogUnavailable } from '@/components/listing';
 import { Link } from '@/i18n/navigation';
+import heroImage from '@/assets/hero-accueil.jpg';
 import { getCategories, getSizeIndex, listProducts } from '@/lib/api';
 import { pageMetadata } from '@/lib/seo';
 import { localizedPath } from '@/lib/site';
@@ -54,27 +56,38 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
     <main className="main" style={{ paddingTop: 0 }}>
       <section className="hero">
         <div className="container hero-inner">
-          <h1>{t('home.heroTitle')}</h1>
-          <p>{t('home.heroSubtitle')}</p>
-          <SearchBox
-            locale={locale}
-            searchPath={localizedPath(locale, '/search')}
-            sizesBasePath={localizedPath(locale, '/sizes')}
-            productsBasePath={localizedPath(locale, {
-              pathname: '/products/[slug]',
-              params: { slug: '_' },
-            }).replace(/\/_$/, '')}
-            apiUrl={CLIENT_API_URL}
-            labels={{
-              label: t('header.searchLabel'),
-              placeholder: t('header.searchPlaceholder'),
-              submit: t('header.searchSubmit'),
-              sizes: t('header.suggestSizes'),
-              products: t('header.suggestProducts'),
-              suggestions: t('a11y.searchSuggestions'),
-            }}
-          />
-          <p className="hero-hint">{t('home.heroHint')}</p>
+          <div className="hero-copy">
+            <h1>{t('home.heroTitle')}</h1>
+            <p>{t('home.heroSubtitle')}</p>
+            <SearchBox
+              locale={locale}
+              searchPath={localizedPath(locale, '/search')}
+              sizesBasePath={localizedPath(locale, '/sizes')}
+              productsBasePath={localizedPath(locale, {
+                pathname: '/products/[slug]',
+                params: { slug: '_' },
+              }).replace(/\/_$/, '')}
+              apiUrl={CLIENT_API_URL}
+              labels={{
+                label: t('header.searchLabel'),
+                placeholder: t('header.searchPlaceholder'),
+                submit: t('header.searchSubmit'),
+                sizes: t('header.suggestSizes'),
+                products: t('header.suggestProducts'),
+                suggestions: t('a11y.searchSuggestions'),
+              }}
+            />
+            <p className="hero-hint">{t('home.heroHint')}</p>
+          </div>
+          <div className="hero-media">
+            <Image
+              src={heroImage}
+              alt=""
+              priority
+              placeholder="blur"
+              sizes="(min-width: 56rem) 18rem, 60vw"
+            />
+          </div>
         </div>
       </section>
 

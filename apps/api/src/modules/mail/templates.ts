@@ -87,7 +87,7 @@ export function mailLayout(locale: Locale, heading: string, bodyHtml: string): s
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:24px 0;">
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e6e8eb;">
-        <tr><td style="background:#0f4c81;padding:20px 28px;">
+        <tr><td bgcolor="#185D34" style="background-color:#185D34;background-image:linear-gradient(to right,#185D34,#28A745);padding:20px 28px;">
           <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:.2px;">${BRAND[locale]}</span>
         </td></tr>
         <tr><td style="padding:28px;">
@@ -108,7 +108,7 @@ export function mailLayout(locale: Locale, heading: string, bodyHtml: string): s
 
 /** Bouton HTML « appel à l'action » en ligne (compatible messageries). */
 function button(url: string | undefined, label: string): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0;"><tr><td style="border-radius:8px;background:#0f4c81;">
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0;"><tr><td bgcolor="#185D34" style="border-radius:8px;background-color:#185D34;">
     <a href="${url ?? '#'}" style="display:inline-block;padding:12px 22px;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;border-radius:8px;">${label}</a>
   </td></tr></table>`;
 }

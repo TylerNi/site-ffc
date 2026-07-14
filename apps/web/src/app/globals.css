@@ -1,17 +1,28 @@
 /* ------------------------------------------------------------------ */
 /* Design tokens — vitrine Filtration Montréal / Furnace Filters Canada */
+/* Identité de marque relevée dans docs/marque.md (tâche 28).          */
 /* ------------------------------------------------------------------ */
 
 :root {
-  --bg: #f6f8fa;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --ink: #14212b;
-  --muted: #5a6b77;
-  --line: #dfe6ec;
+  --ink: #2f2f2b;
+  --ink-strong: #191919;
+  --muted: #6b6b66;
+  --line: #d7d7d7;
 
-  --brand: #0e5e96;
-  --brand-dark: #0a4a77;
-  --brand-soft: #e8f1f8;
+  /* Vert d'action (CTA de grande taille/gras — voir règle d'accessibilité
+     plus bas) et vert foncé (texte, liens, boutons standards — le seul
+     couple qui passe l'AA sur fond blanc à toute taille). */
+  --brand: #26a943;
+  --brand-dark: #185d34;
+  --brand-accent: #28a745;
+  --brand-soft: #ebebeb;
+
+  --footer-bg: #1f1f1f;
+  --footer-text: #b2b2b2;
+
+  --star: #ffa41c;
 
   --ok: #177245;
   --ok-soft: #e6f4ec;
@@ -54,7 +65,9 @@ body {
 }
 
 a {
-  color: var(--brand);
+  /* Texte/lien vert : #26A943 sur blanc n'est qu'à ~3:1 (AA échoue pour du
+     texte standard) — le vert foncé passe ~7.9:1, réservé aux liens ici. */
+  color: var(--brand-dark);
   text-decoration: none;
 }
 
@@ -63,7 +76,7 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--brand-dark);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -74,6 +87,7 @@ h3 {
   line-height: 1.2;
   margin: 0 0 0.5em;
   letter-spacing: -0.015em;
+  color: var(--ink-strong);
 }
 
 h1 {
@@ -147,7 +161,7 @@ svg {
   left: -9999px;
   top: 0;
   background: var(--surface);
-  color: var(--brand);
+  color: var(--brand-dark);
   padding: 0.5rem 1rem;
   z-index: 100;
 }
@@ -155,6 +169,32 @@ svg {
 .skip-link:focus-visible {
   left: 0.5rem;
   top: 0.5rem;
+}
+
+/* ---------------------------- Bandeau d'annonce ----------------------- */
+
+/* Enveloppe stylée en attendant le compte à rebours natif (tâche 22) —
+   hauteur fixe, aucun décalage de mise en page (CLS) à l'hydratation.
+   Dégradé assombri par rapport au gradient de marque mesuré (#185D34 →
+   #28A745) : à cette taille de texte (13px gras, sous le seuil AA "grand
+   texte"), #28A745 ne donne que ~3,1:1 en blanc. #1f7a3c préserve l'effet
+   dégradé vert tout en passant ~5,4:1. */
+.announcement-bar {
+  background: var(--brand-dark);
+  background: linear-gradient(to right, var(--brand-dark), #1f7a3c);
+  color: #fff;
+}
+
+.announcement-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding-block: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.02em;
 }
 
 /* ------------------------------- Header ------------------------------ */
@@ -169,17 +209,17 @@ svg {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem 1.25rem;
-  padding-block: 0.75rem;
+  padding-block: 0.85rem;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  font-weight: 750;
-  font-size: 1.05rem;
-  color: var(--ink);
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ink-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   white-space: nowrap;
 }
 
@@ -187,41 +227,64 @@ svg {
   text-decoration: none;
 }
 
-.logo svg {
-  flex: none;
-}
-
-.site-nav {
+.header-icons {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.1rem;
   margin-left: auto;
   font-size: 0.925rem;
 }
 
-.site-nav a {
+.header-icons a {
   color: var(--ink);
-  font-weight: 550;
+  font-weight: 600;
 }
 
-.site-nav a:hover {
-  color: var(--brand);
+.header-icons a:hover {
+  color: var(--brand-dark);
+  text-decoration: none;
+}
+
+/* Barre secondaire : fond pâle, bascule de langue — sous l'en-tête blanc. */
+.site-subnav {
+  background: var(--brand-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-subnav-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: 2.5rem;
+  font-size: 0.85rem;
+}
+
+.site-subnav a {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.site-subnav a:hover {
+  color: var(--brand-dark);
   text-decoration: none;
 }
 
 .lang-switch {
-  border: 1px solid var(--line);
+  margin-left: auto;
+  border: 0;
   border-radius: 999px;
-  padding: 0.25rem 0.8rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--brand);
+  padding: 0.2rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--brand-dark);
   background: var(--surface);
 }
 
 .lang-switch:hover {
-  background: var(--brand-soft);
-  text-decoration: none;
+  background: var(--surface);
+  text-decoration: underline;
 }
 
 /* ---------------------------- Recherche ------------------------------ */
@@ -251,13 +314,13 @@ svg {
 
 .searchbox input:focus {
   outline: none;
-  border-color: var(--brand);
+  border-color: var(--brand-dark);
   background: var(--surface);
 }
 
 .searchbox button {
   border: 0;
-  background: var(--brand);
+  background: var(--brand-dark);
   color: #fff;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   padding: 0 1rem;
@@ -268,7 +331,7 @@ svg {
 }
 
 .searchbox button:hover {
-  background: var(--brand-dark);
+  filter: brightness(1.15);
 }
 
 .suggest {
@@ -322,19 +385,32 @@ svg {
 /* -------------------------------- Héros ------------------------------ */
 
 .hero {
-  background:
-    radial-gradient(60rem 20rem at 85% -5rem, var(--brand-soft), transparent 60%), var(--surface);
+  background: var(--brand-soft);
   border-bottom: 1px solid var(--line);
 }
 
 .hero-inner {
-  padding-block: 3rem 2.5rem;
-  max-width: 46rem;
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: 2.5rem;
 }
 
-.hero p {
+@media (min-width: 56rem) {
+  .hero-inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+.hero-copy h1 {
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.hero-copy p {
   font-size: 1.05rem;
-  color: var(--muted);
+  color: var(--ink);
   margin-bottom: 1.25rem;
 }
 
@@ -346,6 +422,17 @@ svg {
   margin-top: 0.5rem;
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+.hero-media {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-media img {
+  width: 100%;
+  height: auto;
+  max-width: 18rem;
 }
 
 /* ------------------------------- Pills ------------------------------- */
@@ -375,8 +462,8 @@ svg {
 }
 
 .pill:hover {
-  border-color: var(--brand);
-  color: var(--brand);
+  border-color: var(--brand-dark);
+  color: var(--brand-dark);
   text-decoration: none;
 }
 
@@ -457,7 +544,7 @@ svg {
 
 .card-name {
   font-size: 0.98rem;
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1.35;
   margin: 0;
   display: -webkit-box;
@@ -467,11 +554,11 @@ svg {
 }
 
 .card-name a {
-  color: var(--ink);
+  color: var(--ink-strong);
 }
 
 .card-name a:hover {
-  color: var(--brand);
+  color: var(--brand-dark);
   text-decoration: none;
 }
 
@@ -506,27 +593,34 @@ svg {
 
 /* ------------------------------ Boutons ------------------------------ */
 
+/* Libellés MAJUSCULES/gras par défaut. Le vert vif (--brand) n'est utilisé
+   que pour les CTA en gras à taille "large text" AA (≥ ~18.7px gras, ratio
+   blanc/vert vif ~3:1) : .btn-primary et .cart-checkout-btn ci-dessous. Le
+   bouton standard reste en vert foncé (~7.9:1), toujours conforme quelle
+   que soit sa taille. */
 .btn {
   display: inline-block;
-  background: var(--brand);
+  background: var(--brand-dark);
   color: #fff;
   border: 0;
   border-radius: var(--radius-sm);
   padding: 0.55rem 1.2rem;
   font: inherit;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   cursor: pointer;
 }
 
 .btn:hover {
-  background: var(--brand-dark);
+  filter: brightness(1.15);
   text-decoration: none;
 }
 
 .btn-ghost {
   background: var(--surface);
-  color: var(--brand);
+  color: var(--brand-dark);
   border: 1px solid var(--line);
 }
 
@@ -575,7 +669,7 @@ svg {
 .field input:focus,
 .field select:focus {
   outline: none;
-  border-color: var(--brand);
+  border-color: var(--brand-dark);
   background: var(--surface);
 }
 
@@ -674,7 +768,7 @@ svg {
   color: var(--muted);
   padding: 0.6rem 0.9rem;
   border-bottom: 1px solid var(--line);
-  background: var(--bg);
+  background: var(--brand-soft);
 }
 
 .variant-table td {
@@ -702,7 +796,7 @@ svg {
 
 .info-box {
   background: var(--brand-soft);
-  border: 1px solid #cfe2f0;
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 1rem 1.25rem;
   font-size: 0.925rem;
@@ -711,7 +805,7 @@ svg {
 /* ------------------------------ Étoiles ------------------------------ */
 
 .stars {
-  color: #d98e04;
+  color: var(--star);
   letter-spacing: 0.1em;
   font-size: 0.9rem;
 }
@@ -719,11 +813,18 @@ svg {
 /* ------------------------------- Footer ------------------------------ */
 
 .site-footer {
-  background: var(--surface);
-  border-top: 1px solid var(--line);
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  border-top: 0;
   margin-top: 3rem;
   padding-block: 2.5rem 2rem;
   font-size: 0.9rem;
+}
+
+/* Le focus visible global (--brand-dark, ~2:1 sur #1F1F1F) ne tient pas
+   la barre AA "composant non textuel" (3:1) sur le footer sombre. */
+.site-footer :focus-visible {
+  outline-color: #fff;
 }
 
 .footer-cols {
@@ -737,8 +838,12 @@ svg {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--muted);
+  color: var(--footer-text);
   margin-bottom: 0.6rem;
+}
+
+.footer-cols .muted {
+  color: var(--footer-text);
 }
 
 .footer-cols ul {
@@ -751,13 +856,17 @@ svg {
 }
 
 .footer-cols a {
-  color: var(--ink);
+  color: #fff;
+}
+
+.footer-cols a:hover {
+  color: var(--brand-accent);
 }
 
 .footer-legal {
-  color: var(--muted);
+  color: var(--footer-text);
   font-size: 0.82rem;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   padding-top: 1.25rem;
 }
 
@@ -846,7 +955,7 @@ svg {
   height: 1.15rem;
   padding-inline: 0.25rem;
   border-radius: 999px;
-  background: var(--brand);
+  background: var(--brand-dark);
   color: #fff;
   font-size: 0.68rem;
   font-weight: 700;
@@ -1011,7 +1120,15 @@ svg {
   width: 100%;
   text-align: center;
   margin-top: 0.75rem;
-  padding-block: 0.65rem;
+  padding-block: 0.8rem;
+  /* CTA principal : vert vif + libellé large/gras, seul contexte où le
+     blanc sur --brand atteint le seuil AA "grand texte" (~3:1). */
+  background: var(--brand);
+  font-size: 1.2rem;
+}
+
+.cart-checkout-btn:hover {
+  filter: brightness(0.94);
 }
 
 .cart-continue {
@@ -1082,7 +1199,7 @@ svg {
 
 .checkout-form textarea:focus {
   outline: none;
-  border-color: var(--brand);
+  border-color: var(--brand-dark);
   background: var(--surface);
 }
 
@@ -1126,17 +1243,16 @@ svg {
 
 .btn-primary {
   background: var(--brand);
-  color: #fff;
+  font-size: 1.15rem;
 }
 .btn-primary:hover {
-  background: var(--brand-dark);
+  filter: brightness(0.94);
 }
 .btn-danger {
   background: #b3261e;
-  color: #fff;
 }
 .btn-danger:hover {
-  background: #8f1d17;
+  filter: brightness(1.1);
 }
 .btn:disabled {
   opacity: 0.6;
@@ -1204,7 +1320,7 @@ svg {
 
 .account-signin input:focus {
   outline: none;
-  border-color: var(--brand);
+  border-color: var(--brand-dark);
 }
 
 /* Tableau des commandes — responsive (cartes en mobile). */
