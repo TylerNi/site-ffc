@@ -5,7 +5,7 @@ Plateforme e-commerce maison qui remplace un maximum de services utilisés pour 
 - **furnacefilterscanada.com** — anglais
 - **filtrationmontreal.com** — français
 
-Le but est de réduire les coûts liés à l'infrastructure web, d'ajouter des fonctionnalités pertinentes pour cette entreprise et ses clients, et d'améliorer la qualité de vie des utilisateurs du site (clients et compagnie).
+Le but est de réduire les coûts liés à l'infrastructure web, d'ajouter des fonctionnalités pertinentes pour cette entreprise et ses clients, d'améliorer la qualité de vie des utilisateurs du site (clients et compagnie), et de rehausser la cybersécurité par rapport aux boutiques BigCommerce actuelles — c'est une priorité transversale du projet, pas une étape isolée (authentification durcie, RBAC appliqué côté serveur, secrets jamais en clair, conformité Loi 25, et un durcissement dédié en fin de projet — tâche 26).
 
 ## Architecture du dépôt
 
