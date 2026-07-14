@@ -14,10 +14,13 @@ Monorepo **pnpm workspaces + Turborepo**, TypeScript strict partout.
 ```
 site-ffc/
 ├── apps/
-│   ├── web/          Next.js (App Router) — vitrine publique bilingue
-│   │                 locale par domaine (filtrationmontreal.com → fr,
-│   │                 furnacefilterscanada.com → en), repli par préfixe en dev
-│   ├── admin/        Next.js — back-office (connexion factice pour l'instant)
+│   ├── web/          Next.js (App Router) — vitrine bilingue, panier,
+│   │                 checkout Stripe, compte client (commandes, colis,
+│   │                 identification par photo IA); locale par domaine
+│   │                 (filtrationmontreal.com → fr, furnacefilterscanada.com
+│   │                 → en), repli par préfixe en dev
+│   ├── admin/        Next.js — back-office (RBAC granulaire, MFA
+│   │                 obligatoire, audit); catalogue/inventaire, revue IA
 │   ├── api/          NestJS — API REST /v1, OpenAPI (/docs), env validé par zod
 │   └── mobile/       Expo + expo-router — app iOS/Android
 ├── packages/
@@ -55,7 +58,11 @@ pnpm --filter @ffc/api db:deploy
 pnpm --filter @ffc/api db:seed
 ```
 
-Toutes les valeurs par défaut fonctionnent en local sans modification.
+Toutes les valeurs par défaut fonctionnent en local sans modification. Redis
+(`docker compose up -d redis`) est optionnel en dev : sans `REDIS_URL`, les
+files BullMQ (paiement, ShipStation, suivi de colis, IA) s'exécutent en
+traitement immédiat dans le processus API plutôt qu'en file — il devient
+obligatoire seulement en production.
 
 ## Commandes
 
@@ -124,11 +131,19 @@ justifications et procédures dans **[`infra/README.md`](infra/README.md)**.
 
 ## Base de données
 
-PostgreSQL 16 + Prisma 6 (`apps/api/prisma/`) : 43 tables, enums partagés avec
+PostgreSQL 16 + Prisma 6 (`apps/api/prisma/`) : 45 tables, enums partagés avec
 `@ffc/core`, montants en cents, numérotation de factures sans trou, audit
 append-only, anonymisation Loi 25 outillée. Conventions, décisions et
 diagrammes dans **[`docs/database.md`](docs/database.md)** et
 [`docs/database-erd.md`](docs/database-erd.md).
+
+## Authentification
+
+Argon2id pour les mots de passe, refresh tokens à rotation (jamais stockés en
+clair), connexions sociales Google/Apple, MFA TOTP, mode invité (panier →
+compte sans perte de contenu) et droits Loi 25 (export, suppression). Aucun
+secret ni jeton en clair en base. Détails et justifications dans
+**[`docs/auth.md`](docs/auth.md)**.
 
 ## Catalogue et recherche
 
@@ -139,6 +154,38 @@ tailles et équivalences nominal ↔ réel. Recherche full-text Postgres + trigr
 tolérante aux fautes, avec normalisation des dimensions (« 16x25x1 », « 16 x
 25 x 1 », « 16-25-1 », « 15 3/4 x 24 3/4 »…) et autocomplétion `< 50 ms`.
 Détails et décisions dans **[`docs/catalog.md`](docs/catalog.md)**.
+
+Le catalogue initial vient d'une migration ponctuelle et en lecture seule des
+deux vitrines BigCommerce : `pnpm --filter @ffc/api bigcommerce:export` puis
+`bigcommerce:import`, appariement fr/en par SKU partagé. Mapping et décisions
+dans **[`docs/import-mapping.md`](docs/import-mapping.md)**.
+
+## Administration
+
+Back-office (`apps/admin`) pour l'équipe : RBAC granulaire appliqué côté
+serveur (le client ne fait que masquer la navigation selon les permissions),
+MFA obligatoire, step-up sur les actions sensibles, invitations et journal
+d'audit append-only. CRUD produits/variantes/traductions/images, inventaire
+et alertes de stock bas, avec revalidation ISR immédiate de la vitrine à
+chaque changement. Détails dans **[`docs/admin.md`](docs/admin.md)**.
+
+## Panier et checkout Stripe
+
+Panier compte + invité, checkout Stripe (PaymentIntents + Payment Element),
+taxes canadiennes exactes par province, webhooks idempotents. Le client
+n'est jamais cru : prix, stock, taxes et totaux sont recalculés côté serveur
+à chaque étape depuis la base, et le montant du PaymentIntent sort de cette
+cotation. PCI SAQ A — la carte ne transite que par l'iframe Stripe du
+navigateur. Détails dans **[`docs/checkout.md`](docs/checkout.md)**.
+
+## Commandes, factures et courriels
+
+Cycle de vie des commandes après paiement (machine d'états partagée dans
+`packages/core/src/orders.ts`), espace « Mes commandes » côté client,
+factures PDF bilingues numérotées sans trou (obligations québécoises :
+TPS/TVQ, français par défaut — Loi 96), remboursements total/partiel, et
+courriels transactionnels idempotents via SES. Détails dans
+**[`docs/commandes.md`](docs/commandes.md)**.
 
 ## Expédition (ShipStation)
 
@@ -151,11 +198,43 @@ repli si un appel se perd — créent les `shipments` et font passer la commande
 « expédiée ». Procédure de configuration et correspondance des champs dans
 **[`docs/shipstation.md`](docs/shipstation.md)**.
 
+## Suivi de colis
+
+Une fois l'étiquette créée, un polling adaptatif interroge les API des mêmes
+quatre transporteurs derrière une interface commune (`CarrierTracker`) :
+ajouter un transporteur se limite à écrire un adapter. Statuts normalisés,
+jalons notifiés une seule fois (courriel + push), passage automatique de la
+commande à « livrée » à la livraison de tous les colis. Page cliente
+« Mes colis ». Détails dans **[`docs/tracking.md`](docs/tracking.md)**.
+
+## Identification par photo (IA)
+
+Le client photographie la plaque signalétique de son équipement ou le cadre
+de son filtre actuel; après consentement et vérification de quota, l'API
+ré-encode l'image (métadonnées EXIF/GPS retirées) et l'envoie à un
+fournisseur de vision interchangeable (`VisionProvider` — Anthropic/OpenAI)
+puis fait correspondre le résultat au catalogue (exact → alias → flou
+pg_trgm, ou par dimensions/MERV). Sous le seuil de confiance : file de
+révision admin. Photos purgées après 30 jours. Banc d'essai comparatif :
+`pnpm --filter @ffc/api ai:bench`. Détails dans **[`docs/ia.md`](docs/ia.md)**.
+
 ## État
 
-En construction — fondations du monorepo (tâche 02), infrastructure/CI-CD
-(tâche 03), schéma de base de données (tâche 04), authentification (tâche 05),
-API catalogue/recherche (tâche 06), vitrine (tâche 07), import BigCommerce
-(tâche 08), admin et RBAC (tâche 09), panier/checkout Stripe (tâche 11),
-commandes/factures/courriels (tâche 12) et intégration ShipStation (tâche 13)
-en place.
+En construction. Boutique déjà opérationnelle de bout en bout (achat →
+expédition → suivi) : fondations du monorepo (tâche 02),
+infrastructure/CI-CD (tâche 03), schéma de base de données (tâche 04),
+authentification (tâche 05), API catalogue/recherche (tâche 06), vitrine
+(tâche 07), import BigCommerce (tâche 08 — testé par fixtures, 2 critères
+d'acceptation en attente de jetons API réels), admin et RBAC (tâche 09),
+admin catalogue/inventaire (tâche 10), panier/checkout Stripe (tâche 11),
+commandes/factures/courriels (tâche 12), intégration ShipStation (tâche 13),
+suivi de colis (tâche 14), identification par photo IA (tâche 17) et
+identité visuelle (tâche 28) en place.
+
+Reste à faire : socle et parcours d'achat mobile (tâches 15-16), mon
+équipement et file de révision IA (tâche 18), compagnon mobile (tâche 19),
+rappels de remplacement et réachat (tâche 20), avis clients (tâche 21),
+opérations admin — remboursements, clients, promotions, rapports (tâche 22),
+intégration QuickBooks (tâche 23), migration finale des données (tâche 24),
+redirections et bascule DNS (tâche 25), durcissement sécurité (tâche 26) et
+lancement (tâche 27).
