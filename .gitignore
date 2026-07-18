@@ -21,6 +21,9 @@ node_modules/
 .env
 .env.*
 !.env.example
+# .env.test ne contient AUCUN secret (base ffc_test locale) : versionné pour
+# que les tests n'aient jamais besoin de lire le .env du développeur.
+!.env.test
 
 # Tests
 coverage/

@@ -20,6 +20,12 @@ import { ShippingModule } from './modules/shipping/shipping.module';
       isGlobal: true,
       cache: true,
       validate: validateEnv,
+      // En test, ne JAMAIS lire le .env du développeur : ses vraies clés
+      // (ShipStation, Postes Canada…) se figeraient dans la config validée
+      // au premier import et les tests appelleraient les API réelles.
+      // `.env.test` (sans secrets) fournit la base ; les helpers de test
+      // ajustent le reste via process.env AVANT le bootstrap.
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
     }),
     PrismaModule,
     AuditModule,

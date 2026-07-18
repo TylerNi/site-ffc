@@ -22,6 +22,9 @@ export default defineConfig({
     // lui-même ses transactions parallèles).
     fileParallelism: false,
     globalSetup: './test/global-setup.ts',
+    // Purge les vraies clés API héritées du processus principal AVANT tout
+    // import applicatif (voir test/env-scrub.setup.ts).
+    setupFiles: ['./test/env-scrub.setup.ts'],
     testTimeout: 30_000,
     hookTimeout: 60_000,
   },
