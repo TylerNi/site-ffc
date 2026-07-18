@@ -19,6 +19,8 @@ describe('bigcommerce/report + urls-csv', () => {
     expect(report).toContain('Paires candidates à revue manuelle');
     expect(report).toContain('Produits sans image');
     expect(report).toContain('Variantes sans dimension reconnue');
+    expect(report).toContain('Variantes sans dimension repérable');
+    expect(report).toContain('FF-MODEL-ONLY-EN');
     expect(report).toContain('SKU en double');
     expect(report).toContain('Catégories orphelines (EN)');
     expect(report).toContain('FF-DUPLICATE-1');

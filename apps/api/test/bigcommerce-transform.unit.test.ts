@@ -94,6 +94,14 @@ describe('bigcommerce/transform — buildImportPlan', () => {
     );
   });
 
+  it('signale les variantes sans dimension repérable (produits à modèle) sans les importer', () => {
+    expect(discrepancies.variantsWithoutDimension).toContainEqual(
+      expect.objectContaining({ sku: 'FF-MODEL-ONLY-EN' }),
+    );
+    const h = plan.products.find((p) => p.bigcommerceProductId === 'en:307')!;
+    expect(h.variants.map((v) => v.sku)).not.toContain('FF-MODEL-ONLY-EN');
+  });
+
   it('signale les produits sans image (B et H)', () => {
     const ids = discrepancies.productsWithoutImage.map((p) => p.bigcommerceProductId).sort();
     expect(ids).toEqual(['en:302', 'en:307']);

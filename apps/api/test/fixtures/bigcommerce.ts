@@ -394,6 +394,17 @@ const productH_en: BigCommerceProduct = {
         { option_display_name: 'MERV', label: '8' },
       ],
     },
+    // Produit « à modèle » (ex. filtre d'échangeur d'air) : aucune dimension
+    // repérable — non importable (le schéma exige une taille), signalé au rapport.
+    {
+      id: 4006,
+      product_id: 307,
+      sku: 'FF-MODEL-ONLY-EN',
+      upc: null,
+      price: 39.99,
+      weight: 0.4,
+      option_values: [{ option_display_name: 'MERV', label: '8' }],
+    },
   ],
 };
 

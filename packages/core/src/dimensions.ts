@@ -19,11 +19,15 @@ import { type FilterDimensions, NOMINAL_FILTER_SIZES, type NominalFilterSize } f
 /** Séparateurs de dimensions acceptés : x, ×, *, « by », « par ». */
 const DIMENSION_SEPARATOR = /\s*(?:x|×|\*|by|par)\s*/i;
 
+/** Marques de pouces à effacer avant analyse (« 19 3/4" x 20 1/2" »). */
+const INCH_MARKS = /["″”]|''|’’/g;
+
 /** Jeton de dimension repérable DANS une requête plus large (« filtre 16x25x1 »).
  *  Exige un séparateur de type « x » (pas le tiret, pour ne pas capturer
- *  « merv-11 ») et 2 ou 3 composantes numériques (entières, décimales ou fractions). */
+ *  « merv-11 ») et 2 ou 3 composantes numériques (entières, décimales,
+ *  fractions pures « 7/8 » ou nombres mixtes « 15 3/4 »). */
 const DIMENSION_TOKEN =
-  /\b\d{1,2}(?:[.,]\d+)?(?:\s\d+\/\d+)?\s*(?:x|×|\*|by|par)\s*\d{1,2}(?:[.,]\d+)?(?:\s\d+\/\d+)?(?:\s*(?:x|×|\*|by|par)\s*\d{1,2}(?:[.,]\d+)?(?:\s\d+\/\d+)?)?\b/i;
+  /\b\d{1,2}(?:[.,]\d+)?(?:\s\d+\/\d+|\/\d+)?\s*(?:x|×|\*|by|par)\s*\d{1,2}(?:[.,]\d+)?(?:\s\d+\/\d+|\/\d+)?(?:\s*(?:x|×|\*|by|par)\s*\d{1,2}(?:[.,]\d+)?(?:\s\d+\/\d+|\/\d+)?)?\b/i;
 
 /** Tolérances de correspondance : quasi exacte sur le nominal, plus lâche sur
  *  les dimensions réelles (les fiches produits arrondissent au 1/8 de pouce). */
@@ -88,7 +92,7 @@ function splitComponents(raw: string): string[] {
  */
 export function parseDimensionInput(raw: string): ParsedDimension | null {
   if (typeof raw !== 'string') return null;
-  const parts = splitComponents(raw);
+  const parts = splitComponents(raw.replace(INCH_MARKS, ''));
   if (parts.length < 2 || parts.length > 3) return null;
 
   const numbers = parts.map(parseComponent);
@@ -111,17 +115,20 @@ export function looksLikeDimension(raw: string): boolean {
  */
 export function extractDimension(query: string): { dimension: string; rest: string } | null {
   if (typeof query !== 'string') return null;
-  const match = query.match(DIMENSION_TOKEN);
+  const normalized = query.replace(INCH_MARKS, '');
+  const match = normalized.match(DIMENSION_TOKEN);
   if (match) {
     const dimension = match[0];
-    const rest = (query.slice(0, match.index) + query.slice((match.index ?? 0) + dimension.length))
+    const rest = (
+      normalized.slice(0, match.index) + normalized.slice((match.index ?? 0) + dimension.length)
+    )
       .replace(/\s+/g, ' ')
       .trim();
     return { dimension, rest };
   }
   // Requête entièrement composée d'une dimension au tiret (« 16-25-1 »).
-  if (looksLikeDimension(query)) {
-    return { dimension: query.trim(), rest: '' };
+  if (looksLikeDimension(normalized)) {
+    return { dimension: normalized.trim(), rest: '' };
   }
   return null;
 }

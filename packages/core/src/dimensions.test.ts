@@ -33,6 +33,14 @@ describe('parseDimensionInput — formats d’écriture', () => {
     });
   });
 
+  it('accepte les marques de pouces (« 19 3/4" x 20 1/2" x 4 7/8" »)', () => {
+    expect(parseDimensionInput('19 3/4" x 20 1/2" x 4 7/8"')).toEqual({
+      width: 19.75,
+      height: 20.5,
+      depth: 4.875,
+    });
+  });
+
   it('rejette les saisies non dimensionnelles', () => {
     expect(parseDimensionInput('bonjour')).toBeNull();
     expect(parseDimensionInput('16')).toBeNull();
@@ -57,6 +65,17 @@ describe('extractDimension — requête mixte', () => {
       dimension: '16x25x1',
       rest: 'filtre merv 11',
     });
+  });
+
+  it('capture une profondeur en fraction pure (« 7/8 »)', () => {
+    expect(extractDimension('7 1/2 x 13 1/2 x 7/8 Furnace Filter Merv 8. (12-pack)')).toEqual({
+      dimension: '7 1/2 x 13 1/2 x 7/8',
+      rest: 'Furnace Filter Merv 8. (12-pack)',
+    });
+  });
+
+  it('isole la dimension d’un libellé enrichi (« 12x24x1 (12-Pack) 286$ »)', () => {
+    expect(extractDimension('12x24x1 (12-Pack) 286$')?.dimension).toBe('12x24x1');
   });
 
   it('gère une requête purement dimensionnelle au tiret', () => {

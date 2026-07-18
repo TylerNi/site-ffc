@@ -70,6 +70,11 @@ export function buildDiscrepancyReport(
     ),
     '',
     section(
+      'Variantes sans dimension repérable (produits à modèle — non importées, le schéma exige une taille)',
+      discrepancies.variantsWithoutDimension.map((v) => `SKU ${v.sku} — « ${v.productName} »`),
+    ),
+    '',
+    section(
       'SKU en double (conservés pour un seul produit)',
       discrepancies.duplicateSkus.map(
         (d) =>

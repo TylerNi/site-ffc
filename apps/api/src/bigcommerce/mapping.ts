@@ -41,9 +41,11 @@ export interface DimensionResolution {
 }
 
 /**
- * Résout la taille nominale d'une variante. Retourne `size: null` (avec la
- * chaîne brute conservée) quand la dimension repérée ne correspond à aucune
- * taille du référentiel `@ffc/core` — à ne PAS importer telle quelle.
+ * Résout la taille nominale d'une variante. La valeur repérée peut être un
+ * libellé enrichi (« 12x24x1 (12-Pack) 286$ ») : la dimension en est alors
+ * extraite. Retourne `size: null` (avec la chaîne brute conservée) quand la
+ * dimension ne correspond à aucune taille du référentiel `@ffc/core` — à ne
+ * PAS importer telle quelle.
  */
 export function resolveDimension(
   productName: string,
@@ -57,7 +59,11 @@ export function resolveDimension(
     null;
   if (!raw) return null;
 
-  const parsed = parseDimensionInput(raw);
+  let parsed = parseDimensionInput(raw);
+  if (!parsed) {
+    const embedded = extractDimension(raw);
+    parsed = embedded ? parseDimensionInput(embedded.dimension) : null;
+  }
   if (!parsed || parsed.depth === null) return { raw, size: null };
 
   const canonical = canonicalDimensionLabel(parsed);
@@ -83,7 +89,9 @@ export function resolveMerv(
   return result.success ? result.data : null;
 }
 
-/** Nombre de filtres par unité de vente (« Box of 6 » → 6). Défaut : 1. */
+/** Nombre de filtres par unité de vente (« Box of 6 » → 6). Cherché dans
+ *  l'option/champ dédié, puis dans tous les libellés d'options (« 12x24x1
+ *  (12-Pack) 286$ »), puis dans le nom du produit. Défaut : 1. */
 export function resolvePackSize(
   productName: string,
   sku: string,
@@ -94,11 +102,15 @@ export function resolvePackSize(
     findOptionValue(optionValues, PACK_OPTION_PATTERN) ??
     findCustomField(customFields, PACK_OPTION_PATTERN);
   if (optionRaw) {
-    const direct = Number.parseInt(optionRaw.replace(/\D+/g, ''), 10);
+    const packText = optionRaw.match(PACK_TEXT_PATTERN);
+    const firstNumber =
+      packText?.[1] ?? packText?.[2] ?? packText?.[3] ?? optionRaw.match(/\d{1,3}/)?.[0];
+    const direct = firstNumber ? Number.parseInt(firstNumber, 10) : Number.NaN;
     if (Number.isFinite(direct) && direct > 0) return direct;
   }
 
-  const match = `${productName} ${sku}`.match(PACK_TEXT_PATTERN);
+  const optionLabels = optionValues.map((option) => option.label).join(' ');
+  const match = `${optionLabels} ${productName} ${sku}`.match(PACK_TEXT_PATTERN);
   const group = match?.[1] ?? match?.[2] ?? match?.[3];
   const value = group ? Number.parseInt(group, 10) : 1;
   return Number.isFinite(value) && value > 0 ? value : 1;

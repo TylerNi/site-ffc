@@ -105,6 +105,7 @@ export interface DiscrepancyReportData {
   manualReviewPairs: ManualReviewCandidate[];
   productsWithoutImage: Array<{ bigcommerceProductId: string; name: string }>;
   variantsWithUnrecognizedDimension: Array<{ sku: string; productName: string; raw: string }>;
+  variantsWithoutDimension: Array<{ sku: string; productName: string }>;
   duplicateSkus: Array<{ sku: string; keptForProduct: string; ignoredForProducts: string[] }>;
   orphanCategories: { en: BigCommerceCategory[]; fr: BigCommerceCategory[] };
 }
@@ -266,6 +267,7 @@ function planCategories(catalogExport: CatalogExport): {
 interface VariantBuildResult {
   variants: PlannedVariant[];
   unrecognized: Array<{ sku: string; productName: string; raw: string }>;
+  withoutDimension: Array<{ sku: string; productName: string }>;
 }
 
 function buildVariant(
@@ -281,12 +283,13 @@ function buildVariant(
 ): {
   variant: PlannedVariant | null;
   unrecognized?: { sku: string; productName: string; raw: string };
+  withoutDimension?: { sku: string; productName: string };
 } {
   const resolution = resolveDimension(productName, variant.option_values, customFields);
   if (!resolution || !resolution.size) {
     return resolution
       ? { variant: null, unrecognized: { sku: variant.sku, productName, raw: resolution.raw } }
-      : { variant: null };
+      : { variant: null, withoutDimension: { sku: variant.sku, productName } };
   }
 
   const merv = resolveMerv(productName, variant.option_values, customFields);
@@ -314,6 +317,7 @@ function buildVariant(
 
 function buildVariantsForProduct(product: BigCommerceProduct, store: StoreKey): VariantBuildResult {
   const unrecognized: VariantBuildResult['unrecognized'] = [];
+  const withoutDimension: VariantBuildResult['withoutDimension'] = [];
   const variants: PlannedVariant[] = [];
   const fallbackPriceCents = dollarsToCents(product.price);
   const fallbackCompareAtCents = dollarsToCents(product.retail_price);
@@ -334,9 +338,10 @@ function buildVariantsForProduct(product: BigCommerceProduct, store: StoreKey): 
     );
     if (result.variant) variants.push(result.variant);
     if (result.unrecognized) unrecognized.push(result.unrecognized);
+    if (result.withoutDimension) withoutDimension.push(result.withoutDimension);
   });
 
-  return { variants, unrecognized };
+  return { variants, unrecognized, withoutDimension };
 }
 
 /** Fusionne les variantes en/fr d'un même produit apparié, dédupliquées par SKU. */
@@ -346,6 +351,7 @@ function mergeVariants(en: VariantBuildResult, fr: VariantBuildResult): VariantB
   return {
     variants: [...bySku.values()],
     unrecognized: [...en.unrecognized, ...fr.unrecognized],
+    withoutDimension: [...en.withoutDimension, ...fr.withoutDimension],
   };
 }
 
@@ -388,6 +394,7 @@ export function buildImportPlan(catalogExport: CatalogExport): {
   const products: PlannedProduct[] = [];
   const variantsWithUnrecognizedDimension: DiscrepancyReportData['variantsWithUnrecognizedDimension'] =
     [];
+  const variantsWithoutDimension: DiscrepancyReportData['variantsWithoutDimension'] = [];
   const productsWithoutImage: DiscrepancyReportData['productsWithoutImage'] = [];
 
   function translationOf(product: BigCommerceProduct, locale: 'fr' | 'en'): PlannedTranslation {
@@ -423,6 +430,7 @@ export function buildImportPlan(catalogExport: CatalogExport): {
     },
   ): void {
     variantsWithUnrecognizedDimension.push(...built.variantResult.unrecognized);
+    variantsWithoutDimension.push(...built.variantResult.withoutDimension);
     if (built.images.length === 0) {
       productsWithoutImage.push({ bigcommerceProductId, name: built.translations[0]!.name });
     }
@@ -530,6 +538,7 @@ export function buildImportPlan(catalogExport: CatalogExport): {
       manualReviewPairs: pairing.manualReview,
       productsWithoutImage,
       variantsWithUnrecognizedDimension,
+      variantsWithoutDimension,
       duplicateSkus,
       orphanCategories,
     },

@@ -22,8 +22,8 @@
 import {
   ADMIN_PERMISSIONS,
   ADMIN_ROLES,
+  findNominalSize,
   MERV_RATINGS,
-  NOMINAL_FILTER_SIZES,
   type NominalFilterSize,
   PERMISSION_WILDCARD,
   PROVINCES,
@@ -115,10 +115,35 @@ function unitWeightFor(depth: number): number {
   return UNIT_WEIGHT_GRAMS[depth] ?? 500;
 }
 
+/** Tailles de démo FIGÉES : le seed reste identique quand le référentiel
+ *  `@ffc/core` s'enrichit (les tests d'intégration comptent sur ces données). */
+function sizesFromLabels(labels: readonly string[]): NominalFilterSize[] {
+  return labels.map((label) => {
+    const size = findNominalSize(label);
+    if (!size) throw new Error(`Taille seed absente du référentiel @ffc/core : ${label}`);
+    return size;
+  });
+}
+
+const SEED_ONE_INCH = [
+  '14x20x1',
+  '14x25x1',
+  '16x20x1',
+  '16x24x1',
+  '16x25x1',
+  '18x24x1',
+  '20x20x1',
+  '20x24x1',
+  '20x25x1',
+  '24x24x1',
+] as const;
+const SEED_FOUR_INCH = ['16x25x4', '20x25x4'] as const;
+const SEED_FIVE_INCH = ['16x25x5', '20x25x5'] as const;
+
 function buildProductSeeds(): ProductSeed[] {
-  const oneInch = NOMINAL_FILTER_SIZES.filter((size) => size.nominalDimensions.depth === 1);
-  const fourInch = NOMINAL_FILTER_SIZES.filter((size) => size.nominalDimensions.depth === 4);
-  const fiveInch = NOMINAL_FILTER_SIZES.filter((size) => size.nominalDimensions.depth === 5);
+  const oneInch = sizesFromLabels(SEED_ONE_INCH);
+  const fourInch = sizesFromLabels(SEED_FOUR_INCH);
+  const fiveInch = sizesFromLabels(SEED_FIVE_INCH);
 
   const seeds: ProductSeed[] = [];
   let index = 1;

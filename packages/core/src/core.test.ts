@@ -20,11 +20,16 @@ describe('locales', () => {
 });
 
 describe('tailles de filtres', () => {
-  it('les dimensions réelles sont toujours inférieures aux nominales', () => {
+  it('les dimensions réelles ne dépassent jamais les nominales (strictement moindres pour les tailles standard)', () => {
     for (const size of NOMINAL_FILTER_SIZES) {
-      expect(size.actualDimensions.width).toBeLessThan(size.nominalDimensions.width);
-      expect(size.actualDimensions.height).toBeLessThan(size.nominalDimensions.height);
-      expect(size.actualDimensions.depth).toBeLessThan(size.nominalDimensions.depth);
+      expect(size.actualDimensions.width).toBeLessThanOrEqual(size.nominalDimensions.width);
+      expect(size.actualDimensions.height).toBeLessThanOrEqual(size.nominalDimensions.height);
+      expect(size.actualDimensions.depth).toBeLessThanOrEqual(size.nominalDimensions.depth);
+      if (!size.nominal.includes('.')) {
+        expect(size.actualDimensions.width).toBeLessThan(size.nominalDimensions.width);
+        expect(size.actualDimensions.height).toBeLessThan(size.nominalDimensions.height);
+        expect(size.actualDimensions.depth).toBeLessThan(size.nominalDimensions.depth);
+      }
     }
   });
 
@@ -34,8 +39,19 @@ describe('tailles de filtres', () => {
     }
   });
 
+  it('les libellés nominaux sont uniques', () => {
+    const labels = NOMINAL_FILTER_SIZES.map((size) => size.nominal);
+    expect(new Set(labels).size).toBe(labels.length);
+  });
+
   it('retrouve une taille par libellé', () => {
     expect(findNominalSize('16x25x1')?.actualDimensions.depth).toBe(0.75);
+    expect(findNominalSize('10x20x2')?.actualDimensions).toEqual({
+      width: 9.75,
+      height: 19.75,
+      depth: 1.75,
+    });
+    expect(findNominalSize('20.25x25.38x5.25')?.actualDimensions.depth).toBe(5.25);
     expect(findNominalSize('99x99x9')).toBeUndefined();
   });
 });

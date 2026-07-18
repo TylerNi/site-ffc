@@ -43,6 +43,21 @@ describe('bigcommerce/mapping', () => {
       expect(result?.raw).toBe('17x99x1');
     });
 
+    it('extrait la dimension d’un libellé d’option enrichi (« 12x24x1 (12-Pack) 286$ »)', () => {
+      const result = resolveDimension(
+        'Furnace filter',
+        [{ option_display_name: 'Size', label: '12x24x1 (12-Pack) 286$' }],
+        [],
+      );
+      expect(result?.size?.nominal).toBe('12x24x1');
+    });
+
+    it('lit les tailles fractionnaires avec marques de pouces (« 19 3/4" x 20 1/2" x 4 7/8" »)', () => {
+      const result = resolveDimension('19 3/4" x 20 1/2" x 4 7/8". (3-pack)', [], []);
+      expect(result?.size?.nominal).toBe('19.75x20.5x4.88');
+      expect(result?.size?.actualDimensions).toEqual({ width: 19.75, height: 20.5, depth: 4.88 });
+    });
+
     it('aucune dimension repérable → null', () => {
       expect(resolveDimension('Produit sans taille', [], [])).toBeNull();
     });
@@ -79,6 +94,23 @@ describe('bigcommerce/mapping', () => {
 
     it('lit le format en français (« Boîte de N »)', () => {
       expect(resolvePackSize('Filtre - Boîte de 12', 'sku', [], [])).toBe(12);
+    });
+
+    it('lit le format embarqué dans un libellé d’option de taille', () => {
+      expect(
+        resolvePackSize(
+          'Furnace filter',
+          'sku',
+          [{ option_display_name: 'Size', label: '12x24x1 (12-Pack) 286$' }],
+          [],
+        ),
+      ).toBe(12);
+    });
+
+    it('un prix dans l’option dédiée ne pollue pas le compte (« 12-Pack 174$ » → 12)', () => {
+      expect(
+        resolvePackSize('x', 'sku', [{ option_display_name: 'Pack', label: '12-Pack 174$' }], []),
+      ).toBe(12);
     });
 
     it('défaut : 1 (vente à l’unité)', () => {

@@ -110,16 +110,16 @@ ces clés → mêmes comptes, aucun doublon (vérifié par
 
 ### Variante (`ProductVariant`)
 
-| BigCommerce                                                                                                                              | Prisma                                      |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `variant.sku`                                                                                                                            | `sku` (clé d'idempotence)                   |
-| `variant.upc`                                                                                                                            | `barcode`                                   |
-| Taille : option `Size`/`Taille`/`Dimension` > champ personnalisé > nom produit → résolue au référentiel `@ffc/core` (`resolveDimension`) | `nominalLabel`, `nominal*In`, `actual*In`   |
-| MERV : option `MERV` > champ personnalisé > nom produit, validé 1–20 (ASHRAE 52.2)                                                       | `merv` (`null` si absent — ex. pré-filtres) |
-| Format de boîte : option `Pack`/`Box`/`Boîte` > nom produit (« Box of N », « Boîte de N »)                                               | `packSize` (défaut `1`)                     |
-| `price` (dollars)                                                                                                                        | `priceCents`                                |
-| `retail_price` / `cost_price` (niveau produit — BigCommerce ne les décline pas par variante)                                             | `compareAtPriceCents` / `costCents`         |
-| `weight` (livres, niveau variante sinon produit)                                                                                         | `weightGrams`                               |
+| BigCommerce                                                                                                                                                                                                                                                              | Prisma                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| `variant.sku`                                                                                                                                                                                                                                                            | `sku` (clé d'idempotence)                   |
+| `variant.upc`                                                                                                                                                                                                                                                            | `barcode`                                   |
+| Taille : option `Size`/`Taille`/`Dimension` > champ personnalisé > nom produit → résolue au référentiel `@ffc/core` (`resolveDimension`) ; les libellés enrichis (« 12x24x1 (12-Pack) 286$ »), marques de pouces (« 19 3/4" ») et fractions pures (« 7/8 ») sont tolérés | `nominalLabel`, `nominal*In`, `actual*In`   |
+| MERV : option `MERV` > champ personnalisé > nom produit, validé 1–20 (ASHRAE 52.2)                                                                                                                                                                                       | `merv` (`null` si absent — ex. pré-filtres) |
+| Format de boîte : option `Pack`/`Box`/`Boîte` > libellés d'options (« (12-Pack) ») > nom produit (« Box of N », « Boîte de N »)                                                                                                                                          | `packSize` (défaut `1`)                     |
+| `price` (dollars)                                                                                                                                                                                                                                                        | `priceCents`                                |
+| `retail_price` / `cost_price` (niveau produit — BigCommerce ne les décline pas par variante)                                                                                                                                                                             | `compareAtPriceCents` / `costCents`         |
+| `weight` (livres, niveau variante sinon produit)                                                                                                                                                                                                                         | `weightGrams`                               |
 
 **Tailles non reconnues** : si la chaîne repérée ne correspond à aucune
 entrée de `NOMINAL_FILTER_SIZES` (`packages/core/src/filters.ts`), la
@@ -127,6 +127,15 @@ variante n'est **pas importée** (dimensions physiques jamais fabriquées) —
 elle est listée dans « Variantes sans dimension reconnue » du rapport. Une
 fois la taille ajoutée au référentiel `@ffc/core` (ou une faute de saisie
 corrigée côté BigCommerce), un nouvel import la reprend automatiquement.
+Le référentiel a été enrichi au catalogue réel (81 tailles) depuis l'export
+EN du 2026-07-18.
+
+**Variantes sans dimension repérable** : les produits identifiés par numéro
+de modèle (filtres d'échangeur d'air Fantech/Venmar, filtres
+d'humidificateur, purificateurs) n'ont aucune taille standard. Le schéma
+exigeant une dimension par variante, ils ne sont **pas importés** — listés
+dans « Variantes sans dimension repérable » du rapport, en attendant une
+décision (schéma à assouplir ou gamme hors périmètre).
 
 **SKU en double** : un SKU ne peut appartenir qu'à **un seul** produit importé
 (contrainte `ProductVariant.sku @unique`). Si le même SKU apparaît sur deux
