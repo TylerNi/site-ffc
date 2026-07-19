@@ -18,6 +18,8 @@
     "db:erd": "prisma generate && tsx scripts/generate-erd.ts",
     "bigcommerce:export": "tsx scripts/bigcommerce/export.ts",
     "bigcommerce:import": "tsx scripts/bigcommerce/import.ts",
+    "bigcommerce:crawl": "tsx scripts/bigcommerce/crawl-urls.ts",
+    "bigcommerce:redirects": "tsx scripts/bigcommerce/redirects.ts",
     "ai:bench": "tsx --env-file-if-exists=.env scripts/ai-bench.ts"
   },
   "prisma": {

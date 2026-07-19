@@ -1572,3 +1572,22 @@ model Setting {
 
   @@map("settings")
 }
+
+/// Vigie SEO post-bascule (tâche 25) : compteur quotidien des 404 de la
+/// vitrine, agrégé par (hôte, chemin, jour UTC). Alimente le rapport admin
+/// des URLs légitimes à récupérer dans la table de redirections. Rétention
+/// courte (purge > 90 jours) — aucune donnée personnelle, chemins tronqués.
+model StorefrontNotFound {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  host        String   @db.VarChar(255)
+  path        String   @db.VarChar(400)
+  day         DateTime @db.Date
+  hits        Int      @default(1)
+  lastReferer String?  @map("last_referer") @db.VarChar(500)
+  lastSeenAt  DateTime @default(now()) @map("last_seen_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([host, path, day])
+  @@index([day, hits(sort: Desc)])
+  @@map("storefront_not_found")
+}

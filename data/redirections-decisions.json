@@ -1,0 +1,136 @@
+[
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/index.php",
+    "action": "redirect",
+    "to": "/",
+    "reason": "Alias historique de l'accueil BigCommerce."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/cart.php",
+    "action": "redirect",
+    "to": "/cart",
+    "reason": "Panier BigCommerce → panier de la nouvelle vitrine."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/checkout.php",
+    "action": "redirect",
+    "to": "/cart",
+    "reason": "Caisse BigCommerce → panier (une session de caisse ne se transfère pas)."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/login.php",
+    "action": "redirect",
+    "to": "/account/orders",
+    "reason": "Connexion BigCommerce → espace « Mes commandes » (invite de connexion)."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/account.php",
+    "action": "redirect",
+    "to": "/account/orders",
+    "reason": "Compte client BigCommerce → espace « Mes commandes »."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/sitemap.php",
+    "action": "redirect",
+    "to": "/sitemap.xml",
+    "reason": "Plan de site HTML BigCommerce → sitemap de la nouvelle vitrine."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/xmlsitemap.php",
+    "action": "redirect",
+    "to": "/sitemap.xml",
+    "reason": "Sitemap XML BigCommerce → sitemap de la nouvelle vitrine."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/wishlist.php",
+    "action": "gone",
+    "reason": "Listes de souhaits non reprises sur la nouvelle plateforme — 410 assumé."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/giftcertificates.php",
+    "action": "gone",
+    "reason": "Cartes-cadeaux BigCommerce non reprises — 410 assumé."
+  },
+  {
+    "host": "www.furnacefilterscanada.com",
+    "path": "/rss.php",
+    "action": "gone",
+    "reason": "Flux RSS BigCommerce non repris — 410 assumé."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/index.php",
+    "action": "redirect",
+    "to": "/",
+    "reason": "Alias historique de l'accueil BigCommerce."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/cart.php",
+    "action": "redirect",
+    "to": "/panier",
+    "reason": "Panier BigCommerce → panier de la nouvelle vitrine."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/checkout.php",
+    "action": "redirect",
+    "to": "/panier",
+    "reason": "Caisse BigCommerce → panier (une session de caisse ne se transfère pas)."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/login.php",
+    "action": "redirect",
+    "to": "/compte/commandes",
+    "reason": "Connexion BigCommerce → espace « Mes commandes » (invite de connexion)."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/account.php",
+    "action": "redirect",
+    "to": "/compte/commandes",
+    "reason": "Compte client BigCommerce → espace « Mes commandes »."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/sitemap.php",
+    "action": "redirect",
+    "to": "/sitemap.xml",
+    "reason": "Plan de site HTML BigCommerce → sitemap de la nouvelle vitrine."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/xmlsitemap.php",
+    "action": "redirect",
+    "to": "/sitemap.xml",
+    "reason": "Sitemap XML BigCommerce → sitemap de la nouvelle vitrine."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/wishlist.php",
+    "action": "gone",
+    "reason": "Listes de souhaits non reprises sur la nouvelle plateforme — 410 assumé."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/giftcertificates.php",
+    "action": "gone",
+    "reason": "Cartes-cadeaux BigCommerce non reprises — 410 assumé."
+  },
+  {
+    "host": "www.filtrationmontreal.com",
+    "path": "/rss.php",
+    "action": "gone",
+    "reason": "Flux RSS BigCommerce non repris — 410 assumé."
+  }
+]

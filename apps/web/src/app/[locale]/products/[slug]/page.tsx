@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { after } from 'next/server';
 import { type Locale } from '@ffc/i18n';
 import { AddToCart } from '@/components/AddToCart';
 import { Breadcrumbs, type Crumb } from '@/components/Breadcrumbs';
@@ -11,8 +12,9 @@ import { getProduct, listProducts, type ProductDetail } from '@/lib/api';
 import { formatCents, formatDimensions, formatList } from '@/lib/format';
 import { productImageUrl } from '@/lib/images';
 import { productJsonLd } from '@/lib/jsonld';
+import { reportStorefrontNotFound } from '@/lib/report-404';
 import { pageMetadata } from '@/lib/seo';
-import { absoluteUrl, type LocalizedHref } from '@/lib/site';
+import { absoluteUrl, localizedPath, siteOrigin, type LocalizedHref } from '@/lib/site';
 
 export const revalidate = 300;
 // Slugs hors pré-rendu : générés à la demande puis mis en cache (ISR).
@@ -73,7 +75,20 @@ export default async function ProductPage({
   setRequestLocale(locale);
 
   const product = await getProduct(decodeURIComponent(slug), locale);
-  if (product === 'not-found') notFound();
+  if (product === 'not-found') {
+    // Vigie SEO (tâche 25) : page ISR, donc pas d'accès aux en-têtes de la
+    // requête — hôte déduit de la locale, signalé hors du chemin critique.
+    after(() =>
+      reportStorefrontNotFound({
+        host: new URL(siteOrigin(locale)).host,
+        path: localizedPath(locale, {
+          pathname: '/products/[slug]',
+          params: { slug: decodeURIComponent(slug) },
+        }),
+      }),
+    );
+    notFound();
+  }
   if (!product) {
     // API injoignable : erreur franche (pas de 404 mensonger, pas de cache
     // d'une coquille vide) — error.tsx affiche l'état dégradé.

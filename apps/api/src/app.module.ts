@@ -12,6 +12,7 @@ import { HealthModule } from './modules/health/health.module';
 import { MailModule } from './modules/mail/mail.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PushModule } from './modules/push/push.module';
+import { SeoModule } from './modules/seo/seo.module';
 import { ShippingModule } from './modules/shipping/shipping.module';
 
 @Module({
@@ -38,6 +39,7 @@ import { ShippingModule } from './modules/shipping/shipping.module';
     OrdersModule,
     ShippingModule,
     AiModule,
+    SeoModule,
     AdminModule,
   ],
 })

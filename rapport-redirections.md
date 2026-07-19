@@ -1,0 +1,891 @@
+# Rapport de génération des redirections 301 — bascule BigCommerce (tâche 25)
+
+Généré le 2026-07-19T16:26:36.676Z par `pnpm --filter @ffc/api bigcommerce:redirects`.
+
+## Sources croisées
+
+- `data/urls-bigcommerce.csv` (tâche 08) : 613 lignes
+- `data/urls-crawl.csv` (sitemaps publics + BFS) : 1238 lignes
+- `data/redirections-decisions.json` : 20 décisions versionnées
+- Base Prisma : 331 produits ACTIVE appariés, 176 catégories actives appariées
+
+## Résultat
+
+- **521 redirections exactes** et **6 URLs en 410 assumé** dans `apps/web/src/redirects/redirects.generated.json`
+- **803 écart(s) bloquant(s)** (détail ci-dessous et dans `data/redirections-ecarts.json`)
+- 8 URL(s) ignorée(s) à bon droit (racine, robots.txt, sitemap.xml, URLs vides)
+
+## Couverture par hôte
+
+### www.furnacefilterscanada.com
+
+| type     | total | exactes | 410 | en attente | ignorées |
+| -------- | ----- | ------- | --- | ---------- | -------- |
+| product  | 364   | 331     | 0   | 33         | 0        |
+| category | 216   | 176     | 0   | 40         | 0        |
+| page     | 28    | 0       | 0   | 27         | 1        |
+| brand    | 14    | 0       | 0   | 14         | 0        |
+| blog     | 87    | 0       | 0   | 87         | 0        |
+| other    | 25    | 7       | 3   | 15         | 0        |
+
+### www.filtrationmontreal.com
+
+| type     | total | exactes | 410 | en attente | ignorées |
+| -------- | ----- | ------- | --- | ---------- | -------- |
+| product  | 336   | 0       | 0   | 336        | 0        |
+| category | 169   | 0       | 0   | 169        | 0        |
+| page     | 12    | 0       | 0   | 11         | 1        |
+| brand    | 14    | 0       | 0   | 14         | 0        |
+| blog     | 6     | 0       | 0   | 6          | 0        |
+| other    | 61    | 7       | 3   | 51         | 0        |
+
+## Écarts bloquants (803)
+
+Chaque écart doit recevoir une décision explicite dans
+`data/redirections-decisions.json` (cible argumentée, 410 assumé, ou
+déblocage amont : import FR, rapport SEO du blogue). **Jamais de 301 par
+défaut vers l’accueil.**
+
+### URL découverte au crawl hors inventaire CSV — décision requise (cible argumentée ou 410 assumé). — 66 URL(s)
+
+- `www.filtrationmontreal.com/10x20x1`
+- `www.filtrationmontreal.com/10x20x2`
+- `www.filtrationmontreal.com/10x24x1`
+- `www.filtrationmontreal.com/10x25x1`
+- `www.filtrationmontreal.com/12x16x1`
+- `www.filtrationmontreal.com/12x20x1`
+- `www.filtrationmontreal.com/12x20x2`
+- `www.filtrationmontreal.com/12x24x1`
+- `www.filtrationmontreal.com/12x24x2`
+- `www.filtrationmontreal.com/12x24x4`
+- `www.filtrationmontreal.com/12x25x1`
+- `www.filtrationmontreal.com/14x20x1`
+- `www.filtrationmontreal.com/14x24x1`
+- `www.filtrationmontreal.com/14x25x1`
+- `www.filtrationmontreal.com/14x25x2`
+- `www.filtrationmontreal.com/15x20x1`
+- `www.filtrationmontreal.com/15x20x2`
+- `www.filtrationmontreal.com/15x25x1`
+- `www.filtrationmontreal.com/15x25x2`
+- `www.filtrationmontreal.com/16x16x1`
+- `www.filtrationmontreal.com/16x16x2`
+- `www.filtrationmontreal.com/16x20x1`
+- `www.filtrationmontreal.com/16x20x2`
+- `www.filtrationmontreal.com/16x24x1`
+- `www.filtrationmontreal.com/16x24x2`
+- `www.filtrationmontreal.com/16x24x4`
+- `www.filtrationmontreal.com/16x25x2`
+- `www.filtrationmontreal.com/18x20x1`
+- `www.filtrationmontreal.com/18x20x2`
+- `www.filtrationmontreal.com/18x24x1`
+- `www.filtrationmontreal.com/18x24x2`
+- `www.filtrationmontreal.com/18x24x4`
+- `www.filtrationmontreal.com/18x25x1`
+- `www.filtrationmontreal.com/20x20x2`
+- `www.filtrationmontreal.com/20x24x1`
+- `www.filtrationmontreal.com/20x24x2`
+- `www.filtrationmontreal.com/20x24x4`
+- `www.filtrationmontreal.com/20x25x1`
+- `www.filtrationmontreal.com/20x25x2`
+- `www.filtrationmontreal.com/20x30x1`
+- `www.filtrationmontreal.com/20x30x2`
+- `www.filtrationmontreal.com/22x22x1`
+- `www.filtrationmontreal.com/24x24x1`
+- `www.filtrationmontreal.com/24x24x2`
+- `www.filtrationmontreal.com/25x25x1`
+- `www.filtrationmontreal.com/25x25x2`
+- `www.filtrationmontreal.com/7x20x1`
+- `www.filtrationmontreal.com/compare`
+- `www.filtrationmontreal.com/decouvrez-nos-67-grandeurs-de-filtre`
+- `www.filtrationmontreal.com/filtre-camfil-dual-9`
+- `www.filtrationmontreal.com/honeywell-fc100a1029`
+- `www.furnacefilterscanada.com/16x25x5-options`
+- `www.furnacefilterscanada.com/16x25x5-reservepro-by-generalaire-gf-4541`
+- `www.furnacefilterscanada.com/20x20x2`
+- `www.furnacefilterscanada.com/20x20x5`
+- `www.furnacefilterscanada.com/20x20x5-reservepro-by-generalaire-gf-4556`
+- `www.furnacefilterscanada.com/20x25x5`
+- `www.furnacefilterscanada.com/20x25x5-reservepro-by-generalaire-gf-4551`
+- `www.furnacefilterscanada.com/blog/can-i-run-my-furnace-without-a-filter`
+- `www.furnacefilterscanada.com/blog/merv-13-vs-merv-8-air-filters-do-you-really-need-to-spend-more`
+- `www.furnacefilterscanada.com/camfil-dual-9-pleated-filter`
+- `www.furnacefilterscanada.com/compare`
+- `www.furnacefilterscanada.com/customer-reviews`
+- `www.furnacefilterscanada.com/furnace-filters-16x25x5`
+- `www.furnacefilterscanada.com/honeywell-fc100a1011`
+- `www.furnacefilterscanada.com/honeywell-fc100a1029`
+
+### URL découverte hors CSV (crawl) sans identifiant BigCommerce apparié — à croiser manuellement. — 505 URL(s)
+
+- `www.filtrationmontreal.com/10x20x1-merv-13`
+- `www.filtrationmontreal.com/10x20x1-merv-8`
+- `www.filtrationmontreal.com/10x20x2-merv-13`
+- `www.filtrationmontreal.com/10x20x2-merv-13-aaf`
+- `www.filtrationmontreal.com/10x20x4`
+- `www.filtrationmontreal.com/10x20x4-camfil-ap-3`
+- `www.filtrationmontreal.com/10x20x4-merv-13`
+- `www.filtrationmontreal.com/10x24x1-merv-13`
+- `www.filtrationmontreal.com/10x24x1-merv-8`
+- `www.filtrationmontreal.com/10x25x1-merv-8`
+- `www.filtrationmontreal.com/12x12x1-merv-8-aaf`
+- `www.filtrationmontreal.com/12x16x1-merv-8`
+- `www.filtrationmontreal.com/12x20x1-merv-13`
+- `www.filtrationmontreal.com/12x20x1-merv-8`
+- `www.filtrationmontreal.com/12x24x1-merv-13`
+- `www.filtrationmontreal.com/12x24x1-merv-8`
+- `www.filtrationmontreal.com/12x24x2-camfil-30-30`
+- `www.filtrationmontreal.com/12x25x1-merv-8`
+- `www.filtrationmontreal.com/14x20x1-merv-13`
+- `www.filtrationmontreal.com/14x20x1-merv-8`
+- `www.filtrationmontreal.com/14x24x1-merv-13`
+- `www.filtrationmontreal.com/14x24x1-merv-8`
+- `www.filtrationmontreal.com/14x25x1-merv-11`
+- `www.filtrationmontreal.com/14x25x1-merv-13`
+- `www.filtrationmontreal.com/14x25x1-merv-8`
+- `www.filtrationmontreal.com/14x25x2-camfil-ap-11`
+- `www.filtrationmontreal.com/15-3-8-x-25-1-2-x-5-1-4`
+- `www.filtrationmontreal.com/15-38-x-21-78-x-5-14`
+- `www.filtrationmontreal.com/15x20x1-merv-13`
+- `www.filtrationmontreal.com/15x20x1-merv-8`
+- `www.filtrationmontreal.com/15x25x1-merv-13`
+- `www.filtrationmontreal.com/15x25x1-merv-8`
+- `www.filtrationmontreal.com/16x16x1-merv-13`
+- `www.filtrationmontreal.com/16x16x1-merv-8`
+- `www.filtrationmontreal.com/16x16x2-filtre-fournaise-camfil`
+- `www.filtrationmontreal.com/16x20x1-merv-11`
+- `www.filtrationmontreal.com/16x20x1-merv-13`
+- `www.filtrationmontreal.com/16x20x1-merv-13-`
+- `www.filtrationmontreal.com/16x20x1-merv-8`
+- `www.filtrationmontreal.com/16x20x2-merv-11`
+- `www.filtrationmontreal.com/16x20x2-merv-13`
+- `www.filtrationmontreal.com/16x20x2-merv-8`
+- `www.filtrationmontreal.com/16x20x4-merv-11`
+- `www.filtrationmontreal.com/16x20x4-merv-13`
+- `www.filtrationmontreal.com/16x20x4-merv-8`
+- `www.filtrationmontreal.com/16x20x5`
+- `www.filtrationmontreal.com/16x24x1-merv-13`
+- `www.filtrationmontreal.com/16x24x1-merv-8`
+- `www.filtrationmontreal.com/16x24x2-merv-11`
+- `www.filtrationmontreal.com/16x24x2-merv-13`
+- `www.filtrationmontreal.com/16x24x2-merv-8`
+- `www.filtrationmontreal.com/16x25x1-merv-11`
+- `www.filtrationmontreal.com/16x25x1-merv-13`
+- `www.filtrationmontreal.com/16x25x1-merv-8`
+- `www.filtrationmontreal.com/16x25x2-merv-11`
+- `www.filtrationmontreal.com/16x25x2-merv-13`
+- `www.filtrationmontreal.com/16x25x2-merv-8`
+- `www.filtrationmontreal.com/16x25x3`
+- `www.filtrationmontreal.com/16x25x4-merv-11`
+- `www.filtrationmontreal.com/16x25x4-merv-13`
+- `www.filtrationmontreal.com/16x25x4-merv-8`
+- `www.filtrationmontreal.com/16x25x4-opti-pac`
+- `www.filtrationmontreal.com/16x25x5`
+- `www.filtrationmontreal.com/16x25x5-filtre-fournaise-camfil-ap-11`
+- `www.filtrationmontreal.com/18x20x1-merv-8`
+- `www.filtrationmontreal.com/18x24x1-merv-13`
+- `www.filtrationmontreal.com/18x24x1-merv-8`
+- `www.filtrationmontreal.com/18x25x1-merv-13`
+- `www.filtrationmontreal.com/18x25x1-merv-8`
+- `www.filtrationmontreal.com/18x25x2`
+- `www.filtrationmontreal.com/20-1-4-x-20-3-4-x-5-1-4`
+- `www.filtrationmontreal.com/20-1-4-x-25-3-8-x-5-1-4`
+- `www.filtrationmontreal.com/20x20x1-merv-11`
+- `www.filtrationmontreal.com/20x20x1-merv-13`
+- `www.filtrationmontreal.com/20x20x1-merv-8`
+- `www.filtrationmontreal.com/20x20x2-de-camfil-boite-de-12-filtres`
+- `www.filtrationmontreal.com/20x20x2-merv-11`
+- `www.filtrationmontreal.com/20x20x2-merv-13`
+- `www.filtrationmontreal.com/20x20x2-merv-8`
+- `www.filtrationmontreal.com/20x20x4-merv-11`
+- `www.filtrationmontreal.com/20x20x4-merv-13`
+- `www.filtrationmontreal.com/20x20x4-merv-8`
+- `www.filtrationmontreal.com/20x20x5`
+- `www.filtrationmontreal.com/20x20x5-filtre-fournaise-camfil-ap-11`
+- `www.filtrationmontreal.com/20x24x1-merv-13`
+- `www.filtrationmontreal.com/20x24x1-merv-8`
+- `www.filtrationmontreal.com/20x25x1-merv-11`
+- `www.filtrationmontreal.com/20x25x1-merv-13`
+- `www.filtrationmontreal.com/20x25x1-merv-8`
+- `www.filtrationmontreal.com/20x25x2-merv-13`
+- `www.filtrationmontreal.com/20x25x2-merv-8`
+- `www.filtrationmontreal.com/20x25x4-merv-11`
+- `www.filtrationmontreal.com/20x25x4-merv-13`
+- `www.filtrationmontreal.com/20x25x4-merv-8`
+- `www.filtrationmontreal.com/20x25x5`
+- `www.filtrationmontreal.com/20x25x5-filtre-fournaise`
+- `www.filtrationmontreal.com/20x30x1-merv-8`
+- `www.filtrationmontreal.com/22x22x1-merv-13`
+- `www.filtrationmontreal.com/22x22x1-merv-8`
+- `www.filtrationmontreal.com/24x24x1-merv-11`
+- `www.filtrationmontreal.com/24x24x1-merv-13`
+- `www.filtrationmontreal.com/24x24x1-merv-8`
+- `www.filtrationmontreal.com/24x24x2-merv-11`
+- `www.filtrationmontreal.com/24x24x2-merv-13`
+- `www.filtrationmontreal.com/24x24x2-merv-8`
+- `www.filtrationmontreal.com/24x24x4-merv-11`
+- `www.filtrationmontreal.com/24x24x4-merv-13`
+- `www.filtrationmontreal.com/24x24x4-merv-8`
+- `www.filtrationmontreal.com/25x25x1-merv-13`
+- `www.filtrationmontreal.com/25x25x1-merv-8`
+- `www.filtrationmontreal.com/7x20x1-merv-8`
+- `www.filtrationmontreal.com/aldes-612405`
+- `www.filtrationmontreal.com/aldes-612410-merv-13`
+- `www.filtrationmontreal.com/aprilaire-10`
+- `www.filtrationmontreal.com/aprilaire-35-boite-de-3-filtres`
+- `www.filtrationmontreal.com/camfil-dual-9-filtre-haute-efficacite-et-economique`
+- `www.filtrationmontreal.com/city-m-purificateur-dair`
+- `www.filtrationmontreal.com/english-1`
+- `www.filtrationmontreal.com/fantech-40187-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-40193-16x16x2-hepa-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-40195-16x16x2-merv-8-et-charbon-filtres-de-remplacement`
+- `www.filtrationmontreal.com/fantech-40390-fb6-merv-13`
+- `www.filtrationmontreal.com/fantech-412447-fml6r-merv-8-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-414921-merv-8-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-414922-merv-8-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-414923-merv-8-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-414924-merv-8`
+- `www.filtrationmontreal.com/fantech-414928-merv-8`
+- `www.filtrationmontreal.com/fantech-463046-merv-8-charbon-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-463048-filtre-de-remplacement-hepa`
+- `www.filtrationmontreal.com/fantech-463943-merv-8-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-463945-merv-8-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-aev-80-414767-merv-13-filtres-de-remplacement`
+- `www.filtrationmontreal.com/fantech-aev-80-445222-merv-8-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-atmo-150-463944-merv-13-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-atmo-200h-e-463946-merv-13-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-402041-merv-3`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-40327-merv-3`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-40328`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-40482-merv-3`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-405116-merv-3`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-405577-merv-3`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-410779-rcf80`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-414644-merv-6`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-414645`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-414646-merv-6`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-414647`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-414648-merv-6`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-422580-merv-3`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-428519-merv-3`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-428520`
+- `www.filtrationmontreal.com/fantech-filtre-lavable-428521-merv-3`
+- `www.filtrationmontreal.com/fantech-hero-120h-428525-filtres-de-remplacement-merv-8`
+- `www.filtrationmontreal.com/fantech-hero-150h-428526-filtres-de-remplacement`
+- `www.filtrationmontreal.com/fantech-hero-150h-428548-merv-13-filtres-de-remplacement`
+- `www.filtrationmontreal.com/fantech-hero-150h-428551-filtres-de-remplacement-hepa`
+- `www.filtrationmontreal.com/fantech-hero-200h-and-250h-428527-filtres-de-remplacement-merv-8`
+- `www.filtrationmontreal.com/fantech-hero-200h-and-250h-428549-filtres-de-remplacement-merv-13`
+- `www.filtrationmontreal.com/fantech-hero-200h-and-250h-428552-filtres-hepa`
+- `www.filtrationmontreal.com/fantech-vhr-200r-ec-422679-merv-13-filtre-de-remplacement`
+- `www.filtrationmontreal.com/fc100a1003`
+- `www.filtrationmontreal.com/fc100a1011-honeywell`
+- `www.filtrationmontreal.com/fc100a1029`
+- `www.filtrationmontreal.com/fc100a1029-honeywell`
+- `www.filtrationmontreal.com/fc100a1037`
+- `www.filtrationmontreal.com/fc100a1037-honeywell`
+- `www.filtrationmontreal.com/fc200e1003-merv-13-honeywell-16x20x4`
+- `www.filtrationmontreal.com/fc200e1011-merv-13-honeywell-20x20x4`
+- `www.filtrationmontreal.com/fc200e1029-merv-13-honeywell-16x25x4`
+- `www.filtrationmontreal.com/fc200e1037-merv-13-honeywell-20x25x4`
+- `www.filtrationmontreal.com/filtre-24x24x4-merv-11`
+- `www.filtrationmontreal.com/filtre-aldes-h150`
+- `www.filtrationmontreal.com/filtre-fournaise-10x10x1`
+- `www.filtrationmontreal.com/filtre-fournaise-10x10x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x1`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x1-merv-13-aaf`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x2`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-10x20x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-10x24x1`
+- `www.filtrationmontreal.com/filtre-fournaise-10x24x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-10x24x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-10x24x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-10x24x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-10x25x1`
+- `www.filtrationmontreal.com/filtre-fournaise-10x25x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-10x25x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-12x12x1`
+- `www.filtrationmontreal.com/filtre-fournaise-12x12x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-12x16x1`
+- `www.filtrationmontreal.com/filtre-fournaise-12x16x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-12x16x1-merv-8-boite-de-12-filtres`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x1`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x2`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-12x20x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x1`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x2`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x4`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x4-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-12x24x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-12x25x1`
+- `www.filtrationmontreal.com/filtre-fournaise-12x25x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-12x25x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x1`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x2`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-14x20x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-14x24x1`
+- `www.filtrationmontreal.com/filtre-fournaise-14x24x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-14x24x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-14x24x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-14x24x1-merv-8-boite-de-12-filtres`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x1`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x2`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-14x25x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x1`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x2`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-15x20x2-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-15x25x1`
+- `www.filtrationmontreal.com/filtre-fournaise-15x25x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-15x25x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-15x25x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-15x25x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-15x25x2`
+- `www.filtrationmontreal.com/filtre-fournaise-15x25x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-15x25x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x16x1`
+- `www.filtrationmontreal.com/filtre-fournaise-16x16x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x16x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x16x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x16x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x16x2`
+- `www.filtrationmontreal.com/filtre-fournaise-16x16x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x16x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x1`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x2`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x2-merv-13-`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x2-merv-8-`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x4`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x4-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x20x4-merv-13-`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x1`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x2`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x4`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x4-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x24x4-merv-8-extra-`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x1`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x1-camfil-citypleat`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x1-merv-13-`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x2`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x2-merv-13-`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x2-merv-8-`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x4`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x4-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-16x25x4-merv-13-`
+- `www.filtrationmontreal.com/filtre-fournaise-18x20x1`
+- `www.filtrationmontreal.com/filtre-fournaise-18x20x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-18x20x1-camfil-30-30s`
+- `www.filtrationmontreal.com/filtre-fournaise-18x20x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-18x20x2`
+- `www.filtrationmontreal.com/filtre-fournaise-18x20x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-18x20x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x1`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x2`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x2-merv-8-aaf`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x4`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x4-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-18x24x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-18x25x1`
+- `www.filtrationmontreal.com/filtre-fournaise-18x25x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-18x25x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-18x25x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-18x25x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-18x25x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-18x25x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-18x25x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x1`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x1-merv-13-`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x2`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x2-merv-13-`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x2-merv8-`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x4`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x4-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x20x4-merv-13-`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x1`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x2`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x2-merv-8-aaf`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x4`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x4-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x24x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x1`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x1-merv-8-aaf`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x2`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x2-merv-8-`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x4`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x4-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-20x25x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-20x30x1`
+- `www.filtrationmontreal.com/filtre-fournaise-20x30x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x30x2`
+- `www.filtrationmontreal.com/filtre-fournaise-20x30x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-20x30x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-22x22x1`
+- `www.filtrationmontreal.com/filtre-fournaise-22x22x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-22x22x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-22x22x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-22x22x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x1`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x2`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x4`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x4-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-24x24x4-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x1`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x1-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x1-merv-13`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x2`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x2-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x2-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x2-camfil-ap-11`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x2-camfil-ap-13`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x4`
+- `www.filtrationmontreal.com/filtre-fournaise-25x25x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-25x29x4`
+- `www.filtrationmontreal.com/filtre-fournaise-25x29x4-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-7x20x1`
+- `www.filtrationmontreal.com/filtre-fournaise-7x20x1-camfil`
+- `www.filtrationmontreal.com/filtre-fournaise-7x20x1-camfil-30-30`
+- `www.filtrationmontreal.com/filtre-fournaise-au-charbon`
+- `www.filtrationmontreal.com/filtre-fournaise-au-charbon-20x20x1-camfil-citypleat-boite-de-12-filtres`
+- `www.filtrationmontreal.com/filtre-fournaise-au-charbon-camfil-citypleat`
+- `www.filtrationmontreal.com/filtre-fournaise-carrier-filxumc082425-merv-8`
+- `www.filtrationmontreal.com/filtre-fournaise-carrier-filxxcar0016-merv-8`
+- `www.filtrationmontreal.com/filtre-fournaise-carrier-filxxcar0020-merv-8`
+- `www.filtrationmontreal.com/filtre-fournaise-carrier-filxxcar0024-merv-8`
+- `www.filtrationmontreal.com/filtre-fournaise-carrier-filxxcar0116-merv-11`
+- `www.filtrationmontreal.com/filtre-fournaise-carrier-filxxcar0120-merv-11`
+- `www.filtrationmontreal.com/filtre-fournaise-carrier-filxxcar0124-merv-11`
+- `www.filtrationmontreal.com/filtre-hepa-dmh4-0400`
+- `www.filtrationmontreal.com/filtre-hepa-venmar-serie-x-21996`
+- `www.filtrationmontreal.com/filtre-venmar-hepa`
+- `www.filtrationmontreal.com/filtres-de-remplacement-city-m`
+- `www.filtrationmontreal.com/filtres-humidificateurs`
+- `www.filtrationmontreal.com/filtres-merv-11`
+- `www.filtrationmontreal.com/filtres-merv-13`
+- `www.filtrationmontreal.com/filtres-merv-8`
+- `www.filtrationmontreal.com/filtres-merv-9`
+- `www.filtrationmontreal.com/g1-1056`
+- `www.filtrationmontreal.com/g8-1056`
+- `www.filtrationmontreal.com/generalaire-16x25x5-merv-11`
+- `www.filtrationmontreal.com/generalaire-20x20x5-merv-11`
+- `www.filtrationmontreal.com/generalaire-20x25x5-merv-11`
+- `www.filtrationmontreal.com/generalaire-990-13`
+- `www.filtrationmontreal.com/greentek-463044-filtre-de-remplacement`
+- `www.filtrationmontreal.com/greentek-463163-filtre-de-remplacement`
+- `www.filtrationmontreal.com/greentek-fantech-filtre-lavable-463939-merv-3`
+- `www.filtrationmontreal.com/hc22e-1003-honeywell`
+- `www.filtrationmontreal.com/hc26e-1004-honeywell`
+- `www.filtrationmontreal.com/honeywell-fc100a1011`
+- `www.filtrationmontreal.com/lampe-de-remplacement-uv-c-d-origine-sanuvox-biopur-en-j-lmprgxj65t5`
+- `www.filtrationmontreal.com/lampe-de-remplacement-uv-c-d-origine-sanuvox-de-haute-intensite-de-10-5-lmphgj105`
+- `www.filtrationmontreal.com/lampe-de-remplacement-uv-c-d-origine-sanuvox-en-j-de-haute-intensite-de-6-5-lmprgj65`
+- `www.filtrationmontreal.com/lampe-uv-sanuvox-lmprgxj65-anti-odeurs-bacteries`
+- `www.filtrationmontreal.com/lampe-uvc-uvv-sanuvox-lmphgxj105-anti-odeurs-et-bacteries-oem`
+- `www.filtrationmontreal.com/lampes-uv-sanuvox`
+- `www.filtrationmontreal.com/lifebreath-65-160-merv6-filtre-de-remplacement`
+- `www.filtrationmontreal.com/lifebreath-65-161-merv6-filtre-de-remplacement`
+- `www.filtrationmontreal.com/lifebreath-65-299r-collecteur-de-remplacement-tfp`
+- `www.filtrationmontreal.com/lifebreath-65-502r-hepa-filtre-de-remplacement`
+- `www.filtrationmontreal.com/lifebreath-65-503r-collecteur-de-remplacement-tfp`
+- `www.filtrationmontreal.com/listes-complete-tous-nos-filtres`
+- `www.filtrationmontreal.com/m0-1056`
+- `www.filtrationmontreal.com/m1-1056`
+- `www.filtrationmontreal.com/m2-1056`
+- `www.filtrationmontreal.com/m8-1056`
+- `www.filtrationmontreal.com/prefiltres-au-charbon-dmh4-0810`
+- `www.filtrationmontreal.com/prefiltres-dmh4-0855`
+- `www.filtrationmontreal.com/purificateur-air-sanuvox-biopur-hepa-charbon-uvc`
+- `www.filtrationmontreal.com/purificateur-dair`
+- `www.filtrationmontreal.com/reservepro-generalaire-ga35`
+- `www.filtrationmontreal.com/sanuvox-biopur-kit-filtre-original-kitrpl-ftrbp`
+- `www.filtrationmontreal.com/sanuvox-p900-purificateur-air-uv-portatif`
+- `www.filtrationmontreal.com/sanuvox-r1r-purificateur-air-uv-conduits-residentiels`
+- `www.filtrationmontreal.com/sanuvox-rmax-g-purificateur-air-uv-conduits-residentiel`
+
+### Page de marque BigCommerce — aucune route équivalente sur la vitrine; décision requise (410 assumé ou cible argumentée). — 28 URL(s)
+
+- `www.filtrationmontreal.com/aaf-flanders`
+- `www.filtrationmontreal.com/aldes`
+- `www.filtrationmontreal.com/aprilaire`
+- `www.filtrationmontreal.com/brands`
+- `www.filtrationmontreal.com/brands/camfil.html`
+- `www.filtrationmontreal.com/brands/honeywell.html`
+- `www.filtrationmontreal.com/brands/venmar.html`
+- `www.filtrationmontreal.com/carrier`
+- `www.filtrationmontreal.com/fantech`
+- `www.filtrationmontreal.com/five-seasons`
+- `www.filtrationmontreal.com/generalaire`
+- `www.filtrationmontreal.com/greentek`
+- `www.filtrationmontreal.com/lifebreath`
+- `www.filtrationmontreal.com/sanuvox`
+- `www.furnacefilterscanada.com/aaf-flanders`
+- `www.furnacefilterscanada.com/aldes`
+- `www.furnacefilterscanada.com/aprilaire`
+- `www.furnacefilterscanada.com/brands`
+- `www.furnacefilterscanada.com/brands/camfil.html`
+- `www.furnacefilterscanada.com/brands/generalaire.html`
+- `www.furnacefilterscanada.com/brands/venmar.html`
+- `www.furnacefilterscanada.com/carrier`
+- `www.furnacefilterscanada.com/fantech`
+- `www.furnacefilterscanada.com/filtrete`
+- `www.furnacefilterscanada.com/five-seasons`
+- `www.furnacefilterscanada.com/greentek`
+- `www.furnacefilterscanada.com/honeywell-furnace-filters`
+- `www.furnacefilterscanada.com/lifebreath`
+
+### Page CMS BigCommerce — décision requise (cible argumentée ou 410 assumé). — 38 URL(s)
+
+- `www.filtrationmontreal.com/avis-legal`
+- `www.filtrationmontreal.com/conditions-de-vente`
+- `www.filtrationmontreal.com/contact`
+- `www.filtrationmontreal.com/english`
+- `www.filtrationmontreal.com/faq`
+- `www.filtrationmontreal.com/faq-lampes-uv-sanuvox-et-purification-de-l-air`
+- `www.filtrationmontreal.com/infos-pratiques`
+- `www.filtrationmontreal.com/livraison-gratuite`
+- `www.filtrationmontreal.com/notre-histoire`
+- `www.filtrationmontreal.com/politique-de-protection-des-renseignements-personnels`
+- `www.filtrationmontreal.com/retours`
+- `www.furnacefilterscanada.com/_23-dec` (id `en:page:150`)
+- `www.furnacefilterscanada.com/01` (id `en:page:151`)
+- `www.furnacefilterscanada.com/blog` (id `en:page:66`)
+- `www.furnacefilterscanada.com/camfil` (id `en:page:79`)
+- `www.furnacefilterscanada.com/camfil-30-30` (id `en:page:85`)
+- `www.furnacefilterscanada.com/cat_2020` (id `en:page:135`)
+- `www.furnacefilterscanada.com/contact` (id `en:page:4`)
+- `www.furnacefilterscanada.com/contact-v2` (id `en:page:149`)
+- `www.furnacefilterscanada.com/covid-19` (id `en:page:131`)
+- `www.furnacefilterscanada.com/customer-support` (id `en:page:138`)
+- `www.furnacefilterscanada.com/francais-1` (id `en:page:153`)
+- `www.furnacefilterscanada.com/free-shipping` (id `en:page:5`)
+- `www.furnacefilterscanada.com/furnace-filters-edmonton` (id `en:page:142`)
+- `www.furnacefilterscanada.com/how-often-to-change-furnace-filter` (id `en:page:143`)
+- `www.furnacefilterscanada.com/killer-tips` (id `en:page:8`)
+- `www.furnacefilterscanada.com/learn-how-to-change-the-filter-in-your-furnace` (id `en:page:16`)
+- `www.furnacefilterscanada.com/learning-center` (id `en:page:139`)
+- `www.furnacefilterscanada.com/legal-privacy` (id `en:page:6`)
+- `www.furnacefilterscanada.com/merv-8-vs-merv-11` (id `en:page:55`)
+- `www.furnacefilterscanada.com/our-story` (id `en:page:3`)
+- `www.furnacefilterscanada.com/returns` (id `en:page:68`)
+- `www.furnacefilterscanada.com/rss-syndication` (id `en:page:1`)
+- `www.furnacefilterscanada.com/sales-conditions` (id `en:page:7`)
+- `www.furnacefilterscanada.com/testimonials` (id `en:page:77`)
+- `www.furnacefilterscanada.com/v3` (id `en:page:152`)
+- `www.furnacefilterscanada.com/what-is-merv-rating` (id `en:page:12`)
+- `www.furnacefilterscanada.com/which-way-does-furnace-filter-go` (id `en:page:144`)
+
+### Billet de blogue — décision requise (reprise en page statique ou 301 argumentée; jamais vers l’accueil). — 93 URL(s)
+
+- `www.filtrationmontreal.com/blog/dans-quel-sens-va-le-filtre-de-fournaise`
+- `www.filtrationmontreal.com/blog/de-quel-ct-installer-mon-filtre-fantech-`
+- `www.filtrationmontreal.com/blog/filtre-fournaise-ou-climatisation-y-atil-une-diffrence-`
+- `www.filtrationmontreal.com/blog/limportance-des-filtres-fournaise-de-qualit-et-les-tests-ashrae`
+- `www.filtrationmontreal.com/blog/pourquoi-les-canadiens-choisissent-les-filtres-camfil-haut-de-gamme-en-2026`
+- `www.filtrationmontreal.com/blog/pourquoi-les-techniciens-en-chauffage-et-ventilation-recommandent-les-filtres-camfil`
+- `www.furnacefilterscanada.com/air-conditioner-air-filter`
+- `www.furnacefilterscanada.com/air-conditioning-filters`
+- `www.furnacefilterscanada.com/air-furnace-filter`
+- `www.furnacefilterscanada.com/blog/2017-new-years-resolution`
+- `www.furnacefilterscanada.com/blog/3-reasons-to-buy-camfil-3030`
+- `www.furnacefilterscanada.com/blog/3-ways-to-know-its-time-for-a-furnace-replacement`
+- `www.furnacefilterscanada.com/blog/3-ways-unpredictable-weather-can-affect-your-energy-bills`
+- `www.furnacefilterscanada.com/blog/4-unexpected-home-maintenance-costs`
+- `www.furnacefilterscanada.com/blog/5-most-common-ac-problems`
+- `www.furnacefilterscanada.com/blog/5-ways-to-get-the-humidity-out-of-your-house`
+- `www.furnacefilterscanada.com/blog/7-best-reminder-apps`
+- `www.furnacefilterscanada.com/blog/7-things-you-should-buy-in-bulk`
+- `www.furnacefilterscanada.com/blog/acronyms-in-the-hvac-industry-defined`
+- `www.furnacefilterscanada.com/blog/air-conditioner-ice-build-up`
+- `www.furnacefilterscanada.com/blog/alberta-furnace-filters`
+- `www.furnacefilterscanada.com/blog/are-furnace-filters-recyclable-heres-why-you-shouldnt-try-it`
+- `www.furnacefilterscanada.com/blog/are-furnace-maintenance-plans-worth-it`
+- `www.furnacefilterscanada.com/blog/camfil-canada`
+- `www.furnacefilterscanada.com/blog/cheap-furnace-filters`
+- `www.furnacefilterscanada.com/blog/choosing-the-right-air-filter-for-your-home-premium-vs-budget-options`
+- `www.furnacefilterscanada.com/blog/does-ac-help-with-allergies-`
+- `www.furnacefilterscanada.com/blog/energy-facts-and-statistics`
+- `www.furnacefilterscanada.com/blog/failure-to-change-filters-can-lead-to-furnace-repair-and-replacement`
+- `www.furnacefilterscanada.com/blog/faqs-of-ordering-filters`
+- `www.furnacefilterscanada.com/blog/furnace-filters-laval`
+- `www.furnacefilterscanada.com/blog/furnace-filters-mississauga`
+- `www.furnacefilterscanada.com/blog/genuine-fantech-air-exchanger-filters`
+- `www.furnacefilterscanada.com/blog/get-10-off-on-furnace-filters-toronto`
+- `www.furnacefilterscanada.com/blog/got-a-custom-filter-and-hate-it-weve-got-a-solution-for-you`
+- `www.furnacefilterscanada.com/blog/honeywell-vs-filtrete-air-filters`
+- `www.furnacefilterscanada.com/blog/how-can-companies-attract-and-retain-their-customers`
+- `www.furnacefilterscanada.com/blog/how-do-you-know-its-time-to-change-your-furnace-filters`
+- `www.furnacefilterscanada.com/blog/how-often-to-change-furnace-filter`
+- `www.furnacefilterscanada.com/blog/how-to-choose-a-hvac-contractor`
+- `www.furnacefilterscanada.com/blog/how-to-choose-the-right-air-filter-for-your-home-premium-vs-budget-filters-with-the-same-merv-rating-explained`
+- `www.furnacefilterscanada.com/blog/how-to-find-size-of-furnace-filter`
+- `www.furnacefilterscanada.com/blog/how-to-find-the-right-size-furnace-filter`
+- `www.furnacefilterscanada.com/blog/how-to-reduce-energy-bill-in-winter`
+- `www.furnacefilterscanada.com/blog/how-to-save-money-on-furnace-filters`
+- `www.furnacefilterscanada.com/blog/is-a-higher-merv-rating-better`
+- `www.furnacefilterscanada.com/blog/is-good-customer-service-extinct`
+- `www.furnacefilterscanada.com/blog/learn-3-tips-for-furnace-filters-replacement`
+- `www.furnacefilterscanada.com/blog/merv-11-furnace-filters`
+- `www.furnacefilterscanada.com/blog/merv-11-vs-merv-12`
+- `www.furnacefilterscanada.com/blog/merv-13-vs-merv-8`
+- `www.furnacefilterscanada.com/blog/merv-rating`
+- `www.furnacefilterscanada.com/blog/merv-ratings-vs-mpr-vs-fpr`
+- `www.furnacefilterscanada.com/blog/outdoor-fresh-air`
+- `www.furnacefilterscanada.com/blog/secrets-of-an-online-store`
+- `www.furnacefilterscanada.com/blog/secrets-of-successful-companies`
+- `www.furnacefilterscanada.com/blog/sick-and-tired-of-waiting`
+- `www.furnacefilterscanada.com/blog/small-business-success-stories`
+- `www.furnacefilterscanada.com/blog/social-media-is-a-great-way-to-connect`
+- `www.furnacefilterscanada.com/blog/the-dirty-truth-your-filter-wont-clean-your-air`
+- `www.furnacefilterscanada.com/blog/the-only-item-we-ship-to-the-us-is`
+- `www.furnacefilterscanada.com/blog/time-for-spring-cleaning-dont-neglect-your-vents-ducts-and-filters`
+- `www.furnacefilterscanada.com/blog/tips-to-slash-your-energy-bills`
+- `www.furnacefilterscanada.com/blog/top-6-summer-destinations`
+- `www.furnacefilterscanada.com/blog/top-7-moving-tips`
+- `www.furnacefilterscanada.com/blog/what-are-furnace-filters-made-of`
+- `www.furnacefilterscanada.com/blog/what-does-a-furnace-inspection-consist-of`
+- `www.furnacefilterscanada.com/blog/what-does-merv-8-mean`
+- `www.furnacefilterscanada.com/blog/what-does-merv-stand-for-`
+- `www.furnacefilterscanada.com/blog/what-is-a-hepa-filter`
+- `www.furnacefilterscanada.com/blog/what-is-the-best-merv-rating-to-use`
+- `www.furnacefilterscanada.com/blog/which-way-should-i-install-my-fantech-filter`
+- `www.furnacefilterscanada.com/blog/which-way-should-my-air-filter-face`
+- `www.furnacefilterscanada.com/blog/why-buy-furnace-filters-online`
+- `www.furnacefilterscanada.com/blog/why-canadian-homeowners-are-switching-to-premium-camfil-filters-in-2026`
+- `www.furnacefilterscanada.com/blog/why-does-merv-matter`
+- `www.furnacefilterscanada.com/blog/why-hvac-technicians-recommend-camfil-filters`
+- `www.furnacefilterscanada.com/blog/why-is-camfil-3030-a-better-choice`
+- `www.furnacefilterscanada.com/blog/why-should-i-install-a-smart-thermostat-here-are-3-reasons`
+- `www.furnacefilterscanada.com/blog/why-you-should-buy-generic-furnace-filters`
+- `www.furnacefilterscanada.com/blog/why-you-should-start-shopping-for-a-new-furnace-and-filters-now-`
+- `www.furnacefilterscanada.com/blog/you-shipped-how-much-last-year-`
+- `www.furnacefilterscanada.com/can-i-run-my-furnace-without-a-filter`
+- `www.furnacefilterscanada.com/filters-canada`
+- `www.furnacefilterscanada.com/filtre-fournaise`
+- `www.furnacefilterscanada.com/furnace-air-filters`
+- `www.furnacefilterscanada.com/furnace-filters-calgary`
+- `www.furnacefilterscanada.com/furnace-filters-montreal`
+- `www.furnacefilterscanada.com/furnace-filters-ottawa`
+- `www.furnacefilterscanada.com/furnace-filters-toronto`
+- `www.furnacefilterscanada.com/furnace-filters-vancouver`
+- `www.furnacefilterscanada.com/furnace-filters-winnipeg`
+- `www.furnacefilterscanada.com/indoor-air-quality`
+
+### Identifiant BigCommerce absent de la base (import non exécuté pour cette vitrine, ou contenu masqué). — 73 URL(s)
+
+- `www.furnacefilterscanada.com/01xs-24z20z12-1d-3-c-a-00-0-00` (id `en:681`)
+- `www.furnacefilterscanada.com/10-1-2-10-1-2-1-perfectpleat-hc-m8` (id `en:671`)
+- `www.furnacefilterscanada.com/10x10` (id `en:261`)
+- `www.furnacefilterscanada.com/10x20` (id `en:99`)
+- `www.furnacefilterscanada.com/10x24` (id `en:252`)
+- `www.furnacefilterscanada.com/10x25` (id `en:255`)
+- `www.furnacefilterscanada.com/12x12` (id `en:263`)
+- `www.furnacefilterscanada.com/12x16` (id `en:257`)
+- `www.furnacefilterscanada.com/12x20` (id `en:103`)
+- `www.furnacefilterscanada.com/12x24` (id `en:104`)
+- `www.furnacefilterscanada.com/12x25` (id `en:258`)
+- `www.furnacefilterscanada.com/14x20` (id `en:106`)
+- `www.furnacefilterscanada.com/14x24` (id `en:259`)
+- `www.furnacefilterscanada.com/14x24x1-furnace-filter-dual-9-pleated-filter` (id `en:695`)
+- `www.furnacefilterscanada.com/14x25` (id `en:108`)
+- `www.furnacefilterscanada.com/15-1-2-x-13-1-2-x-7-8-furnace-filter-merv-8` (id `en:700`)
+- `www.furnacefilterscanada.com/15-3-4-x-24-1-4-x-3-inches-merv-11-3-pack` (id `en:202`)
+- `www.furnacefilterscanada.com/15-3-8x25-1-2x5-1-4` (id `en:292`)
+- `www.furnacefilterscanada.com/15x20` (id `en:109`)
+- `www.furnacefilterscanada.com/15x25` (id `en:110`)
+- `www.furnacefilterscanada.com/16x16` (id `en:111`)
+- `www.furnacefilterscanada.com/16x20` (id `en:112`)
+- `www.furnacefilterscanada.com/16x24` (id `en:113`)
+- `www.furnacefilterscanada.com/16x25` (id `en:114`)
+- `www.furnacefilterscanada.com/16x25x3` (id `en:269`)
+- `www.furnacefilterscanada.com/16x25x5-trion-air-bear-furnace-filter` (id `en:207`)
+- `www.furnacefilterscanada.com/17-x-24-x-3-3-4-dual-9-pleated-filter` (id `en:672`)
+- `www.furnacefilterscanada.com/18-20-2-prepleat-hc-m11-aaf-12-pack` (id `en:689`)
+- `www.furnacefilterscanada.com/18x20` (id `en:115`)
+- `www.furnacefilterscanada.com/18x24` (id `en:116`)
+- `www.furnacefilterscanada.com/18x25` (id `en:117`)
+- `www.furnacefilterscanada.com/19-1-2-x-29-1-4-x-1-3-4-camfil-dual-9-pleated-filter` (id `en:662`)
+- `www.furnacefilterscanada.com/20x20` (id `en:118`)
+- `www.furnacefilterscanada.com/20x20x5-air-filter` (id `en:198`)
+- `www.furnacefilterscanada.com/20x24` (id `en:119`)
+- `www.furnacefilterscanada.com/20x25` (id `en:120`)
+- `www.furnacefilterscanada.com/20x25x2-polyklean-blue-pad` (id `en:659`)
+- `www.furnacefilterscanada.com/20x25x5-trion-air-bear` (id `en:205`)
+- `www.furnacefilterscanada.com/20x30` (id `en:121`)
+- `www.furnacefilterscanada.com/21-23-amerseal-green-2-ply-aaf` (id `en:688`)
+- `www.furnacefilterscanada.com/21x22x1-furnace-filter-merv-8` (id `en:678`)
+- `www.furnacefilterscanada.com/22x22` (id `en:260`)
+- `www.furnacefilterscanada.com/24x24` (id `en:123`)
+- `www.furnacefilterscanada.com/25x25` (id `en:124`)
+- `www.furnacefilterscanada.com/25x29` (id `en:267`)
+- `www.furnacefilterscanada.com/28-1-2-x-31-1-2-x-1-3-4-dual-9-pleated-filter` (id `en:666`)
+- `www.furnacefilterscanada.com/7-1-2-x-13-1-2-x-7-8-furnace-filter-merv-8` (id `en:702`)
+- `www.furnacefilterscanada.com/7-1-2-x-31-1-2-x-2-dual-9-pleated-filter` (id `en:701`)
+- `www.furnacefilterscanada.com/7x20` (id `en:266`)
+- `www.furnacefilterscanada.com/8-3-4-x-24-x-7-8-dual-9-pleated-filter` (id `en:694`)
+- `www.furnacefilterscanada.com/9-7-8-15-7-8-1-prepleat-lpd-sc-m10-aaf` (id `en:699`)
+- `www.furnacefilterscanada.com/aldes-h150-tqg-recovery-core-unit` (id `en:670`)
+- `www.furnacefilterscanada.com/amaircare-annual-kit-for-hepa-40-60` (id `en:685`)
+- `www.furnacefilterscanada.com/aprilaire-416-16x25-merv16` (id `en:668`)
+- `www.furnacefilterscanada.com/aprilaire-filter` (id `en:85`)
+- `www.furnacefilterscanada.com/aprilaire-filter-2200` (id `en:239`)
+- `www.furnacefilterscanada.com/aprilaire-filter-2400` (id `en:238`)
+- `www.furnacefilterscanada.com/aprilaire-water-panel` (id `en:86`)
+- `www.furnacefilterscanada.com/aprilaire-water-panel-part-10` (id `en:242`)
+- `www.furnacefilterscanada.com/camfil-hi-flo-es` (id `en:180`)
+- `www.furnacefilterscanada.com/cg-1000-2-24-24` (id `en:682`)
+- `www.furnacefilterscanada.com/city-m-air-purifier-black` (id `en:547`)
+- `www.furnacefilterscanada.com/copy-of-19-1-2-x-29-1-4-x-1-3-4-camfil-dual-9-pleated-filter-6-pack` (id `en:665`)
+- `www.furnacefilterscanada.com/copy-of-fc100a1037-honeywell-20x25x4-5-pack` (id `en:675`)
+- `www.furnacefilterscanada.com/electro-air-eap900-hepa-air-cleaner-with-uvc-pco` (id `en:697`)
+- `www.furnacefilterscanada.com/generalaire-20x25x5-merv-13-3-pack` (id `en:704`)
+- `www.furnacefilterscanada.com/hide` (id `en:278`)
+- `www.furnacefilterscanada.com/m11` (id `en:367`)
+- `www.furnacefilterscanada.com/m13` (id `en:368`)
+- `www.furnacefilterscanada.com/m8` (id `en:354`)
+- `www.furnacefilterscanada.com/mah-1056b-electro-air-pleated-media-filter-merv-11` (id `en:676`)
+- `www.furnacefilterscanada.com/reservepro-generalaire-ga23-vapor-pad` (id `en:669`)
+- `www.furnacefilterscanada.com/venmar-air-exchanger-parts` (id `en:12`)
+
+## URLs ignorées (8)
+
+### URL identique sur la nouvelle plateforme — aucune redirection nécessaire. — 2 URL(s)
+
+- `www.filtrationmontreal.com` : `/`
+- `www.furnacefilterscanada.com` : `/`
+
+### URL vide côté BigCommerce (page sans chemin public) — rien à rediriger. — 6 URL(s)
+
+- `www.furnacefilterscanada.com` : `(chemin vide)` (id `en:page:71`)
+- `www.furnacefilterscanada.com` : `(chemin vide)` (id `en:page:74`)
+- `www.furnacefilterscanada.com` : `(chemin vide)` (id `en:page:136`)
+- `www.furnacefilterscanada.com` : `(chemin vide)` (id `en:page:140`)
+- `www.furnacefilterscanada.com` : `(chemin vide)` (id `en:page:141`)
+- `www.furnacefilterscanada.com` : `(chemin vide)` (id `en:page:145`)
+
+## Régénération
+
+1. Base dev à jour : `pnpm --filter @ffc/api bigcommerce:import` (import EN réel).
+2. Inventaire frais : `pnpm --filter @ffc/api bigcommerce:crawl`.
+3. `pnpm --filter @ffc/api bigcommerce:redirects` — échoue (code 1) tant qu’il reste un écart.
+4. Commiter l’artefact, les écarts et ce rapport ensemble.

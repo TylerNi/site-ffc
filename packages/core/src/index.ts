@@ -11,3 +11,4 @@ export * from './postal';
 export * from './money';
 export * from './health';
 export * from './vision';
+export * from './redirects';

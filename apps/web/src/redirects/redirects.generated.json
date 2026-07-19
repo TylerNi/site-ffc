@@ -1,0 +1,2710 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-19T16:26:36.676Z",
+  "sources": {
+    "csvRows": 613,
+    "crawlRows": 1238,
+    "decisions": 20
+  },
+  "hosts": {
+    "www.furnacefilterscanada.com": {
+      "locale": "en",
+      "origin": "https://www.furnacefilterscanada.com",
+      "aliases": ["furnacefilterscanada.com"],
+      "exact": {
+        "/10x10x1-furnace-filter": {
+          "to": "/categories/10x10x1-furnace-filter",
+          "type": "category",
+          "id": "en:262"
+        },
+        "/10x10x1-furnace-filter-camfil-30-30": {
+          "to": "/products/10x10x1-furnace-filter-camfil-30-30",
+          "type": "product",
+          "id": "en:534"
+        },
+        "/10x20x1": {
+          "to": "/categories/10x20x1",
+          "type": "category",
+          "id": "en:125"
+        },
+        "/10x20x1-air-filter": {
+          "to": "/products/10x20x1-air-filter",
+          "type": "product",
+          "id": "en:379"
+        },
+        "/10x20x1-furnace-filter-merv-11": {
+          "to": "/products/10x20x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:463"
+        },
+        "/10x20x1-furnace-filter-merv-13": {
+          "to": "/products/10x20x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:587"
+        },
+        "/10x20x1-furnace-filter-merv-13-aaf": {
+          "to": "/products/10x20x1-furnace-filter-merv-13-aaf",
+          "type": "product",
+          "id": "en:661"
+        },
+        "/10x20x1-furnace-filter-merv-8": {
+          "to": "/products/10x20x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:485"
+        },
+        "/10x20x1-merv-13": {
+          "to": "/categories/10x20x1-merv-13",
+          "type": "category",
+          "id": "en:380"
+        },
+        "/10x20x2": {
+          "to": "/categories/10x20x2",
+          "type": "category",
+          "id": "en:126"
+        },
+        "/10x20x2-furnace-filter": {
+          "to": "/products/10x20x2-furnace-filter",
+          "type": "product",
+          "id": "en:131"
+        },
+        "/10x20x2-furnace-filter-merv-11": {
+          "to": "/products/10x20x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:475"
+        },
+        "/10x20x2-furnace-filter-merv-13-aaf": {
+          "to": "/products/10x20x2-furnace-filter-merv-13-aaf",
+          "type": "product",
+          "id": "en:660"
+        },
+        "/10x20x2-furnace-filter-merv-8": {
+          "to": "/products/10x20x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:504"
+        },
+        "/10x20x2-merv-13": {
+          "to": "/categories/10x20x2-merv-13",
+          "type": "category",
+          "id": "en:407"
+        },
+        "/10x20x4-furnace-filter-camfil-ap-3": {
+          "to": "/products/10x20x4-furnace-filter-camfil-ap-3",
+          "type": "product",
+          "id": "en:551"
+        },
+        "/10x24x1": {
+          "to": "/categories/10x24x1",
+          "type": "category",
+          "id": "en:253"
+        },
+        "/10x24x1-furnace-filter": {
+          "to": "/products/10x24x1-furnace-filter",
+          "type": "product",
+          "id": "en:267"
+        },
+        "/10x24x1-furnace-filter-merv-11": {
+          "to": "/products/10x24x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:469"
+        },
+        "/10x24x1-furnace-filter-merv-13": {
+          "to": "/products/10x24x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:591"
+        },
+        "/10x24x1-furnace-filter-merv-8": {
+          "to": "/products/10x24x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:490"
+        },
+        "/10x24x1-merv-13": {
+          "to": "/categories/10x24x1-merv-13",
+          "type": "category",
+          "id": "en:385"
+        },
+        "/10x25x1": {
+          "to": "/categories/10x25x1",
+          "type": "category",
+          "id": "en:101"
+        },
+        "/10x25x1-furnace-filter": {
+          "to": "/products/10x25x1-furnace-filter",
+          "type": "product",
+          "id": "en:268"
+        },
+        "/10x25x1-furnace-filter-merv-8": {
+          "to": "/products/10x25x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:491"
+        },
+        "/12x12x1": {
+          "to": "/categories/12x12x1",
+          "type": "category",
+          "id": "en:264"
+        },
+        "/12x12x1-furnace-filter-camfil-30-30": {
+          "to": "/products/12x12x1-furnace-filter-camfil-30-30",
+          "type": "product",
+          "id": "en:535"
+        },
+        "/12x12x1-furnace-filter-merv-8-aaf": {
+          "to": "/products/12x12x1-furnace-filter-merv-8-aaf",
+          "type": "product",
+          "id": "en:686"
+        },
+        "/12x16x1": {
+          "to": "/categories/12x16x1",
+          "type": "category",
+          "id": "en:102"
+        },
+        "/12x16x1-furnace-filter": {
+          "to": "/products/12x16x1-furnace-filter",
+          "type": "product",
+          "id": "en:271"
+        },
+        "/12x16x1-furnace-filter-merv-8": {
+          "to": "/products/12x16x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:494"
+        },
+        "/12x20x1": {
+          "to": "/categories/12x20x1",
+          "type": "category",
+          "id": "en:127"
+        },
+        "/12x20x1-furnace-filter": {
+          "to": "/products/12x20x1-furnace-filter",
+          "type": "product",
+          "id": "en:367"
+        },
+        "/12x20x1-furnace-filter-merv-11": {
+          "to": "/products/12x20x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:470"
+        },
+        "/12x20x1-furnace-filter-merv-13": {
+          "to": "/products/12x20x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:593"
+        },
+        "/12x20x1-furnace-filter-merv-8": {
+          "to": "/products/12x20x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:492"
+        },
+        "/12x20x1-merv-11": {
+          "to": "/categories/12x20x1-merv-11",
+          "type": "category",
+          "id": "en:311"
+        },
+        "/12x20x1-merv-13": {
+          "to": "/categories/12x20x1-merv-13",
+          "type": "category",
+          "id": "en:386"
+        },
+        "/12x20x1-merv-8": {
+          "to": "/categories/12x20x1-merv-8",
+          "type": "category",
+          "id": "en:343"
+        },
+        "/12x20x2": {
+          "to": "/categories/12x20x2",
+          "type": "category",
+          "id": "en:128"
+        },
+        "/12x20x2-furnace-filter": {
+          "to": "/products/12x20x2-furnace-filter",
+          "type": "product",
+          "id": "en:130"
+        },
+        "/12x20x2-furnace-filter-merv-11": {
+          "to": "/products/12x20x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:479"
+        },
+        "/12x20x2-furnace-filter-merv-13": {
+          "to": "/products/12x20x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:522"
+        },
+        "/12x20x2-furnace-filter-merv-8": {
+          "to": "/products/12x20x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:511"
+        },
+        "/12x20x2-merv-13": {
+          "to": "/categories/12x20x2-merv-13",
+          "type": "category",
+          "id": "en:394"
+        },
+        "/12x24x1": {
+          "to": "/categories/12x24x1",
+          "type": "category",
+          "id": "en:129"
+        },
+        "/12x24x1-furnace-filter": {
+          "to": "/products/12x24x1-furnace-filter",
+          "type": "product",
+          "id": "en:284"
+        },
+        "/12x24x1-furnace-filter-merv-11": {
+          "to": "/products/12x24x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:462"
+        },
+        "/12x24x1-furnace-filter-merv-13": {
+          "to": "/products/12x24x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:585"
+        },
+        "/12x24x1-furnace-filter-merv-8": {
+          "to": "/products/12x24x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:482"
+        },
+        "/12x24x1-merv-13": {
+          "to": "/categories/12x24x1-merv-13",
+          "type": "category",
+          "id": "en:378"
+        },
+        "/12x24x2": {
+          "to": "/categories/12x24x2",
+          "type": "category",
+          "id": "en:130"
+        },
+        "/12x24x2-furnace-filter": {
+          "to": "/products/12x24x2-furnace-filter",
+          "type": "product",
+          "id": "en:129"
+        },
+        "/12x24x2-furnace-filter-merv-11": {
+          "to": "/products/12x24x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:476"
+        },
+        "/12x24x2-furnace-filter-merv-13": {
+          "to": "/products/12x24x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:518"
+        },
+        "/12x24x2-furnace-filter-merv-8": {
+          "to": "/products/12x24x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:502"
+        },
+        "/12x24x2-merv-11": {
+          "to": "/categories/12x24x2-merv-11",
+          "type": "category",
+          "id": "en:322"
+        },
+        "/12x24x2-merv-13": {
+          "to": "/categories/12x24x2-merv-13",
+          "type": "category",
+          "id": "en:329"
+        },
+        "/12x24x2-merv-8": {
+          "to": "/categories/12x24x2-merv-8",
+          "type": "category",
+          "id": "en:355"
+        },
+        "/12x24x4": {
+          "to": "/categories/12x24x4",
+          "type": "category",
+          "id": "en:131"
+        },
+        "/12x24x4-air-filter-merv-11": {
+          "to": "/products/12x24x4-air-filter-merv-11",
+          "type": "product",
+          "id": "en:525"
+        },
+        "/12x24x4-air-filter-merv-13": {
+          "to": "/products/12x24x4-air-filter-merv-13",
+          "type": "product",
+          "id": "en:530"
+        },
+        "/12x24x4-furnace-filter": {
+          "to": "/products/12x24x4-furnace-filter",
+          "type": "product",
+          "id": "en:374"
+        },
+        "/12x24x4-furnace-filter-merv-8": {
+          "to": "/products/12x24x4-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:455"
+        },
+        "/12x24x4-merv-13": {
+          "to": "/categories/12x24x4-merv-13",
+          "type": "category",
+          "id": "en:390"
+        },
+        "/12x25x1": {
+          "to": "/categories/12x25x1",
+          "type": "category",
+          "id": "en:105"
+        },
+        "/12x25x1-furnace-filter": {
+          "to": "/products/12x25x1-furnace-filter",
+          "type": "product",
+          "id": "en:270"
+        },
+        "/12x25x1-furnace-filter-merv-8": {
+          "to": "/products/12x25x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:493"
+        },
+        "/14x20x1": {
+          "to": "/categories/14x20x1",
+          "type": "category",
+          "id": "en:132"
+        },
+        "/14x20x1-furnace-filter": {
+          "to": "/products/14x20x1-furnace-filter",
+          "type": "product",
+          "id": "en:280"
+        },
+        "/14x20x1-furnace-filter-merv-11": {
+          "to": "/products/14x20x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:458"
+        },
+        "/14x20x1-furnace-filter-merv-13": {
+          "to": "/products/14x20x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:580"
+        },
+        "/14x20x1-furnace-filter-merv-8": {
+          "to": "/products/14x20x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:480"
+        },
+        "/14x20x1-merv-13": {
+          "to": "/categories/14x20x1-merv-13",
+          "type": "category",
+          "id": "en:374"
+        },
+        "/14x20x2": {
+          "to": "/categories/14x20x2",
+          "type": "category",
+          "id": "en:133"
+        },
+        "/14x20x2-furnace-filter": {
+          "to": "/products/14x20x2-furnace-filter",
+          "type": "product",
+          "id": "en:81"
+        },
+        "/14x20x2-furnace-filter-merv-11": {
+          "to": "/products/14x20x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:477"
+        },
+        "/14x20x2-furnace-filter-merv-13": {
+          "to": "/products/14x20x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:638"
+        },
+        "/14x20x2-furnace-filter-merv-8": {
+          "to": "/products/14x20x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:499"
+        },
+        "/14x20x2-merv-11": {
+          "to": "/categories/14x20x2-merv-11",
+          "type": "category",
+          "id": "en:323"
+        },
+        "/14x20x2-merv-13": {
+          "to": "/categories/14x20x2-merv-13",
+          "type": "category",
+          "id": "en:330"
+        },
+        "/14x20x2-merv-8": {
+          "to": "/categories/14x20x2-merv-8",
+          "type": "category",
+          "id": "en:356"
+        },
+        "/14x24x1": {
+          "to": "/categories/14x24x1",
+          "type": "category",
+          "id": "en:107"
+        },
+        "/14x24x1-furnace-filter": {
+          "to": "/products/14x24x1-furnace-filter",
+          "type": "product",
+          "id": "en:272"
+        },
+        "/14x24x1-furnace-filter-merv-11": {
+          "to": "/products/14x24x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:471"
+        },
+        "/14x24x1-furnace-filter-merv-13": {
+          "to": "/products/14x24x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:594"
+        },
+        "/14x24x1-furnace-filter-merv-8": {
+          "to": "/products/14x24x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:495"
+        },
+        "/14x24x1-merv-13": {
+          "to": "/categories/14x24x1-merv-13",
+          "type": "category",
+          "id": "en:387"
+        },
+        "/14x25x1": {
+          "to": "/categories/14x25x1",
+          "type": "category",
+          "id": "en:134"
+        },
+        "/14x25x1-furnace-filter-camfil-30-30": {
+          "to": "/products/14x25x1-furnace-filter-camfil-30-30",
+          "type": "product",
+          "id": "en:533"
+        },
+        "/14x25x1-furnace-filter-merv-13": {
+          "to": "/products/14x25x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:581"
+        },
+        "/14x25x1-merv-11": {
+          "to": "/categories/14x25x1-merv-11",
+          "type": "category",
+          "id": "en:312"
+        },
+        "/14x25x1-merv-13": {
+          "to": "/categories/14x25x1-merv-13",
+          "type": "category",
+          "id": "en:375"
+        },
+        "/14x25x1-merv-8": {
+          "to": "/categories/14x25x1-merv-8",
+          "type": "category",
+          "id": "en:344"
+        },
+        "/14x25x2": {
+          "to": "/categories/14x25x2",
+          "type": "category",
+          "id": "en:135"
+        },
+        "/14x25x2-furnace-filter": {
+          "to": "/products/14x25x2-furnace-filter",
+          "type": "product",
+          "id": "en:127"
+        },
+        "/14x25x2-furnace-filter-merv-11": {
+          "to": "/products/14x25x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:189"
+        },
+        "/14x25x2-furnace-filter-merv-13": {
+          "to": "/products/14x25x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:517"
+        },
+        "/14x25x2-furnace-filter-merv-8": {
+          "to": "/products/14x25x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:500"
+        },
+        "/14x25x2-merv-13": {
+          "to": "/categories/14x25x2-merv-13",
+          "type": "category",
+          "id": "en:395"
+        },
+        "/15-3-8-x-21-7-8-x-5-1-4": {
+          "to": "/categories/15-3-8-x-21-7-8-x-5-1-4",
+          "type": "category",
+          "id": "en:270"
+        },
+        "/15x20x1": {
+          "to": "/categories/15x20x1",
+          "type": "category",
+          "id": "en:136"
+        },
+        "/15x20x1-furnace-filter": {
+          "to": "/products/15x20x1-furnace-filter",
+          "type": "product",
+          "id": "en:282"
+        },
+        "/15x20x1-furnace-filter-merv-11": {
+          "to": "/products/15x20x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:460"
+        },
+        "/15x20x1-furnace-filter-merv-13": {
+          "to": "/products/15x20x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:584"
+        },
+        "/15x20x1-furnace-filter-merv-8": {
+          "to": "/products/15x20x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:481"
+        },
+        "/15x20x1-merv-13": {
+          "to": "/categories/15x20x1-merv-13",
+          "type": "category",
+          "id": "en:377"
+        },
+        "/15x20x2": {
+          "to": "/categories/15x20x2",
+          "type": "category",
+          "id": "en:137"
+        },
+        "/15x20x2-furnace-filter": {
+          "to": "/products/15x20x2-furnace-filter",
+          "type": "product",
+          "id": "en:126"
+        },
+        "/15x20x2-furnace-filter-merv-11": {
+          "to": "/products/15x20x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:82"
+        },
+        "/15x20x2-furnace-filter-merv-13": {
+          "to": "/products/15x20x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:545"
+        },
+        "/15x20x2-furnace-filter-merv-8": {
+          "to": "/products/15x20x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:501"
+        },
+        "/15x20x2-merv-13": {
+          "to": "/categories/15x20x2-merv-13",
+          "type": "category",
+          "id": "en:396"
+        },
+        "/15x25x1": {
+          "to": "/categories/15x25x1",
+          "type": "category",
+          "id": "en:138"
+        },
+        "/15x25x1-furnace-filter": {
+          "to": "/products/15x25x1-furnace-filter",
+          "type": "product",
+          "id": "en:265"
+        },
+        "/15x25x1-furnace-filter-merv-11": {
+          "to": "/products/15x25x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:464"
+        },
+        "/15x25x1-furnace-filter-merv-13": {
+          "to": "/products/15x25x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:592"
+        },
+        "/15x25x1-furnace-filter-merv-8": {
+          "to": "/products/15x25x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:489"
+        },
+        "/15x25x1-merv-13": {
+          "to": "/categories/15x25x1-merv-13",
+          "type": "category",
+          "id": "en:384"
+        },
+        "/15x25x2": {
+          "to": "/categories/15x25x2",
+          "type": "category",
+          "id": "en:139"
+        },
+        "/15x25x2-furnace-filter": {
+          "to": "/products/15x25x2-furnace-filter",
+          "type": "product",
+          "id": "en:327"
+        },
+        "/15x25x2-furnace-filter-merv-8": {
+          "to": "/products/15x25x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:513"
+        },
+        "/16x16x1": {
+          "to": "/categories/16x16x1",
+          "type": "category",
+          "id": "en:140"
+        },
+        "/16x16x1-furnace-filter": {
+          "to": "/products/16x16x1-furnace-filter",
+          "type": "product",
+          "id": "en:262"
+        },
+        "/16x16x1-furnace-filter-merv-11": {
+          "to": "/products/16x16x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:465"
+        },
+        "/16x16x1-furnace-filter-merv-13": {
+          "to": "/products/16x16x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:589"
+        },
+        "/16x16x1-furnace-filter-merv-8": {
+          "to": "/products/16x16x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:487"
+        },
+        "/16x16x1-merv-13": {
+          "to": "/categories/16x16x1-merv-13",
+          "type": "category",
+          "id": "en:382"
+        },
+        "/16x16x2": {
+          "to": "/categories/16x16x2",
+          "type": "category",
+          "id": "en:141"
+        },
+        "/16x16x2-furnace-filter": {
+          "to": "/products/16x16x2-furnace-filter",
+          "type": "product",
+          "id": "en:326"
+        },
+        "/16x16x2-furnace-filter-merv-11": {
+          "to": "/products/16x16x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:330"
+        },
+        "/16x16x2-furnace-filter-merv-8": {
+          "to": "/products/16x16x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:508"
+        },
+        "/16x20x1": {
+          "to": "/categories/16x20x1",
+          "type": "category",
+          "id": "en:191"
+        },
+        "/16x20x1-furnace-filter": {
+          "to": "/categories/16x20x1-furnace-filter",
+          "type": "category",
+          "id": "en:280"
+        },
+        "/16x20x1-furnace-filter-merv-13": {
+          "to": "/products/16x20x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:560"
+        },
+        "/16x20x1-furnace-filter-merv-13-": {
+          "to": "/products/16x20x1-furnace-filter-merv-13-",
+          "type": "product",
+          "id": "en:575"
+        },
+        "/16x20x1-furnace-filter-merv-8": {
+          "to": "/products/16x20x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:423"
+        },
+        "/16x20x1-merv-11": {
+          "to": "/categories/16x20x1-merv-11",
+          "type": "category",
+          "id": "en:313"
+        },
+        "/16x20x1-merv-13": {
+          "to": "/categories/16x20x1-merv-13",
+          "type": "category",
+          "id": "en:370"
+        },
+        "/16x20x1-merv-8": {
+          "to": "/categories/16x20x1-merv-8",
+          "type": "category",
+          "id": "en:345"
+        },
+        "/16x20x2": {
+          "to": "/categories/16x20x2",
+          "type": "category",
+          "id": "en:143"
+        },
+        "/16x20x2-furnace-filter": {
+          "to": "/products/16x20x2-furnace-filter",
+          "type": "product",
+          "id": "en:399"
+        },
+        "/16x20x2-furnace-filter-merv-11": {
+          "to": "/products/16x20x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:450"
+        },
+        "/16x20x2-furnace-filter-merv-13": {
+          "to": "/products/16x20x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:451"
+        },
+        "/16x20x2-furnace-filter-merv-13-": {
+          "to": "/products/16x20x2-furnace-filter-merv-13-",
+          "type": "product",
+          "id": "en:563"
+        },
+        "/16x20x2-furnace-filter-merv-8": {
+          "to": "/products/16x20x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:449"
+        },
+        "/16x20x2-furnace-filter-merv-8-": {
+          "to": "/products/16x20x2-furnace-filter-merv-8-",
+          "type": "product",
+          "id": "en:602"
+        },
+        "/16x20x2-merv-11": {
+          "to": "/categories/16x20x2-merv-11",
+          "type": "category",
+          "id": "en:324"
+        },
+        "/16x20x2-merv-13": {
+          "to": "/categories/16x20x2-merv-13",
+          "type": "category",
+          "id": "en:336"
+        },
+        "/16x20x2-merv-8": {
+          "to": "/categories/16x20x2-merv-8",
+          "type": "category",
+          "id": "en:357"
+        },
+        "/16x20x4-air-filter": {
+          "to": "/products/16x20x4-air-filter",
+          "type": "product",
+          "id": "en:362"
+        },
+        "/16x20x4-air-filter-merv-11": {
+          "to": "/products/16x20x4-air-filter-merv-11",
+          "type": "product",
+          "id": "en:431"
+        },
+        "/16x20x4-air-filter-merv-13": {
+          "to": "/products/16x20x4-air-filter-merv-13",
+          "type": "product",
+          "id": "en:436"
+        },
+        "/16x20x4-air-filter-merv-8": {
+          "to": "/products/16x20x4-air-filter-merv-8",
+          "type": "product",
+          "id": "en:416"
+        },
+        "/16x20x4-furnace-filter": {
+          "to": "/categories/16x20x4-furnace-filter",
+          "type": "category",
+          "id": "en:199"
+        },
+        "/16x20x4-furnace-filter-merv-13-": {
+          "to": "/products/16x20x4-furnace-filter-merv-13-",
+          "type": "product",
+          "id": "en:564"
+        },
+        "/16x20x4-merv-11": {
+          "to": "/categories/16x20x4-merv-11",
+          "type": "category",
+          "id": "en:306"
+        },
+        "/16x20x4-merv-13": {
+          "to": "/categories/16x20x4-merv-13",
+          "type": "category",
+          "id": "en:331"
+        },
+        "/16x20x4-merv-8": {
+          "to": "/categories/16x20x4-merv-8",
+          "type": "category",
+          "id": "en:362"
+        },
+        "/16x20x5": {
+          "to": "/categories/16x20x5",
+          "type": "category",
+          "id": "en:145"
+        },
+        "/16x24x1": {
+          "to": "/categories/16x24x1",
+          "type": "category",
+          "id": "en:146"
+        },
+        "/16x24x1-furnace-filter": {
+          "to": "/products/16x24x1-furnace-filter",
+          "type": "product",
+          "id": "en:292"
+        },
+        "/16x24x1-furnace-filter-merv-11": {
+          "to": "/products/16x24x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:468"
+        },
+        "/16x24x1-furnace-filter-merv-13": {
+          "to": "/products/16x24x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:583"
+        },
+        "/16x24x1-furnace-filter-merv-8": {
+          "to": "/products/16x24x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:483"
+        },
+        "/16x24x1-merv-11": {
+          "to": "/categories/16x24x1-merv-11",
+          "type": "category",
+          "id": "en:314"
+        },
+        "/16x24x1-merv-13": {
+          "to": "/categories/16x24x1-merv-13",
+          "type": "category",
+          "id": "en:376"
+        },
+        "/16x24x1-merv-8": {
+          "to": "/categories/16x24x1-merv-8",
+          "type": "category",
+          "id": "en:346"
+        },
+        "/16x24x2": {
+          "to": "/categories/16x24x2",
+          "type": "category",
+          "id": "en:147"
+        },
+        "/16x24x2-furnace-filter": {
+          "to": "/products/16x24x2-furnace-filter",
+          "type": "product",
+          "id": "en:124"
+        },
+        "/16x24x2-furnace-filter-merv-11": {
+          "to": "/products/16x24x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:83"
+        },
+        "/16x24x2-furnace-filter-merv-13": {
+          "to": "/products/16x24x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:521"
+        },
+        "/16x24x2-furnace-filter-merv-8": {
+          "to": "/products/16x24x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:512"
+        },
+        "/16x24x2-merv-13": {
+          "to": "/categories/16x24x2-merv-13",
+          "type": "category",
+          "id": "en:399"
+        },
+        "/16x24x4": {
+          "to": "/categories/16x24x4",
+          "type": "category",
+          "id": "en:148"
+        },
+        "/16x24x4-air-filter-merv-13": {
+          "to": "/products/16x24x4-air-filter-merv-13",
+          "type": "product",
+          "id": "en:527"
+        },
+        "/16x24x4-furnace-filter": {
+          "to": "/products/16x24x4-furnace-filter",
+          "type": "product",
+          "id": "en:351"
+        },
+        "/16x24x4-furnace-filter-camfil-ap-11": {
+          "to": "/products/16x24x4-furnace-filter-camfil-ap-11",
+          "type": "product",
+          "id": "en:537"
+        },
+        "/16x24x4-furnace-filter-merv-8-extra": {
+          "to": "/products/16x24x4-furnace-filter-merv-8-extra",
+          "type": "product",
+          "id": "en:703"
+        },
+        "/16x24x4-merv-13": {
+          "to": "/categories/16x24x4-merv-13",
+          "type": "category",
+          "id": "en:391"
+        },
+        "/16x25x1-air-filter-merv-13": {
+          "to": "/products/16x25x1-air-filter-merv-13",
+          "type": "product",
+          "id": "en:557"
+        },
+        "/16x25x1-charcoal-furnace-filter-12-pack-7oop": {
+          "to": "/products/16x25x1-charcoal-furnace-filter-12-pack-7oop",
+          "type": "product",
+          "id": "en:549"
+        },
+        "/16x25x1-furnace-filter": {
+          "to": "/products/16x25x1-furnace-filter",
+          "type": "product",
+          "id": "en:406"
+        },
+        "/16x25x1-furnace-filter-merv-11": {
+          "to": "/products/16x25x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:427"
+        },
+        "/16x25x1-furnace-filter-merv-13-": {
+          "to": "/products/16x25x1-furnace-filter-merv-13-",
+          "type": "product",
+          "id": "en:576"
+        },
+        "/16x25x1-furnace-filter-merv-8": {
+          "to": "/products/16x25x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:428"
+        },
+        "/16x25x1-merv-11": {
+          "to": "/categories/16x25x1-merv-11",
+          "type": "category",
+          "id": "en:315"
+        },
+        "/16x25x1-merv-13": {
+          "to": "/categories/16x25x1-merv-13",
+          "type": "category",
+          "id": "en:341"
+        },
+        "/16x25x1-merv-8": {
+          "to": "/categories/16x25x1-merv-8",
+          "type": "category",
+          "id": "en:347"
+        },
+        "/16x25x2": {
+          "to": "/categories/16x25x2",
+          "type": "category",
+          "id": "en:150"
+        },
+        "/16x25x2-furnace-filter": {
+          "to": "/products/16x25x2-furnace-filter",
+          "type": "product",
+          "id": "en:368"
+        },
+        "/16x25x2-furnace-filter-merv-11": {
+          "to": "/products/16x25x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:441"
+        },
+        "/16x25x2-furnace-filter-merv-13": {
+          "to": "/products/16x25x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:443"
+        },
+        "/16x25x2-furnace-filter-merv-13-": {
+          "to": "/products/16x25x2-furnace-filter-merv-13-",
+          "type": "product",
+          "id": "en:562"
+        },
+        "/16x25x2-furnace-filter-merv-8": {
+          "to": "/products/16x25x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:442"
+        },
+        "/16x25x2-furnace-filter-merv-8-": {
+          "to": "/products/16x25x2-furnace-filter-merv-8-",
+          "type": "product",
+          "id": "en:566"
+        },
+        "/16x25x2-merv-11": {
+          "to": "/categories/16x25x2-merv-11",
+          "type": "category",
+          "id": "en:325"
+        },
+        "/16x25x2-merv-13": {
+          "to": "/categories/16x25x2-merv-13",
+          "type": "category",
+          "id": "en:337"
+        },
+        "/16x25x2-merv-8": {
+          "to": "/categories/16x25x2-merv-8",
+          "type": "category",
+          "id": "en:358"
+        },
+        "/16x25x4-furnace-filter": {
+          "to": "/categories/16x25x4-furnace-filter",
+          "type": "category",
+          "id": "en:193"
+        },
+        "/16x25x4-furnace-filter-merv-11": {
+          "to": "/products/16x25x4-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:417"
+        },
+        "/16x25x4-furnace-filter-merv-13": {
+          "to": "/products/16x25x4-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:418"
+        },
+        "/16x25x4-furnace-filter-merv-13-": {
+          "to": "/products/16x25x4-furnace-filter-merv-13-",
+          "type": "product",
+          "id": "en:555"
+        },
+        "/16x25x4-furnace-filter-merv-8": {
+          "to": "/products/16x25x4-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:437"
+        },
+        "/16x25x4-merv-11": {
+          "to": "/categories/16x25x4-merv-11",
+          "type": "category",
+          "id": "en:307"
+        },
+        "/16x25x4-merv-13": {
+          "to": "/categories/16x25x4-merv-13",
+          "type": "category",
+          "id": "en:332"
+        },
+        "/16x25x4-merv-8": {
+          "to": "/categories/16x25x4-merv-8",
+          "type": "category",
+          "id": "en:363"
+        },
+        "/16x25x5-furnace-filter": {
+          "to": "/categories/16x25x5-furnace-filter",
+          "type": "category",
+          "id": "en:194"
+        },
+        "/18x20x1": {
+          "to": "/categories/18x20x1",
+          "type": "category",
+          "id": "en:153"
+        },
+        "/18x20x1-furnace-filter": {
+          "to": "/products/18x20x1-furnace-filter",
+          "type": "product",
+          "id": "en:263"
+        },
+        "/18x20x1-furnace-filter-merv-11": {
+          "to": "/products/18x20x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:466"
+        },
+        "/18x20x1-furnace-filter-merv-8": {
+          "to": "/products/18x20x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:488"
+        },
+        "/18x20x1-merv-11": {
+          "to": "/categories/18x20x1-merv-11",
+          "type": "category",
+          "id": "en:316"
+        },
+        "/18x20x1-merv-8": {
+          "to": "/categories/18x20x1-merv-8",
+          "type": "category",
+          "id": "en:348"
+        },
+        "/18x20x2": {
+          "to": "/categories/18x20x2",
+          "type": "category",
+          "id": "en:154"
+        },
+        "/18x20x2-furnace-filter": {
+          "to": "/products/18x20x2-furnace-filter",
+          "type": "product",
+          "id": "en:122"
+        },
+        "/18x20x2-furnace-filter-merv-8": {
+          "to": "/products/18x20x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:515"
+        },
+        "/18x24x1": {
+          "to": "/categories/18x24x1",
+          "type": "category",
+          "id": "en:155"
+        },
+        "/18x24x1-furnace-filter": {
+          "to": "/products/18x24x1-furnace-filter",
+          "type": "product",
+          "id": "en:264"
+        },
+        "/18x24x1-furnace-filter-merv-11": {
+          "to": "/products/18x24x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:467"
+        },
+        "/18x24x1-furnace-filter-merv-13": {
+          "to": "/products/18x24x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:590"
+        },
+        "/18x24x1-furnace-filter-merv-8": {
+          "to": "/products/18x24x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:484"
+        },
+        "/18x24x1-merv-11": {
+          "to": "/categories/18x24x1-merv-11",
+          "type": "category",
+          "id": "en:317"
+        },
+        "/18x24x1-merv-13": {
+          "to": "/categories/18x24x1-merv-13",
+          "type": "category",
+          "id": "en:383"
+        },
+        "/18x24x1-merv-8": {
+          "to": "/categories/18x24x1-merv-8",
+          "type": "category",
+          "id": "en:349"
+        },
+        "/18x24x2": {
+          "to": "/categories/18x24x2",
+          "type": "category",
+          "id": "en:156"
+        },
+        "/18x24x2-furnace-filter": {
+          "to": "/products/18x24x2-furnace-filter",
+          "type": "product",
+          "id": "en:121"
+        },
+        "/18x24x2-furnace-filter-merv-11": {
+          "to": "/products/18x24x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:478"
+        },
+        "/18x24x2-furnace-filter-merv-13": {
+          "to": "/products/18x24x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:520"
+        },
+        "/18x24x2-furnace-filter-merv-8": {
+          "to": "/products/18x24x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:514"
+        },
+        "/18x24x2-furnace-filter-merv-8-aaf": {
+          "to": "/products/18x24x2-furnace-filter-merv-8-aaf",
+          "type": "product",
+          "id": "en:663"
+        },
+        "/18x24x2-merv-13": {
+          "to": "/categories/18x24x2-merv-13",
+          "type": "category",
+          "id": "en:401"
+        },
+        "/18x24x4": {
+          "to": "/categories/18x24x4",
+          "type": "category",
+          "id": "en:177"
+        },
+        "/18x24x4-air-filter-merv-13": {
+          "to": "/products/18x24x4-air-filter-merv-13",
+          "type": "product",
+          "id": "en:528"
+        },
+        "/18x24x4-furnace-filter": {
+          "to": "/products/18x24x4-furnace-filter",
+          "type": "product",
+          "id": "en:376"
+        },
+        "/18x24x4-furnace-filter-merv-11": {
+          "to": "/products/18x24x4-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:524"
+        },
+        "/18x24x4-furnace-filter-merv-8": {
+          "to": "/products/18x24x4-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:457"
+        },
+        "/18x24x4-merv-13": {
+          "to": "/categories/18x24x4-merv-13",
+          "type": "category",
+          "id": "en:392"
+        },
+        "/18x25x1": {
+          "to": "/categories/18x25x1",
+          "type": "category",
+          "id": "en:157"
+        },
+        "/18x25x1-furnace-filter": {
+          "to": "/products/18x25x1-furnace-filter",
+          "type": "product",
+          "id": "en:287"
+        },
+        "/18x25x1-furnace-filter-merv-11": {
+          "to": "/products/18x25x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:474"
+        },
+        "/18x25x1-furnace-filter-merv-13": {
+          "to": "/products/18x25x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:588"
+        },
+        "/18x25x1-furnace-filter-merv-8": {
+          "to": "/products/18x25x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:486"
+        },
+        "/18x25x1-merv-11": {
+          "to": "/categories/18x25x1-merv-11",
+          "type": "category",
+          "id": "en:318"
+        },
+        "/18x25x1-merv-13": {
+          "to": "/categories/18x25x1-merv-13",
+          "type": "category",
+          "id": "en:381"
+        },
+        "/18x25x1-merv-8": {
+          "to": "/categories/18x25x1-merv-8",
+          "type": "category",
+          "id": "en:350"
+        },
+        "/18x25x2": {
+          "to": "/categories/18x25x2",
+          "type": "category",
+          "id": "en:158"
+        },
+        "/18x25x2-furnace-filter": {
+          "to": "/products/18x25x2-furnace-filter",
+          "type": "product",
+          "id": "en:102"
+        },
+        "/18x25x2-furnace-filter-merv-11": {
+          "to": "/products/18x25x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:87"
+        },
+        "/18x25x2-furnace-filter-merv-8": {
+          "to": "/products/18x25x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:507"
+        },
+        "/20-1-4-x-20-3-4-x-5-1-4": {
+          "to": "/categories/20-1-4-x-20-3-4-x-5-1-4",
+          "type": "category",
+          "id": "en:273"
+        },
+        "/20-1-4-x-25-3-8-x-5-1-4": {
+          "to": "/categories/20-1-4-x-25-3-8-x-5-1-4",
+          "type": "category",
+          "id": "en:274"
+        },
+        "/20x20x1": {
+          "to": "/categories/20x20x1",
+          "type": "category",
+          "id": "en:197"
+        },
+        "/20x20x1-charcoal-furnace-filter-12-pack": {
+          "to": "/products/20x20x1-charcoal-furnace-filter-12-pack",
+          "type": "product",
+          "id": "en:553"
+        },
+        "/20x20x1-furnace-filter": {
+          "to": "/products/20x20x1-furnace-filter",
+          "type": "product",
+          "id": "en:299"
+        },
+        "/20x20x1-furnace-filter-merv-11": {
+          "to": "/products/20x20x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:429"
+        },
+        "/20x20x1-furnace-filter-merv-13": {
+          "to": "/products/20x20x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:559"
+        },
+        "/20x20x1-furnace-filter-merv-13-": {
+          "to": "/products/20x20x1-furnace-filter-merv-13-",
+          "type": "product",
+          "id": "en:577"
+        },
+        "/20x20x1-furnace-filter-merv-8": {
+          "to": "/products/20x20x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:430"
+        },
+        "/20x20x1-merv-11": {
+          "to": "/categories/20x20x1-merv-11",
+          "type": "category",
+          "id": "en:319"
+        },
+        "/20x20x1-merv-13": {
+          "to": "/categories/20x20x1-merv-13",
+          "type": "category",
+          "id": "en:371"
+        },
+        "/20x20x1-merv-8": {
+          "to": "/categories/20x20x1-merv-8",
+          "type": "category",
+          "id": "en:351"
+        },
+        "/20x20x2-furnace-filter": {
+          "to": "/categories/20x20x2-furnace-filter",
+          "type": "category",
+          "id": "en:160"
+        },
+        "/20x20x2-furnace-filter-camfil-30-30": {
+          "to": "/products/20x20x2-furnace-filter-camfil-30-30",
+          "type": "product",
+          "id": "en:444"
+        },
+        "/20x20x2-furnace-filter-merv-11": {
+          "to": "/products/20x20x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:445"
+        },
+        "/20x20x2-furnace-filter-merv-13": {
+          "to": "/products/20x20x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:446"
+        },
+        "/20x20x2-furnace-filter-merv-13-": {
+          "to": "/products/20x20x2-furnace-filter-merv-13-",
+          "type": "product",
+          "id": "en:561"
+        },
+        "/20x20x2-furnace-filter-merv-8": {
+          "to": "/products/20x20x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:366"
+        },
+        "/20x20x2-furnace-filter-merv-8-": {
+          "to": "/products/20x20x2-furnace-filter-merv-8-",
+          "type": "product",
+          "id": "en:565"
+        },
+        "/20x20x2-merv-11": {
+          "to": "/categories/20x20x2-merv-11",
+          "type": "category",
+          "id": "en:326"
+        },
+        "/20x20x2-merv-13": {
+          "to": "/categories/20x20x2-merv-13",
+          "type": "category",
+          "id": "en:338"
+        },
+        "/20x20x2-merv-8": {
+          "to": "/categories/20x20x2-merv-8",
+          "type": "category",
+          "id": "en:359"
+        },
+        "/20x20x4-air-filter": {
+          "to": "/products/20x20x4-air-filter",
+          "type": "product",
+          "id": "en:354"
+        },
+        "/20x20x4-air-filter-merv-11": {
+          "to": "/products/20x20x4-air-filter-merv-11",
+          "type": "product",
+          "id": "en:420"
+        },
+        "/20x20x4-air-filter-merv-13": {
+          "to": "/products/20x20x4-air-filter-merv-13",
+          "type": "product",
+          "id": "en:421"
+        },
+        "/20x20x4-air-filter-merv-8": {
+          "to": "/products/20x20x4-air-filter-merv-8",
+          "type": "product",
+          "id": "en:419"
+        },
+        "/20x20x4-furnace-filter": {
+          "to": "/categories/20x20x4-furnace-filter",
+          "type": "category",
+          "id": "en:161"
+        },
+        "/20x20x4-furnace-filter-merv-13": {
+          "to": "/products/20x20x4-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:558"
+        },
+        "/20x20x4-merv-11": {
+          "to": "/categories/20x20x4-merv-11",
+          "type": "category",
+          "id": "en:308"
+        },
+        "/20x20x4-merv-13": {
+          "to": "/categories/20x20x4-merv-13",
+          "type": "category",
+          "id": "en:333"
+        },
+        "/20x20x4-merv-8": {
+          "to": "/categories/20x20x4-merv-8",
+          "type": "category",
+          "id": "en:364"
+        },
+        "/20x20x5-furnace-filter": {
+          "to": "/categories/20x20x5-furnace-filter",
+          "type": "category",
+          "id": "en:162"
+        },
+        "/20x24x1": {
+          "to": "/categories/20x24x1",
+          "type": "category",
+          "id": "en:163"
+        },
+        "/20x24x1-furnace-filter": {
+          "to": "/products/20x24x1-furnace-filter",
+          "type": "product",
+          "id": "en:259"
+        },
+        "/20x24x1-furnace-filter-merv-11": {
+          "to": "/products/20x24x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:461"
+        },
+        "/20x24x1-furnace-filter-merv-13": {
+          "to": "/products/20x24x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:586"
+        },
+        "/20x24x1-furnace-filter-merv-8": {
+          "to": "/products/20x24x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:307"
+        },
+        "/20x24x1-merv-11": {
+          "to": "/categories/20x24x1-merv-11",
+          "type": "category",
+          "id": "en:320"
+        },
+        "/20x24x1-merv-13": {
+          "to": "/categories/20x24x1-merv-13",
+          "type": "category",
+          "id": "en:379"
+        },
+        "/20x24x1-merv-8": {
+          "to": "/categories/20x24x1-merv-8",
+          "type": "category",
+          "id": "en:352"
+        },
+        "/20x24x2": {
+          "to": "/categories/20x24x2",
+          "type": "category",
+          "id": "en:164"
+        },
+        "/20x24x2-furnace-filter": {
+          "to": "/products/20x24x2-furnace-filter",
+          "type": "product",
+          "id": "en:118"
+        },
+        "/20x24x2-furnace-filter-merv-11": {
+          "to": "/products/20x24x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:89"
+        },
+        "/20x24x2-furnace-filter-merv-13": {
+          "to": "/products/20x24x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:519"
+        },
+        "/20x24x2-furnace-filter-merv-8": {
+          "to": "/products/20x24x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:503"
+        },
+        "/20x24x2-furnace-filter-merv-8-aaf": {
+          "to": "/products/20x24x2-furnace-filter-merv-8-aaf",
+          "type": "product",
+          "id": "en:664"
+        },
+        "/20x24x2-merv-13": {
+          "to": "/categories/20x24x2-merv-13",
+          "type": "category",
+          "id": "en:403"
+        },
+        "/20x24x4": {
+          "to": "/categories/20x24x4",
+          "type": "category",
+          "id": "en:165"
+        },
+        "/20x24x4-air-filter-merv-11": {
+          "to": "/products/20x24x4-air-filter-merv-11",
+          "type": "product",
+          "id": "en:526"
+        },
+        "/20x24x4-air-filter-merv-13": {
+          "to": "/products/20x24x4-air-filter-merv-13",
+          "type": "product",
+          "id": "en:529"
+        },
+        "/20x24x4-furnace-filter": {
+          "to": "/products/20x24x4-furnace-filter",
+          "type": "product",
+          "id": "en:377"
+        },
+        "/20x24x4-furnace-filter-merv-8": {
+          "to": "/products/20x24x4-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:456"
+        },
+        "/20x24x4-merv-13": {
+          "to": "/categories/20x24x4-merv-13",
+          "type": "category",
+          "id": "en:393"
+        },
+        "/20x25x1": {
+          "to": "/categories/20x25x1",
+          "type": "category",
+          "id": "en:198"
+        },
+        "/20x25x1-furnace-filter": {
+          "to": "/products/20x25x1-furnace-filter",
+          "type": "product",
+          "id": "en:358"
+        },
+        "/20x25x1-furnace-filter-merv-11": {
+          "to": "/products/20x25x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:433"
+        },
+        "/20x25x1-furnace-filter-merv-13": {
+          "to": "/products/20x25x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:578"
+        },
+        "/20x25x1-furnace-filter-merv-8": {
+          "to": "/products/20x25x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:434"
+        },
+        "/20x25x1-furnace-filter-merv-8-aaf": {
+          "to": "/products/20x25x1-furnace-filter-merv-8-aaf",
+          "type": "product",
+          "id": "en:687"
+        },
+        "/20x25x1-merv-11": {
+          "to": "/categories/20x25x1-merv-11",
+          "type": "category",
+          "id": "en:321"
+        },
+        "/20x25x1-merv-13": {
+          "to": "/categories/20x25x1-merv-13",
+          "type": "category",
+          "id": "en:372"
+        },
+        "/20x25x1-merv-8": {
+          "to": "/categories/20x25x1-merv-8",
+          "type": "category",
+          "id": "en:353"
+        },
+        "/20x25x2": {
+          "to": "/categories/20x25x2",
+          "type": "category",
+          "id": "en:167"
+        },
+        "/20x25x2-air-filter-merv-13": {
+          "to": "/products/20x25x2-air-filter-merv-13",
+          "type": "product",
+          "id": "en:447"
+        },
+        "/20x25x2-furnace-filter": {
+          "to": "/products/20x25x2-furnace-filter",
+          "type": "product",
+          "id": "en:99"
+        },
+        "/20x25x2-furnace-filter-merv-11": {
+          "to": "/products/20x25x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:90"
+        },
+        "/20x25x2-furnace-filter-merv-8": {
+          "to": "/products/20x25x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:448"
+        },
+        "/20x25x2-furnace-filter-merv-8-": {
+          "to": "/products/20x25x2-furnace-filter-merv-8-",
+          "type": "product",
+          "id": "en:603"
+        },
+        "/20x25x2-merv-11": {
+          "to": "/categories/20x25x2-merv-11",
+          "type": "category",
+          "id": "en:327"
+        },
+        "/20x25x2-merv-13": {
+          "to": "/categories/20x25x2-merv-13",
+          "type": "category",
+          "id": "en:339"
+        },
+        "/20x25x2-merv-8": {
+          "to": "/categories/20x25x2-merv-8",
+          "type": "category",
+          "id": "en:360"
+        },
+        "/20x25x4-camfil-30-30": {
+          "to": "/products/20x25x4-camfil-30-30",
+          "type": "product",
+          "id": "en:425"
+        },
+        "/20x25x4-furnace-filter": {
+          "to": "/categories/20x25x4-furnace-filter",
+          "type": "category",
+          "id": "en:168"
+        },
+        "/20x25x4-furnace-filter-merv-11": {
+          "to": "/products/20x25x4-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:424"
+        },
+        "/20x25x4-furnace-filter-merv-13": {
+          "to": "/products/20x25x4-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:426"
+        },
+        "/20x25x4-furnace-filter-merv-8": {
+          "to": "/products/20x25x4-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:54"
+        },
+        "/20x25x4-merv-11": {
+          "to": "/categories/20x25x4-merv-11",
+          "type": "category",
+          "id": "en:309"
+        },
+        "/20x25x4-merv-13": {
+          "to": "/categories/20x25x4-merv-13",
+          "type": "category",
+          "id": "en:334"
+        },
+        "/20x25x4-merv-8": {
+          "to": "/categories/20x25x4-merv-8",
+          "type": "category",
+          "id": "en:365"
+        },
+        "/20x25x5-furnace-filter": {
+          "to": "/categories/20x25x5-furnace-filter",
+          "type": "category",
+          "id": "en:169"
+        },
+        "/20x30x1": {
+          "to": "/categories/20x30x1",
+          "type": "category",
+          "id": "en:170"
+        },
+        "/20x30x1-furnace-filter": {
+          "to": "/products/20x30x1-furnace-filter",
+          "type": "product",
+          "id": "en:273"
+        },
+        "/20x30x2": {
+          "to": "/categories/20x30x2",
+          "type": "category",
+          "id": "en:171"
+        },
+        "/20x30x2-furnace-filter": {
+          "to": "/products/20x30x2-furnace-filter",
+          "type": "product",
+          "id": "en:116"
+        },
+        "/20x30x2-furnace-filter-merv-8": {
+          "to": "/products/20x30x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:510"
+        },
+        "/22x22x1": {
+          "to": "/categories/22x22x1",
+          "type": "category",
+          "id": "en:122"
+        },
+        "/22x22x1-furnace-filter-merv-11": {
+          "to": "/products/22x22x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:472"
+        },
+        "/22x22x1-furnace-filter-merv-13": {
+          "to": "/products/22x22x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:595"
+        },
+        "/22x22x1-furnace-filter-merv-8": {
+          "to": "/products/22x22x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:497"
+        },
+        "/22x22x1-furnace-filter-merv-8-12-pack": {
+          "to": "/products/22x22x1-furnace-filter-merv-8-12-pack",
+          "type": "product",
+          "id": "en:274"
+        },
+        "/22x22x1-merv-13": {
+          "to": "/categories/22x22x1-merv-13",
+          "type": "category",
+          "id": "en:388"
+        },
+        "/24x24x1": {
+          "to": "/categories/24x24x1",
+          "type": "category",
+          "id": "en:172"
+        },
+        "/24x24x1-furnace-filter": {
+          "to": "/products/24x24x1-furnace-filter",
+          "type": "product",
+          "id": "en:254"
+        },
+        "/24x24x1-furnace-filter-merv-11": {
+          "to": "/products/24x24x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:302"
+        },
+        "/24x24x1-furnace-filter-merv-13": {
+          "to": "/products/24x24x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:579"
+        },
+        "/24x24x1-furnace-filter-merv-8": {
+          "to": "/products/24x24x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:279"
+        },
+        "/24x24x1-merv-13": {
+          "to": "/categories/24x24x1-merv-13",
+          "type": "category",
+          "id": "en:373"
+        },
+        "/24x24x2": {
+          "to": "/categories/24x24x2",
+          "type": "category",
+          "id": "en:173"
+        },
+        "/24x24x2-furnace-filter": {
+          "to": "/products/24x24x2-furnace-filter",
+          "type": "product",
+          "id": "en:115"
+        },
+        "/24x24x2-furnace-filter-merv-11": {
+          "to": "/products/24x24x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:453"
+        },
+        "/24x24x2-furnace-filter-merv-13": {
+          "to": "/products/24x24x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:454"
+        },
+        "/24x24x2-furnace-filter-merv-8": {
+          "to": "/products/24x24x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:452"
+        },
+        "/24x24x2-merv-11": {
+          "to": "/categories/24x24x2-merv-11",
+          "type": "category",
+          "id": "en:328"
+        },
+        "/24x24x2-merv-13": {
+          "to": "/categories/24x24x2-merv-13",
+          "type": "category",
+          "id": "en:340"
+        },
+        "/24x24x2-merv-8": {
+          "to": "/categories/24x24x2-merv-8",
+          "type": "category",
+          "id": "en:361"
+        },
+        "/24x24x4-air-filter": {
+          "to": "/products/24x24x4-air-filter",
+          "type": "product",
+          "id": "en:55"
+        },
+        "/24x24x4-air-filter-merv-11": {
+          "to": "/products/24x24x4-air-filter-merv-11",
+          "type": "product",
+          "id": "en:438"
+        },
+        "/24x24x4-air-filter-merv-13": {
+          "to": "/products/24x24x4-air-filter-merv-13",
+          "type": "product",
+          "id": "en:440"
+        },
+        "/24x24x4-air-filter-merv-8": {
+          "to": "/products/24x24x4-air-filter-merv-8",
+          "type": "product",
+          "id": "en:439"
+        },
+        "/24x24x4-furnace-filter": {
+          "to": "/categories/24x24x4-furnace-filter",
+          "type": "category",
+          "id": "en:176"
+        },
+        "/24x24x4-merv-11": {
+          "to": "/categories/24x24x4-merv-11",
+          "type": "category",
+          "id": "en:310"
+        },
+        "/24x24x4-merv-13": {
+          "to": "/categories/24x24x4-merv-13",
+          "type": "category",
+          "id": "en:335"
+        },
+        "/24x24x4-merv-8": {
+          "to": "/categories/24x24x4-merv-8",
+          "type": "category",
+          "id": "en:366"
+        },
+        "/25x25x1": {
+          "to": "/categories/25x25x1",
+          "type": "category",
+          "id": "en:174"
+        },
+        "/25x25x1-furnace-filter": {
+          "to": "/products/25x25x1-furnace-filter",
+          "type": "product",
+          "id": "en:275"
+        },
+        "/25x25x1-furnace-filter-merv-11": {
+          "to": "/products/25x25x1-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:473"
+        },
+        "/25x25x1-furnace-filter-merv-13": {
+          "to": "/products/25x25x1-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:596"
+        },
+        "/25x25x1-furnace-filter-merv-8": {
+          "to": "/products/25x25x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:498"
+        },
+        "/25x25x1-merv-13": {
+          "to": "/categories/25x25x1-merv-13",
+          "type": "category",
+          "id": "en:389"
+        },
+        "/25x25x2": {
+          "to": "/categories/25x25x2",
+          "type": "category",
+          "id": "en:175"
+        },
+        "/25x25x2-furnace-filter": {
+          "to": "/products/25x25x2-furnace-filter",
+          "type": "product",
+          "id": "en:76"
+        },
+        "/25x25x2-furnace-filter-merv-11": {
+          "to": "/products/25x25x2-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:74"
+        },
+        "/25x25x2-furnace-filter-merv-13": {
+          "to": "/products/25x25x2-furnace-filter-merv-13",
+          "type": "product",
+          "id": "en:523"
+        },
+        "/25x25x2-furnace-filter-merv-8": {
+          "to": "/products/25x25x2-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:509"
+        },
+        "/25x25x2-merv-13": {
+          "to": "/categories/25x25x2-merv-13",
+          "type": "category",
+          "id": "en:404"
+        },
+        "/25x25x4": {
+          "to": "/categories/25x25x4",
+          "type": "category",
+          "id": "en:406"
+        },
+        "/25x25x4-furnace-filter-camfil-30-30": {
+          "to": "/products/25x25x4-furnace-filter-camfil-30-30",
+          "type": "product",
+          "id": "en:536"
+        },
+        "/25x29x4": {
+          "to": "/categories/25x29x4",
+          "type": "category",
+          "id": "en:268"
+        },
+        "/25x29x4-furnace-filter-camfil-30-30": {
+          "to": "/products/25x29x4-furnace-filter-camfil-30-30",
+          "type": "product",
+          "id": "en:397"
+        },
+        "/7x20x1": {
+          "to": "/categories/7x20x1",
+          "type": "category",
+          "id": "en:98"
+        },
+        "/7x20x1-furnace-filter": {
+          "to": "/products/7x20x1-furnace-filter",
+          "type": "product",
+          "id": "en:378"
+        },
+        "/7x20x1-furnace-filter-merv-8": {
+          "to": "/products/7x20x1-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:496"
+        },
+        "/990-13-evaporator-pad": {
+          "to": "/products/990-13-evaporator-pad",
+          "type": "product",
+          "id": "en:550"
+        },
+        "/account.php": {
+          "to": "/account/orders",
+          "type": "other"
+        },
+        "/air-purifiers": {
+          "to": "/categories/air-purifiers",
+          "type": "category",
+          "id": "en:279"
+        },
+        "/aldes-612405-air-exchanger-filter": {
+          "to": "/products/aldes-612405-air-exchanger-filter",
+          "type": "product",
+          "id": "en:644"
+        },
+        "/aldes-612409-merv-6-air-exchanger-filter": {
+          "to": "/products/aldes-612409-merv-6-air-exchanger-filter",
+          "type": "product",
+          "id": "en:636"
+        },
+        "/aldes-612410-merv-13-air-exchanger-filter": {
+          "to": "/products/aldes-612410-merv-13-air-exchanger-filter",
+          "type": "product",
+          "id": "en:637"
+        },
+        "/aprilaire-10-water-panel": {
+          "to": "/products/aprilaire-10-water-panel",
+          "type": "product",
+          "id": "en:683"
+        },
+        "/aprilaire-35-water-panel-3-pack": {
+          "to": "/products/aprilaire-35-water-panel-3-pack",
+          "type": "product",
+          "id": "en:241"
+        },
+        "/aprilaire-water-panel-1": {
+          "to": "/categories/aprilaire-water-panel-1",
+          "type": "category",
+          "id": "en:293"
+        },
+        "/camfil-dual-9": {
+          "to": "/products/camfil-dual-9",
+          "type": "product",
+          "id": "en:568"
+        },
+        "/carrier-filxumc081625-furnace-filter-merv-8": {
+          "to": "/products/carrier-filxumc081625-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:692"
+        },
+        "/carrier-filxumc082025-furnace-filter-merv-8": {
+          "to": "/products/carrier-filxumc082025-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:690"
+        },
+        "/carrier-filxumc082425-furnace-filter-merv-8": {
+          "to": "/products/carrier-filxumc082425-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:693"
+        },
+        "/carrier-filxumc112025-furnace-filter-merv-11": {
+          "to": "/products/carrier-filxumc112025-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:691"
+        },
+        "/carrier-filxxcar0016-furnace-filter-merv-8": {
+          "to": "/products/carrier-filxxcar0016-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:651"
+        },
+        "/carrier-filxxcar0020-furnace-filter-merv-8": {
+          "to": "/products/carrier-filxxcar0020-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:652"
+        },
+        "/carrier-filxxcar0024-furnace-filter-merv-8": {
+          "to": "/products/carrier-filxxcar0024-furnace-filter-merv-8",
+          "type": "product",
+          "id": "en:653"
+        },
+        "/carrier-filxxcar0116-furnace-filter-merv-11": {
+          "to": "/products/carrier-filxxcar0116-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:654"
+        },
+        "/carrier-filxxcar0120-furnace-filter-merv-11": {
+          "to": "/products/carrier-filxxcar0120-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:655"
+        },
+        "/carrier-filxxcar0124-furnace-filter-merv-11": {
+          "to": "/products/carrier-filxxcar0124-furnace-filter-merv-11",
+          "type": "product",
+          "id": "en:656"
+        },
+        "/cart.php": {
+          "to": "/cart",
+          "type": "other"
+        },
+        "/charcoal-furnace-filter": {
+          "to": "/categories/charcoal-furnace-filter",
+          "type": "category",
+          "id": "en:282"
+        },
+        "/charcoal-furnace-filter-by-camfil": {
+          "to": "/products/charcoal-furnace-filter-by-camfil",
+          "type": "product",
+          "id": "en:554"
+        },
+        "/checkout.php": {
+          "to": "/cart",
+          "type": "other"
+        },
+        "/city-m-air-purifier": {
+          "to": "/products/city-m-air-purifier",
+          "type": "product",
+          "id": "en:546"
+        },
+        "/city-m-replacement-filters-set": {
+          "to": "/products/city-m-replacement-filters-set",
+          "type": "product",
+          "id": "en:548"
+        },
+        "/dmh4-0400-hepa-filter": {
+          "to": "/products/dmh4-0400-hepa-filter",
+          "type": "product",
+          "id": "en:680"
+        },
+        "/dmh4-0810-carbon-prefilters": {
+          "to": "/products/dmh4-0810-carbon-prefilters",
+          "type": "product",
+          "id": "en:679"
+        },
+        "/dmh4-0855-prefilters": {
+          "to": "/products/dmh4-0855-prefilters",
+          "type": "product",
+          "id": "en:657"
+        },
+        "/fantech-40187-replacement-filter": {
+          "to": "/products/fantech-40187-replacement-filter",
+          "type": "product",
+          "id": "en:621"
+        },
+        "/fantech-40193-16x16x2-hepa-replacement-filter": {
+          "to": "/products/fantech-40193-16x16x2-hepa-replacement-filter",
+          "type": "product",
+          "id": "en:567"
+        },
+        "/fantech-40195-16x16x2-merv-8-carbon-replacement-filter": {
+          "to": "/products/fantech-40195-16x16x2-merv-8-carbon-replacement-filter",
+          "type": "product",
+          "id": "en:574"
+        },
+        "/fantech-40279-filter-kit-2-filters": {
+          "to": "/products/fantech-40279-filter-kit-2-filters",
+          "type": "product",
+          "id": "en:677"
+        },
+        "/fantech-40390-fb6-merv-13": {
+          "to": "/products/fantech-40390-fb6-merv-13",
+          "type": "product",
+          "id": "en:599"
+        },
+        "/fantech-412447-fml6r-merv-8-replacement-filter": {
+          "to": "/products/fantech-412447-fml6r-merv-8-replacement-filter",
+          "type": "product",
+          "id": "en:604"
+        },
+        "/fantech-414921-replacement-filter-merv-8": {
+          "to": "/products/fantech-414921-replacement-filter-merv-8",
+          "type": "product",
+          "id": "en:611"
+        },
+        "/fantech-414922-replacement-filter-merv-8": {
+          "to": "/products/fantech-414922-replacement-filter-merv-8",
+          "type": "product",
+          "id": "en:610"
+        },
+        "/fantech-414923-replacement-filter-merv-8": {
+          "to": "/products/fantech-414923-replacement-filter-merv-8",
+          "type": "product",
+          "id": "en:609"
+        },
+        "/fantech-414924-replacement-filter-merv-8": {
+          "to": "/products/fantech-414924-replacement-filter-merv-8",
+          "type": "product",
+          "id": "en:600"
+        },
+        "/fantech-414928-replacement-filter-merv-8": {
+          "to": "/products/fantech-414928-replacement-filter-merv-8",
+          "type": "product",
+          "id": "en:608"
+        },
+        "/fantech-414933-merv-8-replacement-filter-kit": {
+          "to": "/products/fantech-414933-merv-8-replacement-filter-kit",
+          "type": "product",
+          "id": "en:696"
+        },
+        "/fantech-463046-merv-8-carbon-replacement-filter": {
+          "to": "/products/fantech-463046-merv-8-carbon-replacement-filter",
+          "type": "product",
+          "id": "en:645"
+        },
+        "/fantech-463048-hepa-replacement-filter": {
+          "to": "/products/fantech-463048-hepa-replacement-filter",
+          "type": "product",
+          "id": "en:643"
+        },
+        "/fantech-463943-replacement-filter-merv-8": {
+          "to": "/products/fantech-463943-replacement-filter-merv-8",
+          "type": "product",
+          "id": "en:612"
+        },
+        "/fantech-463945-replacement-filter-merv-8": {
+          "to": "/products/fantech-463945-replacement-filter-merv-8",
+          "type": "product",
+          "id": "en:613"
+        },
+        "/fantech-aev-80-414767-merv-13-filter-replacement-kit": {
+          "to": "/products/fantech-aev-80-414767-merv-13-filter-replacement-kit",
+          "type": "product",
+          "id": "en:614"
+        },
+        "/fantech-aev-80-445222-merv-8-replacement-filter": {
+          "to": "/products/fantech-aev-80-445222-merv-8-replacement-filter",
+          "type": "product",
+          "id": "en:618"
+        },
+        "/fantech-atmo-150-463944-replacement-filter": {
+          "to": "/products/fantech-atmo-150-463944-replacement-filter",
+          "type": "product",
+          "id": "en:615"
+        },
+        "/fantech-atmo-200h-e-463946-merv-13-replacement-filter": {
+          "to": "/products/fantech-atmo-200h-e-463946-merv-13-replacement-filter",
+          "type": "product",
+          "id": "en:616"
+        },
+        "/fantech-hero-120h-428525-merv-8-filter-replacement-kit": {
+          "to": "/products/fantech-hero-120h-428525-merv-8-filter-replacement-kit",
+          "type": "product",
+          "id": "en:572"
+        },
+        "/fantech-hero-150h-428526-merv-8-filter-replacement-kit-2-filters": {
+          "to": "/products/fantech-hero-150h-428526-merv-8-filter-replacement-kit-2-filters",
+          "type": "product",
+          "id": "en:556"
+        },
+        "/fantech-hero-150h-428548-filter-replacement-kit": {
+          "to": "/products/fantech-hero-150h-428548-filter-replacement-kit",
+          "type": "product",
+          "id": "en:571"
+        },
+        "/fantech-hero-150h-428551-hepa-filter": {
+          "to": "/products/fantech-hero-150h-428551-hepa-filter",
+          "type": "product",
+          "id": "en:597"
+        },
+        "/fantech-hero-200h-and-250h-428527-merv-8": {
+          "to": "/products/fantech-hero-200h-and-250h-428527-merv-8",
+          "type": "product",
+          "id": "en:573"
+        },
+        "/fantech-hero-200h-and-250h-428549-merv-13-filter": {
+          "to": "/products/fantech-hero-200h-and-250h-428549-merv-13-filter",
+          "type": "product",
+          "id": "en:598"
+        },
+        "/fantech-hero-200h-and-250h-428552-hepa-filter": {
+          "to": "/products/fantech-hero-200h-and-250h-428552-hepa-filter",
+          "type": "product",
+          "id": "en:606"
+        },
+        "/fantech-vhr-200r-ec-422679-replacement-filter-merv-13": {
+          "to": "/products/fantech-vhr-200r-ec-422679-replacement-filter-merv-13",
+          "type": "product",
+          "id": "en:617"
+        },
+        "/fantech-washable-filter-402041-merv-3": {
+          "to": "/products/fantech-washable-filter-402041-merv-3",
+          "type": "product",
+          "id": "en:623"
+        },
+        "/fantech-washable-filter-40327-merv-3": {
+          "to": "/products/fantech-washable-filter-40327-merv-3",
+          "type": "product",
+          "id": "en:625"
+        },
+        "/fantech-washable-filter-40328": {
+          "to": "/products/fantech-washable-filter-40328",
+          "type": "product",
+          "id": "en:632"
+        },
+        "/fantech-washable-filter-40482-merv-3": {
+          "to": "/products/fantech-washable-filter-40482-merv-3",
+          "type": "product",
+          "id": "en:634"
+        },
+        "/fantech-washable-filter-405116-merv-3": {
+          "to": "/products/fantech-washable-filter-405116-merv-3",
+          "type": "product",
+          "id": "en:635"
+        },
+        "/fantech-washable-filter-405577-merv-3": {
+          "to": "/products/fantech-washable-filter-405577-merv-3",
+          "type": "product",
+          "id": "en:622"
+        },
+        "/fantech-washable-filter-410779-rcf80": {
+          "to": "/products/fantech-washable-filter-410779-rcf80",
+          "type": "product",
+          "id": "en:628"
+        },
+        "/fantech-washable-filter-414644-merv-6": {
+          "to": "/products/fantech-washable-filter-414644-merv-6",
+          "type": "product",
+          "id": "en:619"
+        },
+        "/fantech-washable-filter-414645": {
+          "to": "/products/fantech-washable-filter-414645",
+          "type": "product",
+          "id": "en:605"
+        },
+        "/fantech-washable-filter-414646-merv-6": {
+          "to": "/products/fantech-washable-filter-414646-merv-6",
+          "type": "product",
+          "id": "en:620"
+        },
+        "/fantech-washable-filter-414647": {
+          "to": "/products/fantech-washable-filter-414647",
+          "type": "product",
+          "id": "en:582"
+        },
+        "/fantech-washable-filter-414648-merv-6": {
+          "to": "/products/fantech-washable-filter-414648-merv-6",
+          "type": "product",
+          "id": "en:639"
+        },
+        "/fantech-washable-filter-422580-merv-3": {
+          "to": "/products/fantech-washable-filter-422580-merv-3",
+          "type": "product",
+          "id": "en:640"
+        },
+        "/fantech-washable-filter-428519-merv-3": {
+          "to": "/products/fantech-washable-filter-428519-merv-3",
+          "type": "product",
+          "id": "en:641"
+        },
+        "/fantech-washable-filter-428520": {
+          "to": "/products/fantech-washable-filter-428520",
+          "type": "product",
+          "id": "en:631"
+        },
+        "/fantech-washable-filter-428521-merv-3": {
+          "to": "/products/fantech-washable-filter-428521-merv-3",
+          "type": "product",
+          "id": "en:642"
+        },
+        "/fc100a1003": {
+          "to": "/products/fc100a1003",
+          "type": "product",
+          "id": "en:343"
+        },
+        "/fc100a1011": {
+          "to": "/categories/fc100a1011",
+          "type": "category",
+          "id": "en:275"
+        },
+        "/fc100a1029": {
+          "to": "/products/fc100a1029",
+          "type": "product",
+          "id": "en:345"
+        },
+        "/fc100a1029-honeywell": {
+          "to": "/categories/fc100a1029-honeywell",
+          "type": "category",
+          "id": "en:276"
+        },
+        "/fc100a1037": {
+          "to": "/products/fc100a1037",
+          "type": "product",
+          "id": "en:346"
+        },
+        "/fc100a1037-honeywell": {
+          "to": "/categories/fc100a1037-honeywell",
+          "type": "category",
+          "id": "en:277"
+        },
+        "/fc200e1003-merv-13-honeywell-16x20x4": {
+          "to": "/products/fc200e1003-merv-13-honeywell-16x20x4",
+          "type": "product",
+          "id": "en:633"
+        },
+        "/fc200e1011-merv-13-honeywell-20x20x4": {
+          "to": "/products/fc200e1011-merv-13-honeywell-20x20x4",
+          "type": "product",
+          "id": "en:629"
+        },
+        "/fc200e1029-merv-13-honeywell-16x25x4": {
+          "to": "/products/fc200e1029-merv-13-honeywell-16x25x4",
+          "type": "product",
+          "id": "en:626"
+        },
+        "/fc200e1037-merv-13-honeywell-20x25x4": {
+          "to": "/products/fc200e1037-merv-13-honeywell-20x25x4",
+          "type": "product",
+          "id": "en:627"
+        },
+        "/filtrete-16x25x1": {
+          "to": "/products/filtrete-16x25x1",
+          "type": "product",
+          "id": "en:630"
+        },
+        "/francais": {
+          "to": "/categories/francais",
+          "type": "category",
+          "id": "en:408"
+        },
+        "/furnace-filter-16x25x4": {
+          "to": "/products/furnace-filter-16x25x4",
+          "type": "product",
+          "id": "en:42"
+        },
+        "/furnace-filter-size-chart": {
+          "to": "/categories/furnace-filter-size-chart",
+          "type": "category",
+          "id": "en:83"
+        },
+        "/furnace-filters-14x25x1": {
+          "to": "/products/furnace-filters-14x25x1",
+          "type": "product",
+          "id": "en:304"
+        },
+        "/furnace-filters-14x25x1-merv-11": {
+          "to": "/products/furnace-filters-14x25x1-merv-11",
+          "type": "product",
+          "id": "en:459"
+        },
+        "/furnace-filters-16x20x1": {
+          "to": "/products/furnace-filters-16x20x1",
+          "type": "product",
+          "id": "en:422"
+        },
+        "/furnace-filters-16x20x1-camfil-ap-3": {
+          "to": "/products/furnace-filters-16x20x1-camfil-ap-3",
+          "type": "product",
+          "id": "en:348"
+        },
+        "/furnace-filters-16x25x1": {
+          "to": "/categories/furnace-filters-16x25x1",
+          "type": "category",
+          "id": "en:196"
+        },
+        "/furnace-humidifier-filter": {
+          "to": "/categories/furnace-humidifier-filter",
+          "type": "category",
+          "id": "en:289"
+        },
+        "/g1-1056-filter": {
+          "to": "/products/g1-1056-filter",
+          "type": "product",
+          "id": "en:601"
+        },
+        "/g8-1056-filter": {
+          "to": "/products/g8-1056-filter",
+          "type": "product",
+          "id": "en:607"
+        },
+        "/generalaire-16x25x5": {
+          "to": "/products/generalaire-16x25x5",
+          "type": "product",
+          "id": "en:543"
+        },
+        "/generalaire-20x20x5": {
+          "to": "/products/generalaire-20x20x5",
+          "type": "product",
+          "id": "en:544"
+        },
+        "/generalaire-20x25x5": {
+          "to": "/products/generalaire-20x25x5",
+          "type": "product",
+          "id": "en:542"
+        },
+        "/generalaire-humidifier-filter": {
+          "to": "/categories/generalaire-humidifier-filter",
+          "type": "category",
+          "id": "en:291"
+        },
+        "/greentek-463044-replacement-filter-kit": {
+          "to": "/products/greentek-463044-replacement-filter-kit",
+          "type": "product",
+          "id": "en:673"
+        },
+        "/greentek-463163-synthetic-media-air-exchanger-filter": {
+          "to": "/products/greentek-463163-synthetic-media-air-exchanger-filter",
+          "type": "product",
+          "id": "en:646"
+        },
+        "/greentek-fantech-washable-filter-463939-merv-3": {
+          "to": "/products/greentek-fantech-washable-filter-463939-merv-3",
+          "type": "product",
+          "id": "en:684"
+        },
+        "/hc22a1007-honeywell-humidifier-filters": {
+          "to": "/products/hc22a1007-honeywell-humidifier-filters",
+          "type": "product",
+          "id": "en:624"
+        },
+        "/hc22e1003": {
+          "to": "/products/hc22e1003",
+          "type": "product",
+          "id": "en:40"
+        },
+        "/hc26e1004": {
+          "to": "/products/hc26e1004",
+          "type": "product",
+          "id": "en:41"
+        },
+        "/honeywell-filter-fc100a1011": {
+          "to": "/products/honeywell-filter-fc100a1011",
+          "type": "product",
+          "id": "en:344"
+        },
+        "/honeywell-furnace-humidifier-filter": {
+          "to": "/categories/honeywell-furnace-humidifier-filter",
+          "type": "category",
+          "id": "en:290"
+        },
+        "/humidifier-pads": {
+          "to": "/categories/humidifier-pads",
+          "type": "category",
+          "id": "en:187"
+        },
+        "/index.php": {
+          "to": "/",
+          "type": "other"
+        },
+        "/lifebreath-65-160-polyester-merv6-washable-filters": {
+          "to": "/products/lifebreath-65-160-polyester-merv6-washable-filters",
+          "type": "product",
+          "id": "en:647"
+        },
+        "/lifebreath-65-161-polyester-merv6-washable-kit": {
+          "to": "/products/lifebreath-65-161-polyester-merv6-washable-kit",
+          "type": "product",
+          "id": "en:648"
+        },
+        "/lifebreath-65-299r-replacement-tfp-collector": {
+          "to": "/products/lifebreath-65-299r-replacement-tfp-collector",
+          "type": "product",
+          "id": "en:698"
+        },
+        "/lifebreath-65-502r-hepa-replacement-filter": {
+          "to": "/products/lifebreath-65-502r-hepa-replacement-filter",
+          "type": "product",
+          "id": "en:649"
+        },
+        "/lifebreath-65-503r-replacement-tfp-collector": {
+          "to": "/products/lifebreath-65-503r-replacement-tfp-collector",
+          "type": "product",
+          "id": "en:650"
+        },
+        "/login.php": {
+          "to": "/account/orders",
+          "type": "other"
+        },
+        "/m0-1056-filter": {
+          "to": "/products/m0-1056-filter",
+          "type": "product",
+          "id": "en:541"
+        },
+        "/m1-1056": {
+          "to": "/products/m1-1056",
+          "type": "product",
+          "id": "en:36"
+        },
+        "/m1-1056-filter": {
+          "to": "/products/m1-1056-filter",
+          "type": "product",
+          "id": "en:538"
+        },
+        "/m1-1056-furnace-filter": {
+          "to": "/categories/m1-1056-furnace-filter",
+          "type": "category",
+          "id": "en:271"
+        },
+        "/m2-1056": {
+          "to": "/products/m2-1056",
+          "type": "product",
+          "id": "en:37"
+        },
+        "/m2-1056-filter": {
+          "to": "/products/m2-1056-filter",
+          "type": "product",
+          "id": "en:539"
+        },
+        "/m8-1056": {
+          "to": "/products/m8-1056",
+          "type": "product",
+          "id": "en:34"
+        },
+        "/m8-1056-filter": {
+          "to": "/products/m8-1056-filter",
+          "type": "product",
+          "id": "en:540"
+        },
+        "/merv-11-filter": {
+          "to": "/categories/merv-11-filter",
+          "type": "category",
+          "id": "en:283"
+        },
+        "/merv-13-filter": {
+          "to": "/categories/merv-13-filter",
+          "type": "category",
+          "id": "en:287"
+        },
+        "/merv-8-filter": {
+          "to": "/categories/merv-8-filter",
+          "type": "category",
+          "id": "en:342"
+        },
+        "/merv-9-filter": {
+          "to": "/categories/merv-9-filter",
+          "type": "category",
+          "id": "en:369"
+        },
+        "/reservepro-generalaire-ga35-vapor-pad": {
+          "to": "/products/reservepro-generalaire-ga35-vapor-pad",
+          "type": "product",
+          "id": "en:570"
+        },
+        "/sitemap.php": {
+          "to": "/sitemap.xml",
+          "type": "other"
+        },
+        "/venmar-air-exchanger-filter": {
+          "to": "/products/venmar-air-exchanger-filter",
+          "type": "product",
+          "id": "en:39"
+        },
+        "/venmar-x-series-hepa-21996-air-exchanger-filter": {
+          "to": "/products/venmar-x-series-hepa-21996-air-exchanger-filter",
+          "type": "product",
+          "id": "en:658"
+        },
+        "/xmlsitemap.php": {
+          "to": "/sitemap.xml",
+          "type": "other"
+        }
+      },
+      "gone": ["/giftcertificates.php", "/rss.php", "/wishlist.php"]
+    },
+    "www.filtrationmontreal.com": {
+      "locale": "fr",
+      "origin": "https://www.filtrationmontreal.com",
+      "aliases": ["filtrationmontreal.com"],
+      "exact": {
+        "/account.php": {
+          "to": "/compte/commandes",
+          "type": "other"
+        },
+        "/cart.php": {
+          "to": "/panier",
+          "type": "other"
+        },
+        "/checkout.php": {
+          "to": "/panier",
+          "type": "other"
+        },
+        "/index.php": {
+          "to": "/",
+          "type": "other"
+        },
+        "/login.php": {
+          "to": "/compte/commandes",
+          "type": "other"
+        },
+        "/sitemap.php": {
+          "to": "/sitemap.xml",
+          "type": "other"
+        },
+        "/xmlsitemap.php": {
+          "to": "/sitemap.xml",
+          "type": "other"
+        }
+      },
+      "gone": ["/giftcertificates.php", "/rss.php", "/wishlist.php"]
+    }
+  },
+  "coverage": {
+    "byHost": {
+      "www.furnacefilterscanada.com": {
+        "product": {
+          "total": 364,
+          "exact": 331,
+          "gone": 0,
+          "pending": 33,
+          "ignored": 0
+        },
+        "category": {
+          "total": 216,
+          "exact": 176,
+          "gone": 0,
+          "pending": 40,
+          "ignored": 0
+        },
+        "page": {
+          "total": 28,
+          "exact": 0,
+          "gone": 0,
+          "pending": 27,
+          "ignored": 1
+        },
+        "other": {
+          "total": 25,
+          "exact": 7,
+          "gone": 3,
+          "pending": 15,
+          "ignored": 0
+        },
+        "brand": {
+          "total": 14,
+          "exact": 0,
+          "gone": 0,
+          "pending": 14,
+          "ignored": 0
+        },
+        "blog": {
+          "total": 87,
+          "exact": 0,
+          "gone": 0,
+          "pending": 87,
+          "ignored": 0
+        }
+      },
+      "www.filtrationmontreal.com": {
+        "page": {
+          "total": 12,
+          "exact": 0,
+          "gone": 0,
+          "pending": 11,
+          "ignored": 1
+        },
+        "category": {
+          "total": 169,
+          "exact": 0,
+          "gone": 0,
+          "pending": 169,
+          "ignored": 0
+        },
+        "other": {
+          "total": 61,
+          "exact": 7,
+          "gone": 3,
+          "pending": 51,
+          "ignored": 0
+        },
+        "product": {
+          "total": 336,
+          "exact": 0,
+          "gone": 0,
+          "pending": 336,
+          "ignored": 0
+        },
+        "brand": {
+          "total": 14,
+          "exact": 0,
+          "gone": 0,
+          "pending": 14,
+          "ignored": 0
+        },
+        "blog": {
+          "total": 6,
+          "exact": 0,
+          "gone": 0,
+          "pending": 6,
+          "ignored": 0
+        }
+      }
+    }
+  }
+}

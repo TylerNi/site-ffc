@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { CatalogModule } from '../catalog/catalog.module';
+import { SeoModule } from '../seo/seo.module';
 import { ShippingModule } from '../shipping/shipping.module';
 import { AdminController } from './admin.controller';
+import { AdminSeoController } from './admin-seo.controller';
 import { AdminShipstationController } from './admin-shipstation.controller';
 import { AdminTrackingController } from './admin-tracking.controller';
 import { AdminAuditController } from './admin-audit.controller';
@@ -48,7 +50,7 @@ import { StepUpService } from './step-up.service';
  * (tâche 13) : les gardes et l'audit restent ici, la logique reste là-bas.
  */
 @Module({
-  imports: [AuthModule, ShippingModule, CatalogModule],
+  imports: [AuthModule, ShippingModule, CatalogModule, SeoModule],
   controllers: [
     AdminController,
     AdminAuthController,
@@ -57,6 +59,7 @@ import { StepUpService } from './step-up.service';
     AdminInvitationController,
     AdminAuditController,
     AdminDashboardController,
+    AdminSeoController,
     AdminShipstationController,
     AdminTrackingController,
     AdminProductsController,

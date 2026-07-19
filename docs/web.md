@@ -46,6 +46,21 @@ suit la même règle, lue dans `NEXT_PUBLIC_SITE_URL_FR` / `_EN` :
 de production doit s'exécuter avec elles (voir `turbo.json` → `build.env`).
 Un hôte non reconnu (staging, IP directe) reçoit `robots.txt: Disallow: /`
 et un 404 sur `/sitemap.xml` — rien ne s'indexe hors des domaines officiels.
+En production, l'hôte canonique porte le `www.` (comme sur BigCommerce) :
+`NEXT_PUBLIC_SITE_URL_EN=https://www.furnacefilterscanada.com`, l'apex étant
+ramené au `www` par le middleware de redirections.
+
+## Redirections de bascule et vigie 404 (tâche 25)
+
+Le middleware traite d'abord les **redirections 301 de la migration
+BigCommerce** (`src/redirects/`, artefact `redirects.generated.json`
+versionné) avant de déléguer à next-intl : ancienne URL → 301 absolue unique
+(casse, slash, `?sort=`, apex et http compris), chemins abandonnés → 410,
+inconnus → 404. Inerte tant que `REDIRECTS_ENABLED≠1`. Chaque 404 servi est
+signalé à l'API (`src/lib/report-404.ts`, via `after()`) pour le rapport
+quotidien admin. Pipeline complet, règles et régénération :
+`docs/redirections.md`; procédure du jour J : `docs/bascule-dns.md`;
+surveillance : `docs/vigie-seo.md`.
 
 ## SEO technique
 
